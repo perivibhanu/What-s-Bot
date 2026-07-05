@@ -24,7 +24,7 @@ function StudentDetails() {
   const fetchStudent = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:5000/api/students/${id}`, {
+      const res = await axios.get(`https://what-s-bot.onrender.com/api/students/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStudent(res.data);
@@ -44,7 +44,7 @@ function StudentDetails() {
     setSaving(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/api/students/${id}`, editData, {
+      await axios.put(`https://what-s-bot.onrender.com/api/students/${id}`, editData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEditMode(false);
@@ -61,7 +61,7 @@ function StudentDetails() {
     setDeleting(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/students/${id}`, {
+      await axios.delete(`https://what-s-bot.onrender.com/api/students/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       navigate('/students');

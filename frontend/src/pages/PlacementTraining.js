@@ -24,7 +24,7 @@ function PlacementTraining() {
   const fetchMaterials = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/placement', {
+      const res = await axios.get('https://what-s-bot.onrender.com/api/placement', {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Filter by department if needed, but since it's a dept admin, 
@@ -73,7 +73,7 @@ function PlacementTraining() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/placement/upload', formData, {
+      await axios.post('https://what-s-bot.onrender.com/api/placement/upload', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -95,7 +95,7 @@ function PlacementTraining() {
     
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/placement/${id}`, {
+      await axios.delete(`https://what-s-bot.onrender.com/api/placement/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchMaterials();
@@ -110,7 +110,7 @@ function PlacementTraining() {
     setSending(id);
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5000/api/placement/${id}/send`, {}, {
+      await axios.post(`https://what-s-bot.onrender.com/api/placement/${id}/send`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert(`✅ Material sent successfully! (Placeholder logic executed)`);
@@ -128,7 +128,7 @@ function PlacementTraining() {
     setResending(id);
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5000/api/placement/${id}/resend`, {}, {
+      await axios.post(`https://what-s-bot.onrender.com/api/placement/${id}/resend`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert(`✅ Material re-sent successfully! (Placeholder logic executed)`);

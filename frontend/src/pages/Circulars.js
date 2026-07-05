@@ -29,7 +29,7 @@ function Circulars() {
   const fetchCirculars = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/circulars', {
+      const res = await axios.get('https://what-s-bot.onrender.com/api/circulars', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCirculars(res.data);
@@ -63,7 +63,7 @@ function Circulars() {
       const formDataUpload = new FormData();
       formDataUpload.append('file', file);
 
-      const res = await axios.post('http://localhost:5000/api/circulars/upload', formDataUpload, {
+      const res = await axios.post('https://what-s-bot.onrender.com/api/circulars/upload', formDataUpload, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -93,7 +93,7 @@ function Circulars() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/circulars', formData, {
+      await axios.post('https://what-s-bot.onrender.com/api/circulars', formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setShowModal(false);
@@ -110,7 +110,7 @@ function Circulars() {
     setSending(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post(`http://localhost:5000/api/circulars/${selectedCircularId}/send`, targetPayload, {
+      const res = await axios.post(`https://what-s-bot.onrender.com/api/circulars/${selectedCircularId}/send`, targetPayload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert(res.data.message);
@@ -131,7 +131,7 @@ function Circulars() {
     setResending(id);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post(`http://localhost:5000/api/circulars/${id}/resend`, {}, {
+      const res = await axios.post(`https://what-s-bot.onrender.com/api/circulars/${id}/resend`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert(res.data.message);
@@ -150,7 +150,7 @@ function Circulars() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/circulars/${id}`, {
+      await axios.delete(`https://what-s-bot.onrender.com/api/circulars/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchCirculars();

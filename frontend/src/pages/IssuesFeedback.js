@@ -22,7 +22,7 @@ function IssuesFeedback() {
   const fetchIssues = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/feedback/issues', {
+      const res = await axios.get('https://what-s-bot.onrender.com/api/feedback/issues', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setIssues(res.data);
@@ -48,7 +48,7 @@ function IssuesFeedback() {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://localhost:5000/api/feedback/issues/${selectedIssue._id}/status`,
+        `https://what-s-bot.onrender.com/api/feedback/issues/${selectedIssue._id}/status`,
         { status: pendingStatus, adminMessage },
         { headers: { Authorization: `Bearer ${token}` } }
       );

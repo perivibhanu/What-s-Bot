@@ -18,7 +18,7 @@ function Marks() {
   const handleDownloadTemplate = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:5000/api/marks/template', 
+      const res = await axios.post('https://what-s-bot.onrender.com/api/marks/template', 
         { ...filter, subjectsCount }, 
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -57,7 +57,7 @@ function Marks() {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:5000/api/marks/upload', formData, {
+      const res = await axios.post('https://what-s-bot.onrender.com/api/marks/upload', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -82,7 +82,7 @@ function Marks() {
     setStatus('uploading');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:5000/api/marks/clear', 
+      const res = await axios.post('https://what-s-bot.onrender.com/api/marks/clear', 
         { batch: filter.batch, branch: filter.branch, section: filter.section }, 
         { headers: { Authorization: `Bearer ${token}` } }
       );

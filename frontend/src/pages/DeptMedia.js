@@ -3,7 +3,7 @@ import axios from 'axios';
 import DeptLayout from '../components/DeptLayout';
 import '../styles/CollegeMedia.css';
 
-const API = 'http://localhost:5000/api/college-media';
+const API = 'https://what-s-bot.onrender.com/api/college-media';
 
 const getTopicKey = (branch) => {
   const map = {

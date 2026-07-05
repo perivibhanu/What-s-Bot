@@ -24,7 +24,7 @@ function DataUpdate({ type, title, description, icon }) {
   const handleDownloadTemplate = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:5000/api/data/template', 
+      const res = await axios.post('https://what-s-bot.onrender.com/api/data/template', 
         { ...filter, type }, 
         { headers: { Authorization: `Bearer ${token}` }, responseType: 'blob' }
       );
@@ -61,7 +61,7 @@ function DataUpdate({ type, title, description, icon }) {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:5000/api/data/upload', formData, {
+      const res = await axios.post('https://what-s-bot.onrender.com/api/data/upload', formData, {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
       });
       setStatus('success');

@@ -34,7 +34,7 @@ function Students() {
   const fetchBatchYears = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/students/batch-years', {
+      const res = await axios.get('https://what-s-bot.onrender.com/api/students/batch-years', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBatchYears(res.data);
@@ -46,7 +46,7 @@ function Students() {
   const fetchStudents = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/students', {
+      const res = await axios.get('https://what-s-bot.onrender.com/api/students', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (role === 'dept_admin') {
@@ -68,7 +68,7 @@ function Students() {
       if (role === 'dept_admin') {
         payload.branch = dept;
       }
-      await axios.post('http://localhost:5000/api/students', payload, {
+      await axios.post('https://what-s-bot.onrender.com/api/students', payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setShowModal(false);
@@ -83,7 +83,7 @@ function Students() {
   const handleDownloadTemplate = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/students/import/template', {
+      const res = await axios.get('https://what-s-bot.onrender.com/api/students/import/template', {
         headers: { Authorization: `Bearer ${token}` },
         responseType: 'blob'
       });
@@ -112,7 +112,7 @@ function Students() {
       const token = localStorage.getItem('token');
       const formData = new FormData();
       formData.append('file', importFile);
-      const res = await axios.post('http://localhost:5000/api/students/import/bulk', formData, {
+      const res = await axios.post('https://what-s-bot.onrender.com/api/students/import/bulk', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -143,7 +143,7 @@ function Students() {
     setDeletingBatch(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.delete(`http://localhost:5000/api/students/bulk-delete/${deleteBatchYear}`, {
+      const res = await axios.delete(`https://what-s-bot.onrender.com/api/students/bulk-delete/${deleteBatchYear}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert(res.data.message);

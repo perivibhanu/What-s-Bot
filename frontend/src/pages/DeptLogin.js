@@ -15,7 +15,7 @@ function DeptLogin({ setToken }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/dept-login`, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL || 'https://what-s-bot.onrender.com'}/api/auth/dept-login`, {
         department,
         username,
         password
