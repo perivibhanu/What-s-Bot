@@ -36,6 +36,29 @@ mongoose.connect(process.env.MONGODB_URI, {
   .catch(err => console.error('MongoDB connection error:', err));
 
 // Routes
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    message: 'Welcome to Velammal WhatsApp Bot Backend API',
+    endpoints: {
+      webhook: '/webhook',
+      admin: '/api/admin',
+      students: '/api/students',
+      auth: '/api/auth',
+      circulars: '/api/circulars',
+      marks: '/api/marks',
+      timetables: '/api/timetables',
+      data: '/api/data',
+      collegeMedia: '/api/college-media',
+      placement: '/api/placement',
+      staff: '/api/staff',
+      staffMessages: '/api/staff-messages',
+      admissions: '/api/admissions',
+      feedback: '/api/feedback'
+    }
+  });
+});
+
 app.use('/webhook', require('./routes/webhook'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/students', require('./routes/students'));
