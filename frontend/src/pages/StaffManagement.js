@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+
 import Layout from '../components/Layout';
 import DeptLayout from '../components/DeptLayout';
 import '../styles/Students.css'; // Reusing students CSS for similar layout
@@ -23,12 +23,13 @@ function StaffManagement() {
   
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBranch, setFilterBranch] = useState('');
-  const navigate = useNavigate();
+
 
   const role = localStorage.getItem('role');
   const dept = localStorage.getItem('dept');
   const Wrapper = role === 'dept_admin' ? DeptLayout : Layout;
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchStaff(); }, [activeTab]);
 
   const fetchStaff = async () => {

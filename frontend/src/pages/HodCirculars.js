@@ -15,6 +15,7 @@ function HodCirculars() {
 
   useEffect(() => {
     fetchCirculars();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchCirculars = async () => {

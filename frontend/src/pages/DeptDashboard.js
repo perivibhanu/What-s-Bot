@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import axios from 'axios';
 import DeptLayout from '../components/DeptLayout';
 import '../styles/Dashboard.css'; // Reusing dashboard styles
 
 function DeptDashboard() {
-  const navigate = useNavigate();
+
   const dept = localStorage.getItem('dept');
   const [stats, setStats] = useState({ total: 0, registered: 0 });
 

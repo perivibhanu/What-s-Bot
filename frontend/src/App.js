@@ -23,7 +23,7 @@ import Admissions from './pages/Admissions';
 import ApplicationForm from './pages/ApplicationForm';
 import FeeDefaulters from './pages/FeeDefaulters';
 import HostelFeedback from './pages/HostelFeedback';
-import BusFeedback from './pages/BusFeedback';
+
 import IssuesFeedback from './pages/IssuesFeedback';
 
 function App() {

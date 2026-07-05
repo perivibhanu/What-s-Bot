@@ -5,7 +5,7 @@ import '../styles/Dashboard.css';
 
 function Dashboard() {
   const [stats, setStats] = useState({ total: 0, registered: 0 });
-  const [feedbackData, setFeedbackData] = useState([]);
+
 
   useEffect(() => {
     const fetchStats = async () => {

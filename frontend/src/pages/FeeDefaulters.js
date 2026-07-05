@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+
 import Layout from '../components/Layout';
 import '../styles/Students.css';
 
@@ -20,7 +20,7 @@ function FeeDefaulters() {
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState(null);
   
-  const navigate = useNavigate();
+
 
   useEffect(() => {
     fetchDefaulters();

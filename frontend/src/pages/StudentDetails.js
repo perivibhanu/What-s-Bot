@@ -15,9 +15,10 @@ function StudentDetails() {
   const [deleting, setDeleting] = useState(false);
 
   const role = localStorage.getItem('role');
-  const dept = localStorage.getItem('dept');
+
   const Wrapper = role === 'dept_admin' ? DeptLayout : Layout;
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchStudent(); }, [id]);
 
   const fetchStudent = async () => {

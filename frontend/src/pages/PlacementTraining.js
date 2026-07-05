@@ -110,7 +110,7 @@ function PlacementTraining() {
     setSending(id);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post(`http://localhost:5000/api/placement/${id}/send`, {}, {
+      await axios.post(`http://localhost:5000/api/placement/${id}/send`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert(`✅ Material sent successfully! (Placeholder logic executed)`);
