@@ -1,0 +1,17 @@
+const mongoose = require('mongoose');
+
+const chatSessionSchema = new mongoose.Schema({
+  phoneNumber: { type: String, required: true, unique: true },
+  currentState: { type: String, default: 'initial' },
+  tempRegNumber: { type: String },
+  issueCategory: { type: String },
+  studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student' },
+  staffId: { type: mongoose.Schema.Types.ObjectId, ref: 'Staff' },
+  userType: { type: String, enum: ['visitor', 'student', 'staff'], default: 'visitor' },
+  lastInteraction: { type: Date, default: Date.now },
+  admissionStep: { type: String, default: '' },
+  admissionData: { type: mongoose.Schema.Types.Mixed, default: {} },
+  tempFeedback: { type: mongoose.Schema.Types.Mixed, default: {} }
+}, { timestamps: true });
+
+module.exports = mongoose.model('ChatSession', chatSessionSchema);

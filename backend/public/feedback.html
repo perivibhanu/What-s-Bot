@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostel Food Feedback</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            color: #1f2937;
+            margin-top: 0;
+            margin-bottom: 24px;
+        }
+        .meal-section {
+            margin-bottom: 24px;
+        }
+        .meal-title {
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        .stars {
+            display: flex;
+            justify-content: space-between;
+            flex-direction: row-reverse;
+            font-size: 2.5rem;
+            color: #d1d5db; /* gray-300 */
+        }
+        .stars input {
+            display: none;
+        }
+        .stars label {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .stars label:hover,
+        .stars label:hover ~ label,
+        .stars input:checked ~ label {
+            color: #fbbf24; /* yellow-400 */
+        }
+        .submit-btn {
+            width: 100%;
+            background-color: #10b981; /* emerald-500 */
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        .submit-btn:hover {
+            background-color: #059669; /* emerald-600 */
+        }
+        .submit-btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        #message {
+            margin-top: 16px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="form-container">
+    <h2>🍽️ Today's Food Feedback</h2>
+    
+    <div class="meal-section">
+        <div class="meal-title">Breakfast</div>
+        <div class="stars">
+            <input type="radio" id="b5" name="breakfast" value="10"><label for="b5">★</label>
+            <input type="radio" id="b4" name="breakfast" value="8"><label for="b4">★</label>
+            <input type="radio" id="b3" name="breakfast" value="6"><label for="b3">★</label>
+            <input type="radio" id="b2" name="breakfast" value="4"><label for="b2">★</label>
+            <input type="radio" id="b1" name="breakfast" value="2"><label for="b1">★</label>
+        </div>
+    </div>
+
+    <div class="meal-section">
+        <div class="meal-title">Lunch</div>
+        <div class="stars">
+            <input type="radio" id="l5" name="lunch" value="10"><label for="l5">★</label>
+            <input type="radio" id="l4" name="lunch" value="8"><label for="l4">★</label>
+            <input type="radio" id="l3" name="lunch" value="6"><label for="l3">★</label>
+            <input type="radio" id="l2" name="lunch" value="4"><label for="l2">★</label>
+            <input type="radio" id="l1" name="lunch" value="2"><label for="l1">★</label>
+        </div>
+    </div>
+
+    <div class="meal-section">
+        <div class="meal-title">Dinner</div>
+        <div class="stars">
+            <input type="radio" id="d5" name="dinner" value="10"><label for="d5">★</label>
+            <input type="radio" id="d4" name="dinner" value="8"><label for="d4">★</label>
+            <input type="radio" id="d3" name="dinner" value="6"><label for="d3">★</label>
+            <input type="radio" id="d2" name="dinner" value="4"><label for="d2">★</label>
+            <input type="radio" id="d1" name="dinner" value="2"><label for="d1">★</label>
+        </div>
+    </div>
+
+    <button id="submitBtn" class="submit-btn" onclick="submitFeedback()">Submit Feedback</button>
+    <div id="message"></div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentId = urlParams.get('id');
+
+    if (!studentId) {
+        document.getElementById('form-container').innerHTML = '<h3 style="text-align:center; color:#ef4444;">Invalid link. Please open this from your WhatsApp bot.</h3>';
+    }
+
+    async function submitFeedback() {
+        const breakfast = document.querySelector('input[name="breakfast"]:checked')?.value;
+        const lunch = document.querySelector('input[name="lunch"]:checked')?.value;
+        const dinner = document.querySelector('input[name="dinner"]:checked')?.value;
+        
+        const msgDiv = document.getElementById('message');
+        msgDiv.style.display = 'block';
+
+        if (!breakfast || !lunch || !dinner) {
+            msgDiv.className = 'error';
+            msgDiv.innerText = '⚠️ Please rate all three meals!';
+            return;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = 'Submitting...';
+
+        try {
+            const response = await fetch('/api/feedback/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    studentId, 
+                    breakfast: Number(breakfast), 
+                    lunch: Number(lunch), 
+                    dinner: Number(dinner) 
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                msgDiv.className = 'success';
+                msgDiv.innerText = '🎉 Thank you! Your feedback has been saved. You can close this window.';
+                document.querySelectorAll('.stars input').forEach(el => el.disabled = true);
+                btn.style.display = 'none';
+            } else {
+                throw new Error(data.message || 'Failed to submit feedback');
+            }
+        } catch (error) {
+            msgDiv.className = 'error';
+            msgDiv.innerText = '❌ ' + error.message;
+            btn.disabled = false;
+            btn.innerText = 'Submit Feedback';
+        }
+    }
+</script>
+
+</body>
+</html>
