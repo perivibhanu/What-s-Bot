@@ -132,20 +132,20 @@ exports.bulkImportStudents = async (req, res) => {
       const rowNum = i + 2;
 
       const regNumber = getField(row,
-        'regnumber', 'reg number', 'registrationnumber', 'registration number',
+        'registrationnumber', 'registration number', 'regnumber', 'reg number',
         'regno', 'rollno', 'roll no'
       ).toUpperCase();
 
-      const name = getField(row, 'name', 'studentname', 'student name', 'fullname', 'full name');
-      const branch = getField(row, 'branch', 'department', 'dept');
+      const name = getField(row, 'studentname', 'student name', 'name', 'fullname', 'full name');
+      const branch = getField(row, 'dept', 'department', 'branch');
       const section = getField(row, 'section', 'sec', 'class');
       const rawPhone = getField(row,
-        'mobilenumber', 'mobile number', 'mobile', 'phone', 'phonenumber',
+        'studentmobilenumber', 'student mobile number', 'mobilenumber', 'mobile number', 'mobile', 'phone', 'phonenumber',
         'phone number', 'whatsapp', 'whatsappnumber', 'contact', 'contactnumber'
       );
       const rawParentPhone = getField(row,
-        'parentmobilenumber', 'parent mobile number', 'parent mobile', 'parent phone', 'parent phonenumber',
-        'parent phone number', 'parent whatsapp', 'parent whatsappnumber', 'parent contact', 'parent contactnumber'
+        'parentwhatsappnumber', 'parent whatsapp number', 'parentmobilenumber', 'parent mobile number', 'parent mobile', 'parent phone', 'parent phonenumber',
+        'parent phone number', 'parent whatsapp', 'parent contact', 'parent contactnumber'
       );
 
       // Validate required fields
@@ -231,22 +231,22 @@ exports.bulkImportStudents = async (req, res) => {
 exports.downloadTemplate = (req, res) => {
   try {
     const sampleData = [
-      { 'Reg Number': '21CS001', 'Name': 'Arun Kumar',    'Branch': 'CSE',  'Section': 'A', 'Mobile Number': '9876543210', 'Parent Mobile Number': '9876543220' },
-      { 'Reg Number': '21CS002', 'Name': 'Priya Sharma',  'Branch': 'CSE',  'Section': 'A', 'Mobile Number': '9876543211', 'Parent Mobile Number': '9876543221' },
-      { 'Reg Number': '21EC001', 'Name': 'Ravi Balaji',   'Branch': 'ECE',  'Section': 'B', 'Mobile Number': '9876543212', 'Parent Mobile Number': '9876543222' },
-      { 'Reg Number': '21ME001', 'Name': 'Sundar Murthy', 'Branch': 'MECH', 'Section': 'A', 'Mobile Number': '9876543213', 'Parent Mobile Number': '9876543223' },
+      { 'Registration Number': '21CS001', 'Student Name': 'Arun Kumar',    'Dept': 'CSE',  'Section': 'A', 'Student Mobile Number': '9876543210', 'Parent WhatsApp Number': '9876543220' },
+      { 'Registration Number': '21CS002', 'Student Name': 'Priya Sharma',  'Dept': 'CSE',  'Section': 'A', 'Student Mobile Number': '9876543211', 'Parent WhatsApp Number': '9876543221' },
+      { 'Registration Number': '21EC001', 'Student Name': 'Ravi Balaji',   'Dept': 'ECE',  'Section': 'B', 'Student Mobile Number': '9876543212', 'Parent WhatsApp Number': '9876543222' },
+      { 'Registration Number': '21ME001', 'Student Name': 'Sundar Murthy', 'Dept': 'MECH', 'Section': 'A', 'Student Mobile Number': '9876543213', 'Parent WhatsApp Number': '9876543223' },
     ];
 
     const worksheet = xlsx.utils.json_to_sheet(sampleData);
     const workbook = xlsx.utils.book_new();
 
     worksheet['!cols'] = [
-      { wch: 15 }, // Reg Number
-      { wch: 25 }, // Name
-      { wch: 10 }, // Branch
+      { wch: 20 }, // Registration Number
+      { wch: 25 }, // Student Name
+      { wch: 10 }, // Dept
       { wch: 10 }, // Section
-      { wch: 18 }, // Mobile Number
-      { wch: 22 }, // Parent Mobile Number
+      { wch: 22 }, // Student Mobile Number
+      { wch: 25 }, // Parent WhatsApp Number
     ];
 
     xlsx.utils.book_append_sheet(workbook, worksheet, 'Students');
