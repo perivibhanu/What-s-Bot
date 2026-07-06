@@ -797,7 +797,7 @@ class WhatsAppService {
   // ─────────────────────────────────────────────────────────────────────────────
 
   async sendAdmissionWelcome(to) {
-    const webFormUrl = process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/apply` : 'https://what-s-bot.vercel.app/apply';
+    const webFormUrl = 'https://what-s-bot.vercel.app/apply';
     
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
