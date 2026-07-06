@@ -96,7 +96,7 @@ exports.uploadMarks = async (req, res) => {
     return res.status(400).json({ error: 'No file uploaded' });
   }
 
-  const { batch, branch, section, examType } = req.body;
+  const { batch, branch, section, examType, message } = req.body;
   const filePath = req.file.path;
 
   if (!batch || !branch || !section || !examType) {
@@ -194,7 +194,7 @@ exports.uploadMarks = async (req, res) => {
       // Send WhatsApp Notification (only if registered)
       if (student.isRegistered && student.phoneNumber) {
         try {
-          await sendMarksNotification(student.phoneNumber, student, examType, subjectMarks);
+          await sendMarksNotification(student.phoneNumber, student, examType, subjectMarks, message);
           results.success++;
           // Small delay to prevent rate limiting
           await new Promise(r => setTimeout(r, 200));
@@ -229,7 +229,7 @@ exports.uploadMarks = async (req, res) => {
 };
 
 // ─── WhatsApp Message Formatter ───────────────────────────────────────────────
-async function sendMarksNotification(to, student, examType, subjectMarks) {
+async function sendMarksNotification(to, student, examType, subjectMarks, optionalMessage) {
   const examNames = {
     'mid1': 'Mid Exam 1',
     'mid2': 'Mid Exam 2',
@@ -257,6 +257,7 @@ async function sendMarksNotification(to, student, examType, subjectMarks) {
     `📝 *Marks Details:*\n${marksText}\n` +
     `📈 *Total Score:* ${total}\n` +
     (rank !== null ? `🏆 *Rank:* ${rank}\n\n` : `\n`) +
+    (optionalMessage ? `📢 *Admin Note:*\n${optionalMessage}\n\n` : '') +
     `Keep it up! 🎉\n` +
     `— VCET Admin`;
 

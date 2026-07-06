@@ -12,6 +12,7 @@ function Marks() {
   });
   const [subjectsCount, setSubjectsCount] = useState(6);
   const [file, setFile] = useState(null);
+  const [optionalMessage, setOptionalMessage] = useState('');
   const [status, setStatus] = useState(null); // 'uploading', 'success', 'error'
   const [result, setResult] = useState(null);
 
@@ -54,6 +55,9 @@ function Marks() {
     formData.append('branch', filter.branch);
     formData.append('section', filter.section);
     formData.append('examType', filter.examType);
+    if (optionalMessage.trim()) {
+      formData.append('message', optionalMessage.trim());
+    }
 
     try {
       const token = localStorage.getItem('token');
@@ -195,20 +199,36 @@ function Marks() {
               <p>Here you push and publish the latest excel which will feed by the admin.</p>
               
               <form className="upload-form" onSubmit={handleUpload}>
-                <label className="file-drop">
-                  <input
-                    type="file"
-                    accept=".xlsx,.xls,.csv"
+                <div className="upload-box" style={{ marginTop: '15px' }}>
+                  <input 
+                    type="file" 
+                    accept=".xlsx, .xls, .csv" 
                     onChange={e => { setFile(e.target.files[0]); setResult(null); setStatus(null); }}
-                    style={{ display: 'none' }}
+                    id="marks-upload"
+                    className="file-input"
                   />
-                  {file ? <span>📄 {file.name}</span> : <span>📂 Click to select filled Excel file</span>}
-                </label>
-                
+                  <label htmlFor="marks-upload" className="file-label">
+                    <span className="icon">📁</span>
+                    {file ? file.name : 'Choose filled template...'}
+                  </label>
+                </div>
+
+                <div className="filter-item" style={{ marginTop: '15px' }}>
+                  <label>Optional Information/News (Sent to Students)</label>
+                  <textarea
+                    value={optionalMessage}
+                    onChange={e => setOptionalMessage(e.target.value)}
+                    placeholder="e.g., Parent Teacher Meeting is next Monday."
+                    rows="3"
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', resize: 'vertical' }}
+                  />
+                </div>
+
                 <button 
                   type="submit" 
                   className={`btn-send ${status === 'uploading' ? 'loading' : ''}`}
                   disabled={status === 'uploading' || !file}
+                  style={{ marginTop: '20px' }}
                 >
                   {status === 'uploading' ? '⏳ Processing & Sending...' : '🚀 Push and Publish'}
                 </button>
