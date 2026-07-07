@@ -92,7 +92,7 @@ function DeptLayout({ children }) {
       <main className="content">
         {children}
       </main>
-      <img src="/spark-watermark.jpg" alt="SPARK Watermark" className="watermark" />
+      <img src="/spark-watermark.jpeg" alt="SPARK Watermark" className="watermark" />
     </div>
   );
 }
