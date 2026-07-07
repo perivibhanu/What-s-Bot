@@ -88,6 +88,35 @@ class WhatsAppService {
     });
   }
 
+  async sendParentWelcome(to, studentName) {
+    const welcomeText = studentName 
+      ? `Welcome! 👋 You are viewing the portal for ${studentName}.\n\nWhat would you like to check?`
+      : 'Welcome! 👋\n\nWhat would you like to check?';
+    
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: {
+          text: welcomeText
+        },
+        action: {
+          button: 'View Menu',
+          sections: [{
+            title: 'Parent Services',
+            rows: [
+              { id: 'principal_circulars', title: '📢 Principal Circulars', description: 'Latest college circulars' },
+              { id: 'hod_circulars', title: '📝 HOD Circulars', description: 'Department specific circulars' },
+              { id: 'marks', title: '📊 Marks', description: 'View semester marks' },
+              { id: 'admission_start', title: '📋 Admission', description: 'Apply for admission online' }
+            ]
+          }]
+        }
+      }
+    });
+  }
+
   async sendHelpdeskCategoryMenu(to, scholarType) {
     let rows = [];
     if (scholarType === 'Hostel') {

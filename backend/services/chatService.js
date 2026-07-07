@@ -94,15 +94,27 @@ class ChatService {
     }
 
     // ── Already verified student sends greeting → show main menu ─────────────
-    if (session.studentId && isGreeting) {
+    if (session.userType === 'student' && session.studentId && isGreeting) {
       session.currentState = 'registered_welcome';
       const student = await Student.findById(session.studentId);
       return whatsappService.sendRegisteredWelcome(from, student?.name);
     }
 
+    // ── Already verified parent sends greeting → show parent menu ────────────
+    if (session.userType === 'parent' && session.studentId && isGreeting) {
+      session.currentState = 'parent_welcome';
+      const student = await Student.findById(session.studentId);
+      return whatsappService.sendParentWelcome(from, student?.name);
+    }
+
     // ── Already verified student in menu ─────────────────────────────────────
-    if (session.studentId && session.currentState === 'registered_welcome') {
+    if (session.userType === 'student' && session.studentId && session.currentState === 'registered_welcome') {
       return this.handleRegisteredUserAction(session, msgLower, from);
+    }
+
+    // ── Already verified parent in menu ──────────────────────────────────────
+    if (session.userType === 'parent' && session.studentId && session.currentState === 'parent_welcome') {
+      return this.handleParentAction(session, msgLower, from);
     }
 
     // ── Sub-department selected (e.g. subdept_cse → dept_cse) ───────────────────
@@ -224,6 +236,9 @@ class ChatService {
       case 'registered_welcome':
         return this.handleRegisteredUserAction(session, msgLower, from);
 
+      case 'parent_welcome':
+        return this.handleParentAction(session, msgLower, from);
+
       case 'awaiting_issue_category':
       case 'awaiting_issue_description':
         return this.handleHelpdeskIssue(session, msgLower, messageText, from);
@@ -264,6 +279,43 @@ class ChatService {
       default:
         // Unknown input → re-show staff menu
         return whatsappService.sendStaffWelcome(from, staffMember.name);
+    }
+  }
+
+  async handleParentAction(session, action, from) {
+    const student = await Student.findById(session.studentId);
+    if (!student) {
+      session.currentState = 'initial';
+      return whatsappService.sendTextMessage(from, 'Session expired. Please send "hi" to start again.');
+    }
+
+    switch (action) {
+      case 'principal_circulars': {
+        const Circular = require('../models/Circular');
+        const circulars = await Circular.find({ status: 'sent', type: 'principal' }).sort({ sentAt: -1 }).limit(1);
+        return whatsappService.sendLatestCirculars(from, circulars);
+      }
+
+      case 'hod_circulars': {
+        const Circular = require('../models/Circular');
+        const circulars = await Circular.find({
+          status: 'sent',
+          type: 'hod',
+          department: student.branch // Fetch using student's branch
+        }).sort({ sentAt: -1 }).limit(1);
+        return whatsappService.sendLatestCirculars(from, circulars);
+      }
+
+      case 'marks':
+        return whatsappService.sendStudentInfo(from, 'marks', student);
+
+      case 'admission_start':
+        session.currentState = 'admission_welcome';
+        return whatsappService.sendAdmissionWelcome(from);
+
+      default:
+        // Unknown input → re-show parent menu
+        return whatsappService.sendParentWelcome(from, student.name);
     }
   }
 
@@ -311,12 +363,20 @@ class ChatService {
       );
     }
 
-    // ✅ Both reg number and phone match!
-    // Store student ID and ask for Scholar Type before completing registration
+    // ✅ Reg number and phone match!
     session.studentId = student._id;
-    session.currentState = 'awaiting_scholar_type';
-    
-    return whatsappService.sendScholarTypeMenu(from);
+
+    if (storedParentPhone === senderPhone && storedPhone !== senderPhone) {
+      // It's exclusively a parent number
+      session.userType = 'parent';
+      session.currentState = 'parent_welcome';
+      await whatsappService.sendTextMessage(from, `✅ *Verification Complete!*\n\nWelcome! 👋`);
+      return whatsappService.sendParentWelcome(from, student.name);
+    } else {
+      // It's a student number (or both are the same, we default to student)
+      session.currentState = 'awaiting_scholar_type';
+      return whatsappService.sendScholarTypeMenu(from);
+    }
   }
 
   async handleScholarType(session, action, from) {

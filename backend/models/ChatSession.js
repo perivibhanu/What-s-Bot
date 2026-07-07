@@ -8,7 +8,7 @@ const chatSessionSchema = new mongoose.Schema({
   issueCategory: { type: String },
   studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student' },
   staffId: { type: mongoose.Schema.Types.ObjectId, ref: 'Staff' },
-  userType: { type: String, enum: ['visitor', 'student', 'staff'], default: 'visitor' },
+  userType: { type: String, enum: ['visitor', 'student', 'staff', 'parent'], default: 'visitor' },
   lastInteraction: { type: Date, default: Date.now },
   admissionStep: { type: String, default: '' },
   admissionData: { type: mongoose.Schema.Types.Mixed, default: {} },
