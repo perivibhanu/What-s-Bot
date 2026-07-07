@@ -8,8 +8,19 @@ function Timetables() {
     isAllStudents: false,
     batch: '22',
     branch: localStorage.getItem('dept') || 'ECE',
-    section: 'A'
+    section: []
   });
+
+  const handleSectionToggle = (sec) => {
+    setFilter(prev => {
+      const current = prev.section || [];
+      if (current.includes(sec)) {
+        return { ...prev, section: current.filter(s => s !== sec) };
+      } else {
+        return { ...prev, section: [...current, sec] };
+      }
+    });
+  };
   
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState(null); // 'uploading', 'success', 'error'
@@ -65,7 +76,7 @@ function Timetables() {
     formData.append('image', file);
     formData.append('batch', filter.isAllStudents ? 'ALL' : filter.batch);
     formData.append('branch', filter.isAllStudents ? 'ALL' : filter.branch);
-    formData.append('section', filter.isAllStudents ? 'ALL' : filter.section);
+    formData.append('section', filter.isAllStudents ? 'ALL' : JSON.stringify(filter.section || []));
 
     try {
       const token = localStorage.getItem('token');
@@ -190,13 +201,20 @@ function Timetables() {
                   </select>
                 </div>
                 <div className="filter-item">
-                  <label>Section</label>
-                  <select value={filter.section} onChange={e => setFilter({ ...filter, section: e.target.value })} disabled={filter.isAllStudents}>
-                    <option value="A">Section A</option>
-                    <option value="B">Section B</option>
-                    <option value="C">Section C</option>
-                    <option value="D">Section D</option>
-                  </select>
+                  <label>Sections</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
+                    {['A', 'B', 'C', 'D'].map(sec => (
+                      <label key={sec} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '14px', cursor: filter.isAllStudents ? 'not-allowed' : 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={(filter.section || []).includes(sec)}
+                          onChange={() => handleSectionToggle(sec)}
+                          disabled={filter.isAllStudents}
+                        />
+                        Section {sec}
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

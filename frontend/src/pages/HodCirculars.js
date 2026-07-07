@@ -10,6 +10,27 @@ function HodCirculars() {
   const [uploading, setUploading] = useState(false);
   const [sending, setSending] = useState(false);
   const [resending, setResending] = useState(null);
+  
+  const [showTargetModal, setShowTargetModal] = useState(false);
+  const [selectedCircularId, setSelectedCircularId] = useState(null);
+  const [targetPayload, setTargetPayload] = useState({
+    audience: 'students',
+    isAll: true,
+    batch: '',
+    department: [],
+    section: []
+  });
+
+  const handleArrayToggle = (field, value) => {
+    setTargetPayload(prev => {
+      const current = prev[field] || [];
+      if (current.includes(value)) {
+        return { ...prev, [field]: current.filter(v => v !== value) };
+      } else {
+        return { ...prev, [field]: [...current, value] };
+      }
+    });
+  };
 
   const dept = localStorage.getItem('dept');
 
@@ -101,18 +122,16 @@ function HodCirculars() {
     }
   };
 
-  const handleSend = async (id) => {
-    if (!window.confirm(`Are you sure you want to send this circular to all registered ${dept} students?`)) {
-      return;
-    }
-
+  const handleSend = async (e) => {
+    e.preventDefault();
     setSending(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post(`https://what-s-bot.onrender.com/api/circulars/${id}/send`, {}, {
+      const res = await axios.post(`https://what-s-bot.onrender.com/api/circulars/${selectedCircularId}/send`, targetPayload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert(res.data.message);
+      setShowTargetModal(false);
       fetchCirculars();
     } catch (err) {
       alert(err.response?.data?.error || 'Failed to send circular');
@@ -188,11 +207,11 @@ function HodCirculars() {
               </a>
               {circular.status === 'draft' && (
                 <button 
-                  onClick={() => handleSend(circular._id)} 
+                  onClick={() => { setSelectedCircularId(circular._id); setShowTargetModal(true); }} 
                   disabled={sending}
                   className="btn-send"
                 >
-                  {sending ? 'Sending...' : 'Send to All'}
+                  {sending && selectedCircularId === circular._id ? 'Sending...' : 'Send'}
                 </button>
               )}
               {circular.status === 'sent' && (
@@ -247,6 +266,94 @@ function HodCirculars() {
                   setShowModal(false);
                   setFormData({ title: '', description: '', fileUrl: '', fileName: '' });
                 }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showTargetModal && (
+        <div className="modal">
+          <div className="modal-content" style={{ maxWidth: '500px' }}>
+            <h2>🎯 Select Target Group</h2>
+            <form onSubmit={handleSend} style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px' }}>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <label style={{ fontWeight: 'bold' }}>Target Audience</label>
+                <select 
+                  value={targetPayload.audience}
+                  onChange={e => setTargetPayload({ ...targetPayload, audience: e.target.value, isAll: true })}
+                  style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                  disabled
+                >
+                  <option value="students">Students</option>
+                </select>
+              </div>
+
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginTop: '10px' }}>
+                <input 
+                  type="checkbox" 
+                  checked={targetPayload.isAll}
+                  onChange={e => setTargetPayload({ ...targetPayload, isAll: e.target.checked })}
+                  style={{ width: '18px', height: '18px' }}
+                />
+                <span style={{ fontWeight: 'bold' }}>
+                  Send to All Students (Entire College)
+                </span>
+              </label>
+
+              {!targetPayload.isAll && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px', marginTop: '10px' }}>
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#666' }}>BATCH YEAR</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. 21" 
+                      value={targetPayload.batch}
+                      onChange={e => setTargetPayload({ ...targetPayload, batch: e.target.value })}
+                      style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', marginTop: '5px' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#666' }}>DEPARTMENTS</label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
+                      {['CSE', 'IT', 'ECE', 'EEE', 'MECH', 'CIVIL', 'AIDS'].map(d => (
+                        <label key={d} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '14px', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={targetPayload.department.includes(d)}
+                            onChange={() => handleArrayToggle('department', d)}
+                          />
+                          {d}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#666' }}>SECTIONS</label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
+                      {['A', 'B', 'C', 'D'].map(sec => (
+                        <label key={sec} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '14px', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={targetPayload.section.includes(sec)}
+                            onChange={() => handleArrayToggle('section', sec)}
+                          />
+                          Section {sec}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="modal-actions" style={{ marginTop: '20px' }}>
+                <button type="submit" disabled={sending} style={{ background: '#22c55e', color: 'white' }}>
+                  {sending ? 'Sending...' : 'Send Broadcast'}
+                </button>
+                <button type="button" onClick={() => setShowTargetModal(false)}>Cancel</button>
               </div>
             </form>
           </div>

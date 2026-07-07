@@ -7,9 +7,21 @@ function Marks() {
   const [filter, setFilter] = useState({
     batch: '22',
     branch: localStorage.getItem('dept') || 'ECE',
-    section: 'A',
+    section: [],
     examType: 'mid1'
   });
+
+  const handleSectionToggle = (sec) => {
+    setFilter(prev => {
+      const current = prev.section || [];
+      if (current.includes(sec)) {
+        return { ...prev, section: current.filter(s => s !== sec) };
+      } else {
+        return { ...prev, section: [...current, sec] };
+      }
+    });
+  };
+
   const [subjectsCount, setSubjectsCount] = useState(6);
   const [file, setFile] = useState(null);
   const [optionalMessage, setOptionalMessage] = useState('');
@@ -30,12 +42,12 @@ function Marks() {
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `${filter.branch}_Batch${filter.batch}_Sec${filter.section}_MarksTemplate.xlsx`);
+      link.setAttribute('download', `${filter.branch}_Batch${filter.batch}_Sec${(filter.section || []).join('-') || 'All'}_MarksTemplate.xlsx`);
       document.body.appendChild(link);
       link.click();
       link.remove();
     } catch (err) {
-      alert('Failed to download template. Ensure there are students in this exact section in the database.');
+      alert('Failed to download template. Ensure there are students in these exact sections in the database.');
     }
   };
 
@@ -53,7 +65,7 @@ function Marks() {
     formData.append('file', file);
     formData.append('batch', filter.batch);
     formData.append('branch', filter.branch);
-    formData.append('section', filter.section);
+    formData.append('section', JSON.stringify(filter.section || []));
     formData.append('examType', filter.examType);
     if (optionalMessage.trim()) {
       formData.append('message', optionalMessage.trim());
@@ -79,7 +91,8 @@ function Marks() {
   };
 
   const handleClearMarks = async () => {
-    if (!window.confirm(`⚠️ WARNING ⚠️\n\nAre you sure you want to completely delete all Mid-1, Mid-2, and Model Exam marks for ${filter.branch} Batch ${filter.batch} Section ${filter.section}?\n\nThis action cannot be undone!`)) {
+    const secString = (filter.section || []).join(', ');
+    if (!window.confirm(`⚠️ WARNING ⚠️\n\nAre you sure you want to completely delete all Mid-1, Mid-2, and Model Exam marks for ${filter.branch} Batch ${filter.batch} Section(s) ${secString}?\n\nThis action cannot be undone!`)) {
       return;
     }
     
@@ -132,13 +145,19 @@ function Marks() {
                   </select>
                 </div>
                 <div className="filter-item">
-                  <label>Section</label>
-                  <select value={filter.section} onChange={e => setFilter({ ...filter, section: e.target.value })}>
-                    <option value="A">Section A</option>
-                    <option value="B">Section B</option>
-                    <option value="C">Section C</option>
-                    <option value="D">Section D</option>
-                  </select>
+                  <label>Sections</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
+                    {['A', 'B', 'C', 'D'].map(sec => (
+                      <label key={sec} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '14px', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={(filter.section || []).includes(sec)}
+                          onChange={() => handleSectionToggle(sec)}
+                        />
+                        Section {sec}
+                      </label>
+                    ))}
+                  </div>
                 </div>
                 <div className="filter-item">
                   <label>Exam Type</label>

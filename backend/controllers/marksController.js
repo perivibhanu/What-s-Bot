@@ -32,9 +32,8 @@ exports.downloadTemplate = async (req, res) => {
   try {
     const { batch, branch, section, subjectsCount = 6 } = req.body;
     
-    if (!batch || !branch || !section) {
-      return res.status(400).json({ error: 'Batch, Branch, and Section are required' });
-    }
+    // section might be an array
+    const sections = Array.isArray(section) ? section : [section].filter(Boolean);
 
     const branchCode = getBranchCode(branch);
     if (!branchCode) {
@@ -42,11 +41,16 @@ exports.downloadTemplate = async (req, res) => {
     }
 
     const regex = getRegNoRegex(batch, branchCode);
+    
+    let sectionQuery = {};
+    if (sections.length > 0) {
+      sectionQuery = { section: { $in: sections.map(s => new RegExp(`^${s}$`, 'i')) } };
+    }
 
     // Find students matching this exact cohort
     const students = await Student.find({
       regNumber: regex,
-      section: new RegExp(`^${section}$`, 'i')
+      ...sectionQuery
     }).sort({ regNumber: 1 });
 
     if (students.length === 0) {
@@ -99,9 +103,17 @@ exports.uploadMarks = async (req, res) => {
   const { batch, branch, section, examType, message } = req.body;
   const filePath = req.file.path;
 
-  if (!batch || !branch || !section || !examType) {
+  let parsedSections = [];
+  try {
+    parsedSections = JSON.parse(section);
+  } catch (e) {
+    parsedSections = [section];
+  }
+  const sections = Array.isArray(parsedSections) ? parsedSections : [parsedSections].filter(Boolean);
+
+  if (!batch || !branch || sections.length === 0 || !examType) {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    return res.status(400).json({ error: 'Missing required fields (batch, branch, section, examType)' });
+    return res.status(400).json({ error: 'Batch, Branch, Section(s), and ExamType are required.' });
   }
 
   if (!['mid1', 'mid2', 'model'].includes(examType)) {
@@ -154,13 +166,13 @@ exports.uploadMarks = async (req, res) => {
       // Find the student in DB
       const student = await Student.findOne({ 
         regNumber, 
-        section: new RegExp(`^${section}$`, 'i') 
+        section: { $in: sections.map(s => new RegExp(`^${s}$`, 'i')) }
       });
 
       if (!student) {
         results.errors.push({ 
           row: rowNum, 
-          reason: `Student ${regNumber} not found in database for Section ${section}`
+          reason: `Student ${regNumber} not found in database for selected Sections`
         });
         continue;
       }
@@ -280,9 +292,11 @@ exports.clearMarks = async (req, res) => {
 
     const regex = getRegNoRegex(batch, branchCode);
 
+    const sections = Array.isArray(section) ? section : [section].filter(Boolean);
+
     const students = await Student.find({
       regNumber: regex,
-      section: new RegExp(`^${section}$`, 'i')
+      ...(sections.length > 0 && { section: { $in: sections.map(s => new RegExp(`^${s}$`, 'i')) } })
     });
 
     if (students.length === 0) {

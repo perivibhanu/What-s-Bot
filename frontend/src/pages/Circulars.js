@@ -18,9 +18,20 @@ function Circulars() {
     audience: 'students',
     isAll: true,
     batch: '',
-    department: '',
-    section: ''
+    department: [],
+    section: []
   });
+
+  const handleArrayToggle = (field, value) => {
+    setTargetPayload(prev => {
+      const current = prev[field] || [];
+      if (current.includes(value)) {
+        return { ...prev, [field]: current.filter(v => v !== value) };
+      } else {
+        return { ...prev, [field]: [...current, value] };
+      }
+    });
+  };
 
   useEffect(() => {
     fetchCirculars();
@@ -306,35 +317,35 @@ function Circulars() {
                   </div>
 
                   <div>
-                    <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#666' }}>DEPARTMENT</label>
-                    <select 
-                      value={targetPayload.department}
-                      onChange={e => setTargetPayload({ ...targetPayload, department: e.target.value })}
-                      style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', marginTop: '5px' }}
-                    >
-                      <option value="">Any Dept</option>
-                      <option value="CSE">CSE</option>
-                      <option value="IT">IT</option>
-                      <option value="ECE">ECE</option>
-                      <option value="EEE">EEE</option>
-                      <option value="MECH">MECH</option>
-                      <option value="CIVIL">CIVIL</option>
-                      <option value="AIDS">AIDS</option>
-                    </select>
+                    <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#666' }}>DEPARTMENTS</label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
+                      {['CSE', 'IT', 'ECE', 'EEE', 'MECH', 'CIVIL', 'AIDS'].map(dept => (
+                        <label key={dept} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '14px', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={targetPayload.department.includes(dept)}
+                            onChange={() => handleArrayToggle('department', dept)}
+                          />
+                          {dept}
+                        </label>
+                      ))}
+                    </div>
                   </div>
 
                   <div>
-                    <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#666' }}>SECTION</label>
-                    <select 
-                      value={targetPayload.section}
-                      onChange={e => setTargetPayload({ ...targetPayload, section: e.target.value })}
-                      style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', marginTop: '5px' }}
-                    >
-                      <option value="">Any Section</option>
-                      <option value="A">Section A</option>
-                      <option value="B">Section B</option>
-                      <option value="C">Section C</option>
-                    </select>
+                    <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#666' }}>SECTIONS</label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
+                      {['A', 'B', 'C', 'D'].map(sec => (
+                        <label key={sec} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '14px', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={targetPayload.section.includes(sec)}
+                            onChange={() => handleArrayToggle('section', sec)}
+                          />
+                          Section {sec}
+                        </label>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}

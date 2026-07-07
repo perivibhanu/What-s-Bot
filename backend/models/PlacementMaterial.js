@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const placementMaterialSchema = new mongoose.Schema({
   batch: { type: String, required: true },
   branch: { type: String, required: true },
-  section: { type: String, required: true },
+  section: { type: [String], required: true },
   fileUrl: { type: String, required: true },
   fileName: { type: String, required: true },
   cloudinaryId: { type: String },

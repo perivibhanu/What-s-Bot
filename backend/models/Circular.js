@@ -14,8 +14,8 @@ const circularSchema = new mongoose.Schema({
   status: { type: String, enum: ['draft', 'sent'], default: 'draft' },
   targetAudience: { type: String, enum: ['students', 'teaching', 'lab_assistant', 'all'], default: 'all' },
   targetBatch: { type: String },
-  targetDepartment: { type: String },
-  targetSection: { type: String }
+  targetDepartment: { type: [String], default: [] },
+  targetSection: { type: [String], default: [] }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Circular', circularSchema);

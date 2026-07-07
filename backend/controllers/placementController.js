@@ -46,7 +46,19 @@ exports.uploadMaterial = async (req, res) => {
     const result = await cloudinary.uploader.upload(imageFile.path, uploadOptions);
     fs.unlinkSync(imageFile.path); 
 
-    const existing = await PlacementMaterial.findOne({ batch, branch, section });
+    let parsedSections = [];
+    if (section === 'ALL') {
+      parsedSections = ['ALL'];
+    } else {
+      try {
+        parsedSections = JSON.parse(section);
+      } catch (err) {
+        parsedSections = [section];
+      }
+    }
+    const sections = Array.isArray(parsedSections) ? parsedSections : [parsedSections].filter(Boolean);
+
+    const existing = await PlacementMaterial.findOne({ batch, branch, section: sections });
 
     if (existing) {
       try {
@@ -72,7 +84,7 @@ exports.uploadMaterial = async (req, res) => {
     const material = await PlacementMaterial.create({
       batch,
       branch,
-      section,
+      section: sections,
       fileUrl: result.secure_url,
       cloudinaryId: result.public_id,
       fileType,

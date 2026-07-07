@@ -215,10 +215,22 @@ const resolveRecipients = async (audience, isAll, batch, department, section, is
       phoneNumber: { $exists: true, $ne: '' }
     };
     if (isHod && department) {
-      query.branch = department;
+      if (Array.isArray(department) && department.length > 0) {
+        query.branch = { $in: department };
+      } else {
+        query.branch = department;
+      }
     } else if (!isAll) {
-      if (department) query.branch = department;
-      if (section) query.section = section;
+      if (department && department.length > 0) {
+        query.branch = Array.isArray(department) ? { $in: department } : department;
+      }
+      if (section && section.length > 0) {
+        if (Array.isArray(section)) {
+          query.section = { $in: section.map(s => new RegExp(`^${s}$`, 'i')) };
+        } else {
+          query.section = new RegExp(`^${section}$`, 'i');
+        }
+      }
       if (batch) query.regNumber = { $regex: `^..${batch}`, $options: 'i' };
     }
     const students = await Student.find(query);
@@ -227,8 +239,8 @@ const resolveRecipients = async (audience, isAll, batch, department, section, is
 
   if (audience === 'teaching' || audience === 'lab_assistant') {
     let query = { type: audience };
-    if (!isAll && department) {
-      query.department = department;
+    if (!isAll && department && department.length > 0) {
+      query.department = Array.isArray(department) ? { $in: department } : department;
     }
     const staff = await Staff.find(query);
     // Filter out valid phone numbers from contact details
@@ -255,9 +267,11 @@ exports.sendCircular = async (req, res) => {
 
     const { audience = 'students', isAll = true, batch, department, section } = req.body;
     
-    // Check if it's an HOD circular - force dept filter
     const isHod = circular.type === 'hod';
-    const effectiveDept = isHod ? circular.department : department;
+    // If it's an HOD circular, the target department is whatever the HOD selected (from 'department' array).
+    // The default was to force circular.department, but now they can broadcast to multiple depts if they want,
+    // though the frontend typically restricts or defaults this. Let's just use what's passed in the payload.
+    const effectiveDept = (isHod && (!department || department.length === 0)) ? [circular.department] : department;
 
     const phoneNumbers = await resolveRecipients(audience, isAll, batch, effectiveDept, section, isHod);
 
@@ -288,8 +302,8 @@ exports.sendCircular = async (req, res) => {
     circular.targetAudience = audience;
     if (!isAll) {
       circular.targetBatch = batch;
-      circular.targetDepartment = effectiveDept;
-      circular.targetSection = section;
+      circular.targetDepartment = Array.isArray(effectiveDept) ? effectiveDept : [effectiveDept].filter(Boolean);
+      circular.targetSection = Array.isArray(section) ? section : [section].filter(Boolean);
     }
     await circular.save();
 
@@ -316,7 +330,7 @@ exports.resendCircular = async (req, res) => {
     }
 
     const isHod = circular.type === 'hod';
-    const isAll = !circular.targetBatch && !circular.targetDepartment && !circular.targetSection;
+    const isAll = !circular.targetBatch && (!circular.targetDepartment || circular.targetDepartment.length === 0) && (!circular.targetSection || circular.targetSection.length === 0);
     
     const phoneNumbers = await resolveRecipients(
       circular.targetAudience || 'students', 

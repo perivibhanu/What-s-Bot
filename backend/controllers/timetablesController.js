@@ -45,10 +45,17 @@ exports.downloadTemplate = async (req, res) => {
     const regex = getRegNoRegex(batch, branchCode);
     const Student = require('../models/Student');
 
+    const sections = Array.isArray(section) ? section : [section].filter(Boolean);
+
+    let sectionQuery = {};
+    if (sections.length > 0 && sections[0] !== 'ALL') {
+      sectionQuery = { section: { $in: sections.map(s => new RegExp(`^${s}$`, 'i')) } };
+    }
+
     // Find students matching this cohort
     const students = await Student.find({
       regNumber: regex,
-      section: new RegExp(`^${section}$`, 'i')
+      ...sectionQuery
     }).sort({ regNumber: 1 });
 
     if (students.length === 0) {
@@ -78,7 +85,7 @@ exports.downloadTemplate = async (req, res) => {
     xlsx.utils.book_append_sheet(workbook, worksheet, 'Seating');
     const buffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
-    res.setHeader('Content-Disposition', `attachment; filename=${branch}_${batch}_Sec${section}_SeatingTemplate.xlsx`);
+    res.setHeader('Content-Disposition', `attachment; filename=${branch}_${batch}_Sec${sections.join('-') || 'All'}_SeatingTemplate.xlsx`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.send(buffer);
 
@@ -134,8 +141,23 @@ exports.uploadTimetable = async (req, res) => {
 
     fs.unlinkSync(imageFile.path); // Remove local file
 
+    let parsedSections = [];
+    if (section === 'ALL') {
+      parsedSections = ['ALL'];
+    } else {
+      try {
+        parsedSections = JSON.parse(section);
+      } catch (err) {
+        parsedSections = [section];
+      }
+    }
+    const sections = Array.isArray(parsedSections) ? parsedSections : [parsedSections].filter(Boolean);
+
     // 2. Check if a timetable already exists for this class
-    const existing = await Timetable.findOne({ batch, branch, section });
+    // In multi-select, a timetable might exist for ANY of the sections. 
+    // To simplify, we'll assume uniqueness per exact array combination, or we could update all matching.
+    // The index is unique on batch, branch, section array.
+    const existing = await Timetable.findOne({ batch, branch, section: sections });
 
     if (existing) {
       // Delete old file from Cloudinary
@@ -165,7 +187,7 @@ exports.uploadTimetable = async (req, res) => {
     const timetable = await Timetable.create({
       batch,
       branch,
-      section,
+      section: sections,
       title,
       description,
       imageUrl: result.secure_url,
@@ -219,7 +241,9 @@ exports.sendTimetable = async (req, res) => {
       query.regNumber = new RegExp(`^\\d{4}${shortBatch}`);
     }
     if (timetable.branch !== 'ALL') query.branch = timetable.branch;
-    if (timetable.section !== 'ALL') query.section = new RegExp(`^${timetable.section}$`, 'i');
+    if (!timetable.section.includes('ALL')) {
+      query.section = { $in: timetable.section.map(s => new RegExp(`^${s}$`, 'i')) };
+    }
 
     const students = await Student.find(query);
 
