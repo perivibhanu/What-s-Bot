@@ -60,6 +60,9 @@ function Layout({ children }) {
             <Link to="/circulars" className={`menu-item ${isActive('/circulars')}`}>
               📄 Principal Circulars
             </Link>
+            <Link to="/parent-circulars" className={`menu-item ${isActive('/parent-circulars')}`}>
+              👨‍👩‍👧 Parents Circulars
+            </Link>
             <Link to="/fee-defaulters" className={`menu-item ${isActive('/fee-defaulters')}`}>
               ⚠️ Fee Defaulters
             </Link>

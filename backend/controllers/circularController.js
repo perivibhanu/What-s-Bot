@@ -127,11 +127,14 @@ exports.uploadFile = async (req, res) => {
   const isWord =
     mimetype === 'application/msword' ||
     mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  const isExcel =
+    mimetype === 'application/vnd.ms-excel' ||
+    mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
-  if (!isImage && !isPdf && !isWord) {
+  if (!isImage && !isPdf && !isWord && !isExcel) {
     cleanupTempFile(filePath);
     return res.status(400).json({
-      error: 'Invalid file type. Only PDF, Word documents (DOC/DOCX), and images (JPG, PNG, GIF) are allowed.'
+      error: 'Invalid file type. Only PDF, Word documents (DOC/DOCX), Excel files (XLS/XLSX), and images (JPG, PNG, GIF) are allowed.'
     });
   }
 
@@ -209,11 +212,17 @@ const normalizePhone = (phone) => {
 const resolveRecipients = async (audience, isAll, batch, department, section, isHod) => {
   let recipients = [];
 
-  if (audience === 'students' || audience === 'all') { // Default to students
+  if (audience === 'students' || audience === 'all' || audience === 'parents') {
     let query = {
       isRegistered: true,
       phoneNumber: { $exists: true, $ne: '' }
     };
+    if (audience === 'parents') {
+      query = {
+        isRegistered: true,
+        parentPhoneNumber: { $exists: true, $ne: '' }
+      };
+    }
     if (isHod && department) {
       if (Array.isArray(department) && department.length > 0) {
         query.branch = { $in: department };
@@ -234,7 +243,11 @@ const resolveRecipients = async (audience, isAll, batch, department, section, is
       if (batch) query.regNumber = { $regex: `^..${batch}`, $options: 'i' };
     }
     const students = await Student.find(query);
-    recipients = recipients.concat(students.map(s => s.phoneNumber));
+    if (audience === 'parents') {
+      recipients = recipients.concat(students.map(s => s.parentPhoneNumber));
+    } else {
+      recipients = recipients.concat(students.map(s => s.phoneNumber));
+    }
   }
 
   if (audience === 'teaching' || audience === 'lab_assistant') {
@@ -267,7 +280,7 @@ exports.sendCircular = async (req, res) => {
 
     const { audience = 'students', isAll = true, batch, department, section } = req.body;
     
-    const isHod = circular.type === 'hod';
+    const isHod = circular.type === 'hod' || circular.type === 'parent_hod';
     // If it's an HOD circular, the target department is whatever the HOD selected (from 'department' array).
     // The default was to force circular.department, but now they can broadcast to multiple depts if they want,
     // though the frontend typically restricts or defaults this. Let's just use what's passed in the payload.

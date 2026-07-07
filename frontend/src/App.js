@@ -6,6 +6,7 @@ import Students from './pages/Students';
 import StudentDetails from './pages/StudentDetails';
 import Settings from './pages/Settings';
 import Circulars from './pages/Circulars';
+import ParentCirculars from './pages/ParentCirculars';
 import Marks from './pages/Marks';
 import Timetables from './pages/Timetables';
 import DataUpdate from './pages/DataUpdate';
@@ -16,6 +17,7 @@ import DeptLogin from './pages/DeptLogin';
 import DeptDashboard from './pages/DeptDashboard';
 import PlacementTraining from './pages/PlacementTraining';
 import HodCirculars from './pages/HodCirculars';
+import HodParentCirculars from './pages/HodParentCirculars';
 import StaffManagement from './pages/StaffManagement';
 import StaffMessages from './pages/StaffMessages';
 import DeptMedia from './pages/DeptMedia';
@@ -66,6 +68,7 @@ function App() {
         </PrivateRoute>} />
         <Route path="/placement-training" element={<PrivateRoute allowedRole="dept_admin"><PlacementTraining /></PrivateRoute>} />
         <Route path="/hod-circulars" element={<PrivateRoute allowedRole="dept_admin"><HodCirculars /></PrivateRoute>} />
+        <Route path="/hod-parent-circulars" element={<PrivateRoute allowedRole="dept_admin"><HodParentCirculars /></PrivateRoute>} />
         <Route path="/dept/media" element={<PrivateRoute allowedRole="dept_admin"><DeptMedia /></PrivateRoute>} />
 
         {/* Shared Routes */}
@@ -77,6 +80,7 @@ function App() {
         {/* Super Admin Routes */}
         <Route path="/" element={<PrivateRoute allowedRole="super_admin"><Dashboard /></PrivateRoute>} />
         <Route path="/circulars" element={<PrivateRoute allowedRole="super_admin"><Circulars /></PrivateRoute>} />
+        <Route path="/parent-circulars" element={<PrivateRoute allowedRole="super_admin"><ParentCirculars /></PrivateRoute>} />
         <Route path="/transport" element={<PrivateRoute allowedRole="super_admin">
           <DataUpdate type="transport" title="Update Transportation" description="Bulk assign bus routes and plate numbers" icon="🚐" />
         </PrivateRoute>} />

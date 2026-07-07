@@ -69,6 +69,9 @@ function DeptLayout({ children }) {
             <Link to="/hod-circulars" className={`menu-item ${isActive('/hod-circulars')}`}>
               📄 HOD Circulars
             </Link>
+            <Link to="/hod-parent-circulars" className={`menu-item ${isActive('/hod-parent-circulars')}`}>
+              👨‍👩‍👧 Parents Circulars
+            </Link>
             <Link to="/staff-messages" className={`menu-item ${isActive('/staff-messages')}`}>
               💬 Staff Messages
             </Link>
