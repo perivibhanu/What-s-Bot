@@ -144,35 +144,6 @@ class WhatsAppService {
     });
   }
 
-  async sendParentWelcome(to, studentName) {
-    const welcomeText = studentName 
-      ? `Welcome, Parent of ${studentName}! 👋\n\nWhat would you like to check?`
-      : 'Welcome, Parent! 👋\n\nWhat would you like to check?';
-    
-    return this.sendMessage(to, {
-      messaging_product: 'whatsapp',
-      type: 'interactive',
-      interactive: {
-        type: 'list',
-        body: {
-          text: welcomeText
-        },
-        action: {
-          button: 'View Menu',
-          sections: [{
-            title: 'Parent Services',
-            rows: [
-              { id: 'parent_principal_circulars', title: '📢 Principal Circulars', description: 'College-wide updates' },
-              { id: 'parent_hod_circulars', title: '📝 HOD Circulars', description: 'Department updates' },
-              { id: 'parent_marks', title: '📊 Marks', description: 'View student marks' },
-              { id: 'parent_admission', title: '📋 Admission', description: 'Admission details' }
-            ]
-          }]
-        }
-      }
-    });
-  }
-
   async sendAcademicsMenu(to) {
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',

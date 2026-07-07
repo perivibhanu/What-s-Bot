@@ -12,7 +12,7 @@ const circularSchema = new mongoose.Schema({
   sentAt: { type: Date, default: Date.now },
   recipientCount: { type: Number, default: 0 },
   status: { type: String, enum: ['draft', 'sent'], default: 'draft' },
-  targetAudience: { type: String, enum: ['students', 'parents', 'both', 'teaching', 'lab_assistant', 'all'], default: 'all' },
+  targetAudience: { type: String, enum: ['students', 'teaching', 'lab_assistant', 'all'], default: 'all' },
   targetBatch: { type: String },
   targetDepartment: { type: [String], default: [] },
   targetSection: { type: [String], default: [] }

@@ -100,7 +100,7 @@ exports.uploadMarks = async (req, res) => {
     return res.status(400).json({ error: 'No file uploaded' });
   }
 
-  const { batch, branch, section, examType, message, sendToParents } = req.body;
+  const { batch, branch, section, examType, message } = req.body;
   const filePath = req.file.path;
 
   let parsedSections = [];
@@ -204,43 +204,16 @@ exports.uploadMarks = async (req, res) => {
       await student.save();
 
       // Send WhatsApp Notification (only if registered)
-      if (student.isRegistered) {
-        let sentAny = false;
-        if (student.phoneNumber) {
-          try {
-            await sendMarksNotification(student.phoneNumber, student, examType, subjectMarks, message);
-            results.success++;
-            sentAny = true;
-            // Small delay to prevent rate limiting
-            await new Promise(r => setTimeout(r, 200));
-          } catch (waErr) {
-            results.errors.push({ 
-              row: rowNum, 
-              reason: `Saved marks, but failed to send WhatsApp to student ${student.phoneNumber}`
-            });
-            results.failed++;
-          }
-        }
-        
-        if (sendToParents === 'true' && student.parentPhoneNumber) {
-          try {
-            await sendMarksNotification(student.parentPhoneNumber, student, examType, subjectMarks, message);
-            results.success++;
-            sentAny = true;
-            await new Promise(r => setTimeout(r, 200));
-          } catch (waErr) {
-            results.errors.push({ 
-              row: rowNum, 
-              reason: `Saved marks, but failed to send WhatsApp to parent ${student.parentPhoneNumber}`
-            });
-            results.failed++;
-          }
-        }
-        
-        if (!sentAny && (!student.phoneNumber && !(sendToParents === 'true' && student.parentPhoneNumber))) {
+      if (student.isRegistered && student.phoneNumber) {
+        try {
+          await sendMarksNotification(student.phoneNumber, student, examType, subjectMarks, message);
+          results.success++;
+          // Small delay to prevent rate limiting
+          await new Promise(r => setTimeout(r, 200));
+        } catch (waErr) {
           results.errors.push({ 
             row: rowNum, 
-            reason: `Saved marks, but ${regNumber} has no valid WhatsApp numbers`
+            reason: `Saved marks, but failed to send WhatsApp to ${student.phoneNumber}`
           });
           results.failed++;
         }

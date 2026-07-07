@@ -198,15 +198,7 @@ function HodCirculars() {
             <div className="circular-info">
               <p>📄 {circular.fileName}</p>
               {circular.status === 'sent' && (
-                <>
-                  <p>👥 Sent to {circular.recipientCount} recipients</p>
-                  <p>🎯 Audience: {
-                    circular.targetAudience === 'students' ? 'Students' : 
-                    circular.targetAudience === 'parents' ? 'Parents' :
-                    circular.targetAudience === 'both' ? 'Students & Parents' :
-                    'All'
-                  }</p>
-                </>
+                <p>👥 Sent to {circular.recipientCount} {dept} students</p>
               )}
               <p>📅 {new Date(circular.createdAt).toLocaleDateString()}</p>
             </div>
@@ -287,35 +279,20 @@ function HodCirculars() {
             <h2>🎯 Select Target Group</h2>
             <form onSubmit={handleSend} style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px' }}>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                <label style={{ fontWeight: 'bold' }}>Target Audience</label>
-                <select 
-                  value={targetPayload.audience}
-                  onChange={e => setTargetPayload({ ...targetPayload, audience: e.target.value, isAll: (e.target.value !== 'students' && e.target.value !== 'parents' && e.target.value !== 'both') ? true : targetPayload.isAll })}
-                  style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-                >
-                  <option value="students">Students Only</option>
-                  <option value="parents">Parents Only</option>
-                  <option value="both">Students & Parents</option>
-                </select>
-              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginTop: '10px' }}>
+                <input 
+                  type="checkbox" 
+                  checked={targetPayload.isAll}
+                  onChange={e => setTargetPayload({ ...targetPayload, isAll: e.target.checked })}
+                  style={{ width: '18px', height: '18px' }}
+                />
+                <span style={{ fontWeight: 'bold' }}>
+                  Send to All Students (Entire College)
+                </span>
+              </label>
 
-              {['students', 'parents', 'both'].includes(targetPayload.audience) && (
-                <>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginTop: '10px' }}>
-                    <input 
-                      type="checkbox" 
-                      checked={targetPayload.isAll}
-                      onChange={e => setTargetPayload({ ...targetPayload, isAll: e.target.checked })}
-                      style={{ width: '18px', height: '18px' }}
-                    />
-                    <span style={{ fontWeight: 'bold' }}>
-                      Send to All {dept} Students
-                    </span>
-                  </label>
-
-                  {!targetPayload.isAll && (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px', marginTop: '10px' }}>
+              {!targetPayload.isAll && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px', marginTop: '10px' }}>
                   <div>
                     <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#666' }}>BATCH YEAR</label>
                     <input 
@@ -340,8 +317,6 @@ function HodCirculars() {
                   </div>
                 </div>
               )}
-            </>
-          )}
 
               <div className="modal-actions" style={{ marginTop: '20px' }}>
                 <button type="submit" disabled={sending} style={{ background: '#22c55e', color: 'white' }}>

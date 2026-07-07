@@ -26,7 +26,6 @@ function Marks() {
   const [subjectsCount, setSubjectsCount] = useState(6);
   const [file, setFile] = useState(null);
   const [optionalMessage, setOptionalMessage] = useState('');
-  const [sendToParents, setSendToParents] = useState(false);
   const [status, setStatus] = useState(null); // 'uploading', 'success', 'error'
   const [result, setResult] = useState(null);
 
@@ -72,7 +71,6 @@ function Marks() {
     if (optionalMessage.trim()) {
       formData.append('message', optionalMessage.trim());
     }
-    formData.append('sendToParents', sendToParents);
 
     try {
       const token = localStorage.getItem('token');
@@ -215,30 +213,6 @@ function Marks() {
             <div className="section-content">
               <h3>Push and Publish</h3>
               <p>Here you push and publish the latest excel which will feed by the admin.</p>
-              
-              <div className="form-group" style={{ marginTop: '15px' }}>
-                <label>Message (Optional)</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. Please find the mid-term marks attached..." 
-                  value={optionalMessage}
-                  onChange={(e) => setOptionalMessage(e.target.value)}
-                  style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' }}
-                />
-              </div>
-
-              <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px', marginBottom: '15px' }}>
-                <input 
-                  type="checkbox" 
-                  id="sendToParentsCheckbox"
-                  checked={sendToParents}
-                  onChange={(e) => setSendToParents(e.target.checked)}
-                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                />
-                <label htmlFor="sendToParentsCheckbox" style={{ cursor: 'pointer', margin: 0, fontWeight: 'bold' }}>
-                  Send to Parents
-                </label>
-              </div>
               
               <form className="upload-form" onSubmit={handleUpload}>
                 <div className="upload-box" style={{ marginTop: '15px' }}>

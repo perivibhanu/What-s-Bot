@@ -209,21 +209,11 @@ const normalizePhone = (phone) => {
 const resolveRecipients = async (audience, isAll, batch, department, section, isHod) => {
   let recipients = [];
 
-  if (['students', 'parents', 'both', 'all'].includes(audience)) {
+  if (audience === 'students' || audience === 'all') { // Default to students
     let query = {
-      isRegistered: true
+      isRegistered: true,
+      phoneNumber: { $exists: true, $ne: '' }
     };
-    if (audience === 'students' || audience === 'all') {
-      query.phoneNumber = { $exists: true, $ne: '' };
-    } else if (audience === 'parents') {
-      query.parentPhoneNumber = { $exists: true, $ne: '' };
-    } else if (audience === 'both') {
-      query.$or = [
-        { phoneNumber: { $exists: true, $ne: '' } },
-        { parentPhoneNumber: { $exists: true, $ne: '' } }
-      ];
-    }
-
     if (isHod && department) {
       if (Array.isArray(department) && department.length > 0) {
         query.branch = { $in: department };
@@ -244,13 +234,7 @@ const resolveRecipients = async (audience, isAll, batch, department, section, is
       if (batch) query.regNumber = { $regex: `^..${batch}`, $options: 'i' };
     }
     const students = await Student.find(query);
-    
-    if (audience === 'students' || audience === 'all' || audience === 'both') {
-      recipients = recipients.concat(students.filter(s => s.phoneNumber).map(s => s.phoneNumber));
-    }
-    if (audience === 'parents' || audience === 'both') {
-      recipients = recipients.concat(students.filter(s => s.parentPhoneNumber).map(s => s.parentPhoneNumber));
-    }
+    recipients = recipients.concat(students.map(s => s.phoneNumber));
   }
 
   if (audience === 'teaching' || audience === 'lab_assistant') {

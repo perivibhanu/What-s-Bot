@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const chatSessionSchema = new mongoose.Schema({
   phoneNumber: { type: String, required: true, unique: true },
   currentState: { type: String, default: 'initial' },
-  currentTopic: { type: String },
   tempRegNumber: { type: String },
+  currentTopic: { type: String },
   issueCategory: { type: String },
   studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student' },
   staffId: { type: mongoose.Schema.Types.ObjectId, ref: 'Staff' },
