@@ -312,11 +312,23 @@ class ChatService {
     }
 
     // ✅ Both reg number and phone match!
-    // Store student ID and ask for Scholar Type before completing registration
+    const isParent = storedParentPhone === senderPhone && storedPhone !== senderPhone;
     session.studentId = student._id;
-    session.currentState = 'awaiting_scholar_type';
-    
-    return whatsappService.sendScholarTypeMenu(from);
+    session.userType = isParent ? 'parent' : 'student';
+
+    if (!student.isRegistered) {
+      session.currentState = 'awaiting_scholar_type';
+      return whatsappService.sendScholarTypeMenu(from);
+    }
+
+    // If already registered
+    session.currentState = 'registered_welcome';
+    if (session.userType === 'parent') {
+      return whatsappService.sendParentWelcome(from, student.name);
+    } else {
+      await whatsappService.sendTextMessage(from, `Welcome back, *${student.name}!* 👋`);
+      return whatsappService.sendRegisteredWelcome(from, student.name);
+    }
   }
 
   async handleScholarType(session, action, from) {
@@ -344,11 +356,15 @@ class ChatService {
     student.isRegistered = true;
     await student.save();
 
-    session.userType = 'student';
     session.currentState = 'registered_welcome';
 
-    await whatsappService.sendTextMessage(from, `✅ *Registration Complete!*\n\nWelcome, *${student.name}!* 👋`);
-    return whatsappService.sendRegisteredWelcome(from, student.name);
+    if (session.userType === 'parent') {
+      await whatsappService.sendTextMessage(from, `✅ *Registration Complete!*\n\nWelcome, Parent of *${student.name}!* 👋`);
+      return whatsappService.sendParentWelcome(from, student.name);
+    } else {
+      await whatsappService.sendTextMessage(from, `✅ *Registration Complete!*\n\nWelcome, *${student.name}!* 👋`);
+      return whatsappService.sendRegisteredWelcome(from, student.name);
+    }
   }
 
   // ── Helpdesk / Issue Handlers ───────────────────────────────────────────────
@@ -421,11 +437,28 @@ class ChatService {
         return whatsappService.sendLatestCirculars(from, circulars);
       }
 
-      case 'academics':
-        return whatsappService.sendAcademicsMenu(from);
+      case 'parent_principal_circulars': {
+        const Circular = require('../models/Circular');
+        const circulars = await Circular.find({ status: 'sent', type: 'principal' }).sort({ sentAt: -1 }).limit(1);
+        return whatsappService.sendLatestCirculars(from, circulars);
+      }
 
+      case 'parent_hod_circulars': {
+        const Circular = require('../models/Circular');
+        const circulars = await Circular.find({ status: 'sent', type: 'hod' }).sort({ sentAt: -1 }).limit(1);
+        return whatsappService.sendLatestCirculars(from, circulars);
+      }
+
+      case 'parent_marks':
       case 'marks':
         return whatsappService.sendStudentInfo(from, 'marks', student);
+
+      case 'parent_admission':
+        session.currentState = 'admission_welcome';
+        return whatsappService.sendAdmissionWelcome(from);
+
+      case 'academics':
+        return whatsappService.sendAcademicsMenu(from);
 
       case 'attendance':
         return whatsappService.sendStudentInfo(from, 'attendance', student);

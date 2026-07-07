@@ -79,7 +79,8 @@ class WhatsAppService {
               { id: 'academics', title: '📚 Academics', description: 'Marks, Attendance, Timetable' },
               { id: 'transportation', title: '🚌 Transportation', description: 'Bus routes & numbers' },
               { id: 'fee_balance', title: '💰 Fee Balance', description: 'Check & pay fees' },
-              { id: 'helpdesk', title: '🎫 Helpdesk / Issues', description: 'Report issues & complaints' }
+              { id: 'helpdesk', title: '🎫 Helpdesk / Issues', description: 'Report issues & complaints' },
+              { id: 'admission_start', title: '📋 Admission', description: 'Apply for admission online' }
             ]
           }]
         }
@@ -136,6 +137,35 @@ class WhatsAppService {
             rows: [
               { id: 'principal_circulars', title: '📢 Principal Circulars', description: 'College-wide updates' },
               { id: 'hod_circulars', title: '📝 HOD Circulars', description: 'Department updates' }
+            ]
+          }]
+        }
+      }
+    });
+  }
+
+  async sendParentWelcome(to, studentName) {
+    const welcomeText = studentName 
+      ? `Welcome, Parent of ${studentName}! 👋\n\nWhat would you like to check?`
+      : 'Welcome, Parent! 👋\n\nWhat would you like to check?';
+    
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: {
+          text: welcomeText
+        },
+        action: {
+          button: 'View Menu',
+          sections: [{
+            title: 'Parent Services',
+            rows: [
+              { id: 'parent_principal_circulars', title: '📢 Principal Circulars', description: 'College-wide updates' },
+              { id: 'parent_hod_circulars', title: '📝 HOD Circulars', description: 'Department updates' },
+              { id: 'parent_marks', title: '📊 Marks', description: 'View student marks' },
+              { id: 'parent_admission', title: '📋 Admission', description: 'Admission details' }
             ]
           }]
         }
