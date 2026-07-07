@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DeptLayout from '../components/DeptLayout';
+import MultiSelectDropdown from '../components/MultiSelectDropdown';
 import '../styles/Timetables.css'; // Reusing Timetables.css for identical layout
 
 function PlacementTraining() {
@@ -197,18 +198,14 @@ function PlacementTraining() {
                 </div>
                 <div className="filter-item">
                   <label>Sections</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
-                    {['A', 'B', 'C', 'D'].map(sec => (
-                      <label key={sec} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '14px', cursor: filter.isAllStudents ? 'not-allowed' : 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={(filter.section || []).includes(sec)}
-                          onChange={() => handleSectionToggle(sec)}
-                          disabled={filter.isAllStudents}
-                        />
-                        Section {sec}
-                      </label>
-                    ))}
+                  <div style={{ marginTop: '5px' }}>
+                    <MultiSelectDropdown 
+                      options={['A', 'B', 'C', 'D']}
+                      selected={filter.section || []}
+                      onChange={handleSectionToggle}
+                      placeholder="Select Sections"
+                      disabled={filter.isAllStudents}
+                    />
                   </div>
                 </div>
               </div>

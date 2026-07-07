@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import DeptLayout from '../components/DeptLayout';
+import MultiSelectDropdown from '../components/MultiSelectDropdown';
 import '../styles/Circulars.css'; // Reusing Circulars.css
 
 function HodCirculars() {
@@ -316,34 +317,14 @@ function HodCirculars() {
                   </div>
 
                   <div>
-                    <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#666' }}>DEPARTMENTS</label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
-                      {['CSE', 'IT', 'ECE', 'EEE', 'MECH', 'CIVIL', 'AIDS'].map(d => (
-                        <label key={d} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '14px', cursor: 'pointer' }}>
-                          <input
-                            type="checkbox"
-                            checked={targetPayload.department.includes(d)}
-                            onChange={() => handleArrayToggle('department', d)}
-                          />
-                          {d}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
                     <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#666' }}>SECTIONS</label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
-                      {['A', 'B', 'C', 'D'].map(sec => (
-                        <label key={sec} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '14px', cursor: 'pointer' }}>
-                          <input
-                            type="checkbox"
-                            checked={targetPayload.section.includes(sec)}
-                            onChange={() => handleArrayToggle('section', sec)}
-                          />
-                          Section {sec}
-                        </label>
-                      ))}
+                    <div style={{ marginTop: '5px' }}>
+                      <MultiSelectDropdown 
+                        options={['A', 'B', 'C', 'D']}
+                        selected={targetPayload.section}
+                        onChange={(sec) => handleArrayToggle('section', sec)}
+                        placeholder="Select Sections"
+                      />
                     </div>
                   </div>
                 </div>
