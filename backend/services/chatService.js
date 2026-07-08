@@ -510,6 +510,11 @@ class ChatService {
         await session.save();
         return whatsappService.sendHelpdeskCategoryMenu(from, student.scholarType);
 
+      case 'admission_start':
+        session.currentState = 'admission_welcome';
+        await session.save();
+        return whatsappService.sendAdmissionWelcome(from);
+
       case 'check_bus': {
         const trans = student.transportation;
         if (trans && (trans.busName || trans.boardingPoint)) {
