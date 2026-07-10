@@ -122,10 +122,11 @@ body {
 /* -- Watermark ------------------------------------------------------------- */
 .watermark {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 250px;
-  opacity: 0.8;
+  top: 50%;
+  left: calc(50% + 130px);
+  transform: translate(-50%, -50%);
+  width: 500px;
+  opacity: 0.1;
   pointer-events: none;
-  z-index: 1000;
+  z-index: 0;
 }
