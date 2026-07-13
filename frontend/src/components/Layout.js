@@ -46,6 +46,9 @@ function Layout({ children }) {
             <Link to="/staff" className={`menu-item ${isActive('/staff')}`}>
               👔 All Staff
             </Link>
+            <Link to="/hostel-wardens" className={`menu-item ${isActive('/hostel-wardens')}`}>
+              👨‍✈️ Hostel Warden
+            </Link>
           </div>
 
           <div className="menu-group">
