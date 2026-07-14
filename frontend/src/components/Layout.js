@@ -59,6 +59,9 @@ function Layout({ children }) {
             <Link to="/late-comers" className={`menu-item ${isActive('/late-comers')}`}>
               🚨 Late Comers
             </Link>
+            <Link to="/feedback/hostel" className={`menu-item ${isActive('/feedback/hostel')}`}>
+              🍽️ Food Feedback
+            </Link>
           </div>
 
           <div className="menu-group">
@@ -86,9 +89,6 @@ function Layout({ children }) {
 
           <div className="menu-group">
             <h4 className="group-title">🗣️ FEEDBACK</h4>
-            <Link to="/feedback/hostel" className={`menu-item ${isActive('/feedback/hostel')}`}>
-              🏠 Hostel
-            </Link>
             <Link to="/feedback/issues" className={`menu-item ${isActive('/feedback/issues')}`}>
               🛠️ Issues
             </Link>
