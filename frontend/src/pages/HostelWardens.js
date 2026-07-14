@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Layout from '../components/Layout';
-import '../styles/StaffManagement.css'; // Reusing staff management styles
+import '../styles/Students.css'; 
 
 function HostelWardens() {
   const [wardens, setWardens] = useState([]);
