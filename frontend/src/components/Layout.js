@@ -1,10 +1,22 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../styles/Layout.css';
 
 function Layout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const sidebarRef = useRef(null);
+
+  useEffect(() => {
+    const savedScroll = sessionStorage.getItem('sidebarScrollPos');
+    if (savedScroll && sidebarRef.current) {
+      sidebarRef.current.scrollTop = parseInt(savedScroll, 10);
+    }
+  }, []);
+
+  const handleScroll = (e) => {
+    sessionStorage.setItem('sidebarScrollPos', e.target.scrollTop);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -17,7 +29,7 @@ function Layout({ children }) {
 
   return (
     <div className="layout">
-      <nav className="sidebar">
+      <nav className="sidebar" ref={sidebarRef} onScroll={handleScroll}>
         <div className="sidebar-header">
           <h2>🎓 Velammalitech Admin</h2>
         </div>
