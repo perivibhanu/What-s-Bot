@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const wardenController = require('../controllers/wardenController');
-const { requireAuth } = require('../middleware/auth'); // Assuming you have auth middleware
+const { authMiddleware } = require('../middleware/auth'); 
 
 // Apply auth middleware to all routes if needed. 
-// For now, let's assume requireAuth is the standard for admin routes.
-router.use(requireAuth);
+router.use(authMiddleware);
 
 router.get('/', wardenController.getAllWardens);
 router.post('/', wardenController.createWarden);
