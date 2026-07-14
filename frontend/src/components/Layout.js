@@ -52,6 +52,16 @@ function Layout({ children }) {
           </div>
 
           <div className="menu-group">
+            <h4 className="group-title">🏢 HOSTEL MANAGEMENT</h4>
+            <Link to="/active-outings" className={`menu-item ${isActive('/active-outings')}`}>
+              🏠 Active Outings
+            </Link>
+            <Link to="/late-comers" className={`menu-item ${isActive('/late-comers')}`}>
+              🚨 Late Comers
+            </Link>
+          </div>
+
+          <div className="menu-group">
             <h4 className="group-title">🚌 CAMPUS SERVICES</h4>
             <Link to="/transport" className={`menu-item ${isActive('/transport')}`}>
               🚐 Transportation

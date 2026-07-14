@@ -26,6 +26,8 @@ import ApplicationForm from './pages/ApplicationForm';
 import FeeDefaulters from './pages/FeeDefaulters';
 import HostelFeedback from './pages/HostelFeedback';
 import HostelWardens from './pages/HostelWardens';
+import ActiveOutings from './pages/ActiveOutings';
+import LateComers from './pages/LateComers';
 
 import IssuesFeedback from './pages/IssuesFeedback';
 
@@ -90,6 +92,8 @@ function App() {
         <Route path="/college-media" element={<PrivateRoute allowedRole="super_admin"><CollegeMedia /></PrivateRoute>} />
         <Route path="/admissions" element={<PrivateRoute allowedRole="super_admin"><Admissions /></PrivateRoute>} />
         <Route path="/fee-defaulters" element={<PrivateRoute allowedRole="super_admin"><FeeDefaulters /></PrivateRoute>} />
+        <Route path="/active-outings" element={<PrivateRoute allowedRole="super_admin"><ActiveOutings /></PrivateRoute>} />
+        <Route path="/late-comers" element={<PrivateRoute allowedRole="super_admin"><LateComers /></PrivateRoute>} />
         
         {/* Feedback Routes */}
         <Route path="/feedback/hostel" element={<PrivateRoute allowedRole="super_admin"><HostelFeedback /></PrivateRoute>} />

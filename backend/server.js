@@ -55,7 +55,8 @@ app.get('/', (req, res) => {
       staffMessages: '/api/staff-messages',
       admissions: '/api/admissions',
       feedback: '/api/feedback',
-      wardens: '/api/wardens'
+      wardens: '/api/wardens',
+      outings: '/api/outings'
     }
   });
 });
@@ -75,6 +76,7 @@ app.use('/api/staff-messages', require('./routes/staffMessages'));
 app.use('/api/admissions', require('./routes/admission'));
 app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/wardens', require('./routes/wardens'));
+app.use('/api/outings', require('./routes/outings'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
