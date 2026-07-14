@@ -68,8 +68,19 @@ class ChatService {
     const msgLower = messageText.toLowerCase();
     const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai', 'back', 'menu', 'main menu'].includes(msgLower);
 
-    // ── Auto-detect staff member ──────────────────────────────────────────────
-    if (isGreeting && session.userType !== 'staff') {
+    // ── Auto-detect staff or warden member ──────────────────────────────────────────────
+    if (isGreeting && session.userType !== 'staff' && session.userType !== 'warden') {
+      const Warden = require('../models/Warden');
+      const wardenList = await Warden.find({});
+      const wardenMember = wardenList.find(w => normalizePhone(w.mobileNumber) === normalizePhone(from));
+      if (wardenMember) {
+        session.userType = 'warden';
+        session.wardenId = wardenMember._id;
+        session.currentState = 'warden_welcome';
+        await session.save();
+        return whatsappService.sendWardenWelcome(from, wardenMember.name, wardenMember.block);
+      }
+
       const Staff = require('../models/Staff');
       const staffList = await Staff.find({});
       const staffMember = staffList.find(s => normalizePhone(s.contactDetails) === normalizePhone(from));
@@ -91,6 +102,17 @@ class ChatService {
 
     if (session.userType === 'staff' && session.currentState === 'staff_welcome') {
       return this.handleStaffAction(session, msgLower, from);
+    }
+
+    if (session.userType === 'warden' && isGreeting) {
+      session.currentState = 'warden_welcome';
+      const Warden = require('../models/Warden');
+      const wardenMember = await Warden.findById(session.wardenId);
+      return whatsappService.sendWardenWelcome(from, wardenMember?.name, wardenMember?.block);
+    }
+
+    if (session.userType === 'warden') {
+      return this.handleWardenAction(session, messageText, from); // Pass raw messageText because images might not have text
     }
 
     // ── Already verified student sends greeting → show main menu ─────────────
@@ -554,6 +576,64 @@ class ChatService {
 
         // Unknown input → re-show menu
         return whatsappService.sendRegisteredWelcome(from, student.name);
+    }
+    }
+  }
+
+  // ── Staff Actions ────────────────────────────────────────────────────────
+  async handleStaffAction(session, action, from) {
+    return whatsappService.sendTextMessage(from, '👔 Staff features are under development.');
+  }
+
+  // ── Warden Actions ────────────────────────────────────────────────────────
+  async handleWardenAction(session, messageText, from) {
+    const Warden = require('../models/Warden');
+    const warden = await Warden.findById(session.wardenId);
+    if (!warden) return;
+
+    const actionLower = typeof messageText === 'string' ? messageText.toLowerCase() : '';
+
+    switch (actionLower) {
+      case 'warden_outing':
+        return whatsappService.sendTextMessage(from, '🚪 *Outings*\n\nPlease reply with:\n1. *NEW* - to view pending requests\n2. *RET [RegNo] [OTP]* - to mark a student returned (e.g. RET VCET-2026-00004 4829)');
+      
+      case 'warden_complaint':
+        session.currentState = 'warden_awaiting_complaint';
+        await session.save();
+        return whatsappService.sendTextMessage(from, '⚠️ *Report an Issue*\n\nPlease type a short description of the issue or send a photo.');
+
+      case 'warden_admission':
+        return whatsappService.sendTextMessage(from, '📋 *Admission Application*\n\nHere is the link to the admission form:\nhttps://what-s-bot.vercel.app/apply');
+
+      default:
+        // Handle awaiting complaint
+        if (session.currentState === 'warden_awaiting_complaint') {
+          // Here we would handle text or photo. For now, text:
+          if (messageText) {
+            const WardenIssue = require('../models/WardenIssue');
+            const ticketId = 'TKT-WARD-' + Math.floor(1000 + Math.random() * 9000);
+            
+            await WardenIssue.create({
+              ticketId,
+              wardenId: session.wardenId,
+              description: messageText,
+              status: 'Open'
+            });
+
+            session.currentState = 'warden_welcome';
+            await session.save();
+            await whatsappService.sendTextMessage(from, `✅ *Complaint Registered*\n\nTicket ID: ${ticketId}\nYour issue has been forwarded to the Principal's Dashboard.`);
+            return whatsappService.sendWardenWelcome(from, warden.name, warden.block);
+          }
+        }
+
+        // Handle RET command
+        if (actionLower.startsWith('ret ')) {
+          // To be implemented in the Outing flow
+          return whatsappService.sendTextMessage(from, 'Outing return feature under development.');
+        }
+
+        return whatsappService.sendWardenWelcome(from, warden.name, warden.block);
     }
   }
 }

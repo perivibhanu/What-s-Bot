@@ -267,6 +267,32 @@ class WhatsAppService {
     });
   }
 
+  async sendWardenWelcome(to, wardenName, blockName) {
+    const welcomeText = wardenName 
+      ? `Welcome back, ${wardenName}! 🏢\n*Hostel Block:* ${blockName || 'N/A'}\n\nPlease select an option:`
+      : 'Welcome back! 🏢\n\nPlease select an option:';
+    
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: { text: welcomeText },
+        action: {
+          button: 'View Menu',
+          sections: [{
+            title: 'Warden Services',
+            rows: [
+              { id: 'warden_outing', title: '🚪 Outing', description: 'Manage New & Return Outings' },
+              { id: 'warden_complaint', title: '⚠️ Complaint', description: 'Report an issue' },
+              { id: 'warden_admission', title: '📋 Admission', description: 'Admission link' }
+            ]
+          }]
+        }
+      }
+    });
+  }
+
   async sendTextMessage(to, text) {
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
