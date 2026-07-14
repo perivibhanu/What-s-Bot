@@ -577,7 +577,6 @@ class ChatService {
         // Unknown input → re-show menu
         return whatsappService.sendRegisteredWelcome(from, student.name);
     }
-    }
   }
 
   // ── Staff Actions ────────────────────────────────────────────────────────
