@@ -30,6 +30,8 @@ import ActiveOutings from './pages/ActiveOutings';
 import LateComers from './pages/LateComers';
 
 import IssuesFeedback from './pages/IssuesFeedback';
+import StaffIssuesFeedback from './pages/StaffIssuesFeedback';
+import WardenIssuesFeedback from './pages/WardenIssuesFeedback';
 
 function App() {
   const [token, setToken] = React.useState(localStorage.getItem('token'));
@@ -98,6 +100,8 @@ function App() {
         {/* Feedback Routes */}
         <Route path="/feedback/hostel" element={<PrivateRoute allowedRole="super_admin"><HostelFeedback /></PrivateRoute>} />
         <Route path="/feedback/issues" element={<PrivateRoute allowedRole="super_admin"><IssuesFeedback /></PrivateRoute>} />
+        <Route path="/feedback/staff-issues" element={<PrivateRoute allowedRole="super_admin"><StaffIssuesFeedback /></PrivateRoute>} />
+        <Route path="/feedback/warden-issues" element={<PrivateRoute allowedRole="super_admin"><WardenIssuesFeedback /></PrivateRoute>} />
 
         <Route path="/settings" element={<PrivateRoute allowedRole="super_admin"><Settings /></PrivateRoute>} />
       </Routes>

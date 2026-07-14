@@ -90,7 +90,13 @@ function Layout({ children }) {
           <div className="menu-group">
             <h4 className="group-title">🗣️ FEEDBACK</h4>
             <Link to="/feedback/issues" className={`menu-item ${isActive('/feedback/issues')}`}>
-              🛠️ Issues
+              🛠️ Student Issues
+            </Link>
+            <Link to="/feedback/staff-issues" className={`menu-item ${isActive('/feedback/staff-issues')}`}>
+              👔 Staff Issues
+            </Link>
+            <Link to="/feedback/warden-issues" className={`menu-item ${isActive('/feedback/warden-issues')}`}>
+              👨‍✈️ Warden Issues
             </Link>
           </div>
 

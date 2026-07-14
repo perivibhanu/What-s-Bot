@@ -1,0 +1,33 @@
+const mongoose = require('mongoose');
+
+const wardenIssueSchema = new mongoose.Schema({
+  ticketId: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  wardenId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Warden',
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['Open', 'Under Review', 'Resolved'],
+    default: 'Open'
+  },
+  adminMessage: {
+    type: String,
+    default: ''
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+module.exports = mongoose.model('WardenIssue', wardenIssueSchema);

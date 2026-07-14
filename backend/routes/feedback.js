@@ -19,4 +19,12 @@ router.post('/submit', feedbackController.submitFeedback);
 router.get('/issues', authMiddleware, feedbackController.getIssues);
 router.put('/issues/:id/status', authMiddleware, feedbackController.updateIssueStatus);
 
+// ── Staff Issue Tickets ──────────────────────────────────────────────────
+router.get('/staff-issues', authMiddleware, feedbackController.getStaffIssues);
+router.put('/staff-issues/:id/status', authMiddleware, feedbackController.updateStaffIssueStatus);
+
+// ── Warden Issue Tickets ──────────────────────────────────────────────────
+router.get('/warden-issues', authMiddleware, feedbackController.getWardenIssues);
+router.put('/warden-issues/:id/status', authMiddleware, feedbackController.updateWardenIssueStatus);
+
 module.exports = router;

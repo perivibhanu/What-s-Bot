@@ -180,3 +180,114 @@ exports.updateIssueStatus = async (req, res) => {
     res.status(500).json({ error: 'Server error updating issue' });
   }
 };
+
+// ── Staff Issue Tickets ──────────────────────────────────────────────────
+const StaffIssue = require('../models/StaffIssue');
+
+exports.getStaffIssues = async (req, res) => {
+  try {
+    const issues = await StaffIssue.find()
+      .populate('staffId', 'name department mobileNumber')
+      .sort({ createdAt: -1 });
+    res.json(issues);
+  } catch (error) {
+    console.error('Error fetching staff issues:', error);
+    res.status(500).json({ error: 'Server error fetching staff issues' });
+  }
+};
+
+exports.updateStaffIssueStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, adminMessage } = req.body;
+    
+    const issue = await StaffIssue.findById(id).populate('staffId', 'name mobileNumber');
+    if (!issue) return res.status(404).json({ error: 'Issue not found' });
+    
+    if (status) issue.status = status;
+    if (adminMessage !== undefined) issue.adminMessage = adminMessage;
+    
+    await issue.save();
+    
+    // Notify via WhatsApp (using mobileNumber directly as fallback)
+    const whatsappService = require('../services/whatsappService');
+    const phoneNumber = issue.staffId?.mobileNumber;
+    
+    if (phoneNumber) {
+      let message = '';
+      if (status === 'Under Review') {
+        message = `🎫 *Staff Ticket ${issue.ticketId} Update*\n\nThe Principal has seen your issue.`;
+      } else if (status === 'Resolved') {
+        message = `✅ *Staff Ticket ${issue.ticketId} Resolved*\n\nYour reported issue has been solved.`;
+      }
+      
+      if (adminMessage) {
+        message += `\n\n*Admin Note:* ${adminMessage}`;
+      }
+      
+      if (message) {
+        await whatsappService.sendTextMessage(phoneNumber, message);
+      }
+    }
+    
+    res.json(issue);
+  } catch (error) {
+    console.error('Error updating staff issue:', error);
+    res.status(500).json({ error: 'Server error updating staff issue' });
+  }
+};
+
+// ── Warden Issue Tickets ──────────────────────────────────────────────────
+const WardenIssue = require('../models/WardenIssue');
+
+exports.getWardenIssues = async (req, res) => {
+  try {
+    const issues = await WardenIssue.find()
+      .populate('wardenId', 'name mobileNumber block')
+      .sort({ createdAt: -1 });
+    res.json(issues);
+  } catch (error) {
+    console.error('Error fetching warden issues:', error);
+    res.status(500).json({ error: 'Server error fetching warden issues' });
+  }
+};
+
+exports.updateWardenIssueStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, adminMessage } = req.body;
+    
+    const issue = await WardenIssue.findById(id).populate('wardenId', 'name mobileNumber');
+    if (!issue) return res.status(404).json({ error: 'Issue not found' });
+    
+    if (status) issue.status = status;
+    if (adminMessage !== undefined) issue.adminMessage = adminMessage;
+    
+    await issue.save();
+    
+    const whatsappService = require('../services/whatsappService');
+    const phoneNumber = issue.wardenId?.mobileNumber;
+    
+    if (phoneNumber) {
+      let message = '';
+      if (status === 'Under Review') {
+        message = `🎫 *Warden Ticket ${issue.ticketId} Update*\n\nThe Principal has seen your issue.`;
+      } else if (status === 'Resolved') {
+        message = `✅ *Warden Ticket ${issue.ticketId} Resolved*\n\nYour reported issue has been solved.`;
+      }
+      
+      if (adminMessage) {
+        message += `\n\n*Admin Note:* ${adminMessage}`;
+      }
+      
+      if (message) {
+        await whatsappService.sendTextMessage(phoneNumber, message);
+      }
+    }
+    
+    res.json(issue);
+  } catch (error) {
+    console.error('Error updating warden issue:', error);
+    res.status(500).json({ error: 'Server error updating warden issue' });
+  }
+};
