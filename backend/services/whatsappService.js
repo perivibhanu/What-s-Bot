@@ -148,24 +148,22 @@ class WhatsAppService {
 
   async sendStaffWelcome(to, staffName) {
     const welcomeText = staffName 
-      ? `Welcome back, ${staffName}! 👋\n\nWhat would you like to check?`
-      : 'Welcome back! 👋\n\nWhat would you like to check?';
+      ? `Welcome back, ${staffName}! 👔\n\nPlease select an option:`
+      : 'Welcome back! 👔\n\nPlease select an option:';
     
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
       type: 'interactive',
       interactive: {
         type: 'list',
-        body: {
-          text: welcomeText
-        },
+        body: { text: welcomeText },
         action: {
           button: 'View Menu',
           sections: [{
             title: 'Staff Services',
             rows: [
-              { id: 'principal_circulars', title: '📢 Principal Circulars', description: 'College-wide updates' },
-              { id: 'hod_circulars', title: '📝 HOD Circulars', description: 'Department updates' }
+              { id: 'staff_complaint', title: '⚠️ Complaint', description: 'Report an issue' },
+              { id: 'staff_admission', title: '📋 Admission', description: 'Admission link' }
             ]
           }]
         }

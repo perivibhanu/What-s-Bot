@@ -581,8 +581,45 @@ class ChatService {
   }
 
   // ── Staff Actions ────────────────────────────────────────────────────────
-  async handleStaffAction(session, action, from) {
-    return whatsappService.sendTextMessage(from, '👔 Staff features are under development.');
+  async handleStaffAction(session, messageText, from) {
+    const Staff = require('../models/Staff');
+    const staff = await Staff.findById(session.staffId);
+    if (!staff) return;
+
+    const actionLower = typeof messageText === 'string' ? messageText.toLowerCase() : '';
+
+    switch (actionLower) {
+      case 'staff_complaint':
+        session.currentState = 'staff_awaiting_complaint';
+        await session.save();
+        return whatsappService.sendTextMessage(from, '⚠️ *Report an Issue*\n\nPlease type a short description of the issue.');
+
+      case 'staff_admission':
+        return whatsappService.sendTextMessage(from, '📋 *Admission Application*\n\nHere is the link to the admission form:\nhttps://what-s-bot.vercel.app/apply');
+
+      default:
+        // Handle awaiting complaint
+        if (session.currentState === 'staff_awaiting_complaint') {
+          if (messageText) {
+            const StaffIssue = require('../models/StaffIssue');
+            const ticketId = 'TKT-STAFF-' + Math.floor(1000 + Math.random() * 9000);
+            
+            await StaffIssue.create({
+              ticketId,
+              staffId: session.staffId,
+              description: messageText,
+              status: 'Open'
+            });
+
+            session.currentState = 'staff_welcome';
+            await session.save();
+            await whatsappService.sendTextMessage(from, `✅ *Complaint Registered*\n\nTicket ID: ${ticketId}\nYour issue has been forwarded to the Principal's Dashboard.`);
+            return whatsappService.sendStaffWelcome(from, staff.name);
+          }
+        }
+
+        return whatsappService.sendStaffWelcome(from, staff.name);
+    }
   }
 
   // ── Warden Actions ────────────────────────────────────────────────────────
