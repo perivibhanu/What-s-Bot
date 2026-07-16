@@ -79,7 +79,8 @@ app.use('/api/wardens', require('./routes/wardens'));
 app.use('/api/outings', require('./routes/outings'));
 
 const PORT = process.env.PORT || 5000;
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Webhook URL: http://localhost:${PORT}/webhook`);
+  console.log(`Webhook URL: ${BASE_URL}/webhook`);
 });
