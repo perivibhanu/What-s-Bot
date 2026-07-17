@@ -13,7 +13,7 @@ function HostelFeedback() {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get(`https://what-s-bot.onrender.com/api/feedback/distribution?date=${selectedDate}`, {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/feedback/distribution?date=${selectedDate}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setDistributionData(res.data);

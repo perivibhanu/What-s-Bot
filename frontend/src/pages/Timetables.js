@@ -36,7 +36,7 @@ function Timetables() {
   const fetchTimetables = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('https://what-s-bot.onrender.com/api/timetables', {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/timetables`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTimetables(res.data);
@@ -81,7 +81,7 @@ function Timetables() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://what-s-bot.onrender.com/api/timetables/upload', formData, {
+      await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/timetables/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -104,7 +104,7 @@ function Timetables() {
     
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`https://what-s-bot.onrender.com/api/timetables/${id}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/timetables/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchTimetables();
@@ -119,7 +119,7 @@ function Timetables() {
     setSending(id);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post(`https://what-s-bot.onrender.com/api/timetables/${id}/send`, {}, {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/timetables/${id}/send`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.sentCount === 0) {
@@ -141,7 +141,7 @@ function Timetables() {
     setResending(id);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post(`https://what-s-bot.onrender.com/api/timetables/${id}/resend`, {}, {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/timetables/${id}/resend`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.sentCount === 0) {

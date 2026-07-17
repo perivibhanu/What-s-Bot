@@ -19,7 +19,7 @@ function Settings() {
   const fetchSettings = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('https://what-s-bot.onrender.com/api/admin/settings', {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/admin/settings`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSettings(res.data);
@@ -32,7 +32,7 @@ function Settings() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.put('https://what-s-bot.onrender.com/api/admin/settings', settings, {
+      await axios.put(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/admin/settings`, settings, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert('Settings updated');

@@ -12,7 +12,7 @@ function Login({ setToken }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('https://what-s-bot.onrender.com/api/auth/login', { username, password });
+      const res = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/login`, { username, password });
       localStorage.setItem('token', res.data.token);
       setToken(res.data.token);
       navigate('/');

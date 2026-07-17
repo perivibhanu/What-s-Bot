@@ -36,7 +36,7 @@ function StaffManagement() {
     try {
       const token = localStorage.getItem('token');
       // Pass type to backend to filter
-      const res = await axios.get(`https://what-s-bot.onrender.com/api/staff?type=${activeTab}`, {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/staff?type=${activeTab}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (role === 'dept_admin') {
@@ -59,7 +59,7 @@ function StaffManagement() {
         payload.department = dept;
       }
       
-      await axios.post('https://what-s-bot.onrender.com/api/staff', payload, {
+      await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/staff`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setShowModal(false);
@@ -74,7 +74,7 @@ function StaffManagement() {
     if (!window.confirm(`Are you sure you want to delete ${name}?`)) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`https://what-s-bot.onrender.com/api/staff/${id}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/staff/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchStaff();
@@ -87,7 +87,7 @@ function StaffManagement() {
   const handleDownloadTemplate = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('https://what-s-bot.onrender.com/api/staff/import/template', {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/staff/import/template`, {
         headers: { Authorization: `Bearer ${token}` },
         responseType: 'blob'
       });
@@ -116,7 +116,7 @@ function StaffManagement() {
       const token = localStorage.getItem('token');
       const formData = new FormData();
       formData.append('file', importFile);
-      const res = await axios.post('https://what-s-bot.onrender.com/api/staff/import/bulk', formData, {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/staff/import/bulk`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

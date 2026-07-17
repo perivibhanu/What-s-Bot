@@ -21,7 +21,7 @@ function WardenIssuesFeedback() {
   const fetchIssues = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`${process.env.REACT_APP_API_URL || 'https://what-s-bot.onrender.com'}/api/feedback/warden-issues`, {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/feedback/warden-issues`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setIssues(res.data);
@@ -47,7 +47,7 @@ function WardenIssuesFeedback() {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `${process.env.REACT_APP_API_URL || 'https://what-s-bot.onrender.com'}/api/feedback/warden-issues/${selectedIssue._id}/status`,
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/feedback/warden-issues/${selectedIssue._id}/status`,
         { status: pendingStatus, adminMessage },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -3,7 +3,7 @@ import axios from 'axios';
 import Layout from '../components/Layout';
 import '../styles/Admissions.css';
 
-const API = 'https://what-s-bot.onrender.com/api/admissions';
+const API = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/admissions`;
 
 function Admissions() {
   const [applications, setApplications] = useState([]);

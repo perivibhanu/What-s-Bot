@@ -594,7 +594,7 @@ class ChatService {
         return whatsappService.sendTextMessage(from, '⚠️ *Report an Issue*\n\nPlease type a short description of the issue.');
 
       case 'staff_admission':
-        return whatsappService.sendTextMessage(from, '📋 *Admission Application*\n\nHere is the link to the admission form:\nhttps://what-s-bot.vercel.app/apply');
+        return whatsappService.sendTextMessage(from, `📋 *Admission Application*\n\nHere is the link to the admission form:\n${process.env.FRONTEND_URL || 'http://localhost:3000'}/apply`);
 
       default:
         // Handle awaiting complaint
@@ -639,7 +639,7 @@ class ChatService {
         return whatsappService.sendTextMessage(from, '⚠️ *Report an Issue*\n\nPlease type a short description of the issue or send a photo.');
 
       case 'warden_admission':
-        return whatsappService.sendTextMessage(from, '📋 *Admission Application*\n\nHere is the link to the admission form:\nhttps://what-s-bot.vercel.app/apply');
+        return whatsappService.sendTextMessage(from, `📋 *Admission Application*\n\nHere is the link to the admission form:\n${process.env.FRONTEND_URL || 'http://localhost:3000'}/apply`);
 
       default:
         // Handle awaiting complaint

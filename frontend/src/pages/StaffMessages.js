@@ -36,7 +36,7 @@ function StaffMessages() {
   const fetchMessages = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('https://what-s-bot.onrender.com/api/staff-messages', {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/staff-messages`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMessages(res.data);
@@ -55,7 +55,7 @@ function StaffMessages() {
       const formDataUpload = new FormData();
       formDataUpload.append('file', file);
 
-      const res = await axios.post('https://what-s-bot.onrender.com/api/staff-messages/upload', formDataUpload, {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/staff-messages/upload`, formDataUpload, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -82,7 +82,7 @@ function StaffMessages() {
     setCreating(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://what-s-bot.onrender.com/api/staff-messages', createFormData, {
+      await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/staff-messages`, createFormData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert('Draft created successfully!');
@@ -101,7 +101,7 @@ function StaffMessages() {
     setSending(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post(`https://what-s-bot.onrender.com/api/staff-messages/${selectedMessageId}/send`, targetPayload, {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/staff-messages/${selectedMessageId}/send`, targetPayload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert(res.data.message);
@@ -121,7 +121,7 @@ function StaffMessages() {
     setResending(id);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post(`https://what-s-bot.onrender.com/api/staff-messages/${id}/resend`, {}, {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/staff-messages/${id}/resend`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert(res.data.message);
@@ -139,7 +139,7 @@ function StaffMessages() {
     }
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`https://what-s-bot.onrender.com/api/staff-messages/${id}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/staff-messages/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchMessages();

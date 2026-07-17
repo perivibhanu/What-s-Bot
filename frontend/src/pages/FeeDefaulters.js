@@ -29,7 +29,7 @@ function FeeDefaulters() {
   const fetchDefaulters = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('https://what-s-bot.onrender.com/api/data/fee-defaulters', {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/data/fee-defaulters`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setDefaulters(res.data);
@@ -55,7 +55,7 @@ function FeeDefaulters() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://what-s-bot.onrender.com/api/data/update-single-fee', formData, {
+      await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/data/update-single-fee`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setShowModal(false);
@@ -81,7 +81,7 @@ function FeeDefaulters() {
       formData.append('type', 'fees');
       formData.append('isAllStudents', true); // Global upload by reg number
 
-      const res = await axios.post('https://what-s-bot.onrender.com/api/data/upload', formData, {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/data/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

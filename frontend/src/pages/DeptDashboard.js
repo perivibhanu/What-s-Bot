@@ -13,7 +13,7 @@ function DeptDashboard() {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('https://what-s-bot.onrender.com/api/students', {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/students`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         

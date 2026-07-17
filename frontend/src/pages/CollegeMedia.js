@@ -3,7 +3,7 @@ import axios from 'axios';
 import Layout from '../components/Layout';
 import '../styles/CollegeMedia.css';
 
-const API = 'https://what-s-bot.onrender.com/api/college-media';
+const API = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/college-media`;
 
 const authHeader = () => ({
   headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }

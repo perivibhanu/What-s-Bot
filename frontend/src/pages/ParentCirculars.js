@@ -75,7 +75,7 @@ function ParentCirculars() {
       const formDataUpload = new FormData();
       formDataUpload.append('file', file);
 
-      const res = await axios.post('https://what-s-bot.onrender.com/api/circulars/upload', formDataUpload, {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/circulars/upload`, formDataUpload, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -105,7 +105,7 @@ function ParentCirculars() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://what-s-bot.onrender.com/api/circulars', {
+      await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/circulars`, {
         ...formData,
         type: 'parent_principal'
       }, {
@@ -125,7 +125,7 @@ function ParentCirculars() {
     setSending(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post(`https://what-s-bot.onrender.com/api/circulars/${selectedCircularId}/send`, targetPayload, {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/circulars/${selectedCircularId}/send`, targetPayload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert(res.data.message);
@@ -146,7 +146,7 @@ function ParentCirculars() {
     setResending(id);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post(`https://what-s-bot.onrender.com/api/circulars/${id}/resend`, {}, {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/circulars/${id}/resend`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert(res.data.message);
@@ -165,7 +165,7 @@ function ParentCirculars() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`https://what-s-bot.onrender.com/api/circulars/${id}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/circulars/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchCirculars();
