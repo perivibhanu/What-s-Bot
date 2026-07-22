@@ -59,8 +59,8 @@ class WhatsAppService {
 
   async sendRegisteredWelcome(to, studentName) {
     const welcomeText = studentName 
-      ? `Welcome back, ${studentName}! 👋\n\nWhat would you like to check?`
-      : 'Welcome back! 👋\n\nWhat would you like to check?';
+      ? `Welcome to Velammal Institute of Technology! 👋\n\nHello ${studentName}, how can we assist you today?`
+      : 'Welcome to Velammal Institute of Technology! 👋\n\nHow can we assist you today?';
     
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
@@ -90,8 +90,8 @@ class WhatsAppService {
 
   async sendParentWelcome(to, studentName) {
     const welcomeText = studentName 
-      ? `Welcome! 👋 You are viewing the portal for ${studentName}.\n\nWhat would you like to check?`
-      : 'Welcome! 👋\n\nWhat would you like to check?';
+      ? `Welcome to Velammal Institute of Technology! 👋\n\nYou are viewing the portal for ${studentName}.\nHow can we assist you today?`
+      : 'Welcome to Velammal Institute of Technology! 👋\n\nHow can we assist you today?';
     
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
@@ -546,6 +546,14 @@ class WhatsAppService {
       `*${circular.title}*\n\n` +
       `${circular.description || ''}\n\n` +
       `Date: ${new Date(circular.sentAt).toLocaleDateString()}`;
+
+    if (!circular.fileUrl) {
+      return this.sendMessage(to, {
+        messaging_product: 'whatsapp',
+        type: 'text',
+        text: { body: caption }
+      });
+    }
 
     if (circular.fileType === 'image') {
       return this.sendMessage(to, {

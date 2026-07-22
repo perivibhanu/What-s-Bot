@@ -99,10 +99,6 @@ function HodCirculars() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.fileUrl) {
-      alert('Please upload a file first');
-      return;
-    }
 
     try {
       const token = localStorage.getItem('token');
@@ -251,7 +247,7 @@ function HodCirculars() {
               />
               <div className="file-upload">
                 <label htmlFor="file-input" className="file-label">
-                  {uploading ? 'Uploading...' : formData.fileName || 'Choose File (PDF/Word/Image)'}
+                  {uploading ? 'Uploading...' : formData.fileName || 'Choose File (Optional - PDF/Word/Image)'}
                 </label>
                 <input 
                   id="file-input"

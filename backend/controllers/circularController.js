@@ -84,8 +84,8 @@ exports.createCircular = async (req, res) => {
   try {
     const { title, description, fileUrl, fileName, fileType, cloudinaryPublicId, type, department } = req.body;
 
-    if (!title || !fileUrl || !fileName) {
-      return res.status(400).json({ error: 'Title, fileUrl, and fileName are required' });
+    if (!title) {
+      return res.status(400).json({ error: 'Title is required' });
     }
 
     const circular = await Circular.create({

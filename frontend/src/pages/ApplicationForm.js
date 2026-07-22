@@ -138,7 +138,8 @@ const ApplicationForm = () => {
         phoneNumber: formData.whatsappNumber // Use whatsapp as primary identifier if needed
       };
 
-      const response = await fetch('/api/admissions', {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${apiUrl}/api/admissions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

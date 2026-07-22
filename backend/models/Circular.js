@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const circularSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
-  fileUrl: { type: String, required: true },
-  fileName: { type: String, required: true },
+  fileUrl: { type: String },
+  fileName: { type: String },
   fileType: { type: String, enum: ['document', 'image'], default: 'document' },
   type: { type: String, enum: ['principal', 'hod', 'parent_principal', 'parent_hod'], default: 'principal' },
   department: { type: String }, // For HOD circulars
