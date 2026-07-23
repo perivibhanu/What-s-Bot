@@ -263,6 +263,7 @@ class ChatService {
 
       case 'awaiting_issue_category':
       case 'awaiting_issue_description':
+      case 'awaiting_outing_details':
         return this.handleHelpdeskIssue(session, msgLower, messageText, from);
 
       default:
