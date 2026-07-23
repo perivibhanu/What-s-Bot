@@ -610,7 +610,7 @@ class ChatService {
       case 'rate_food':
         session.currentState = 'awaiting_food_ratings';
         await session.save();
-        return whatsappService.sendTextMessage(from, '🍽️ *Rate Today\\'s Meals*\n\nPlease reply with a single message containing your ratings (1 to 10) for all meals like this:\n\nBreakfast: 8\nLunch: 7\nSnacks: 9\nDinner: 6');
+        return whatsappService.sendTextMessage(from, `🍽️ *Rate Today's Meals*\n\nPlease reply with a single message containing your ratings (1 to 10) for all meals like this:\n\nBreakfast: 8\nLunch: 7\nSnacks: 9\nDinner: 6`);
 
       case 'transportation':
         await whatsappService.sendStudentInfo(from, 'transportation', student);
