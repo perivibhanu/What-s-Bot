@@ -57,11 +57,28 @@ class WhatsAppService {
     return this.sendMessage(to, message);
   }
 
-  async sendRegisteredWelcome(to, studentName) {
-    const welcomeText = studentName 
-      ? `Welcome to Velammal Institute of Technology! 👋\n\nHello ${studentName}, how can we assist you today?`
+  async sendRegisteredWelcome(to, student) {
+    const welcomeText = student?.name 
+      ? `Welcome to Velammal Institute of Technology! 👋\n\nHello ${student.name}, how can we assist you today?`
       : 'Welcome to Velammal Institute of Technology! 👋\n\nHow can we assist you today?';
     
+    const rows = [
+      { id: 'current_updates', title: '📢 Current Updates', description: 'Principal circulars' },
+      { id: 'academics', title: '📚 Academics', description: 'Marks, Attendance, Timetable' }
+    ];
+
+    if (student?.scholarType === 'Hostel') {
+      rows.push({ id: 'hostel_services', title: '🏨 Hostel Services', description: 'Outings & Food Rating' });
+    } else {
+      rows.push({ id: 'transportation', title: '🚌 Transportation', description: 'Bus routes & numbers' });
+    }
+
+    rows.push(
+      { id: 'fee_balance', title: '💰 Fee Balance', description: 'Check & pay fees' },
+      { id: 'helpdesk', title: '🎫 Helpdesk / Issues', description: 'Report issues & complaints' },
+      { id: 'admission_start', title: '📋 Admission', description: 'Apply for admission online' }
+    );
+
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
       type: 'interactive',
@@ -74,13 +91,48 @@ class WhatsAppService {
           button: 'View Menu',
           sections: [{
             title: 'Student Services',
+            rows: rows
+          }]
+        }
+      }
+    });
+  }
+
+  async sendHostelMenu(to) {
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        body: {
+          text: '🏨 *Hostel Services*\n\nWhat would you like to do?'
+        },
+        action: {
+          buttons: [
+            { type: 'reply', reply: { id: 'make_outing', title: 'Make Outing' } },
+            { type: 'reply', reply: { id: 'rate_food', title: 'Rate Food' } }
+          ]
+        }
+      }
+    });
+  }
+
+  async sendMealSelectionMenu(to) {
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: { text: '🍽️ Which meal would you like to rate?' },
+        action: {
+          button: 'Select Meal',
+          sections: [{
+            title: 'Meals',
             rows: [
-              { id: 'current_updates', title: '📢 Current Updates', description: 'Principal circulars' },
-              { id: 'academics', title: '📚 Academics', description: 'Marks, Attendance, Timetable' },
-              { id: 'transportation', title: '🚌 Transportation', description: 'Bus routes & numbers' },
-              { id: 'fee_balance', title: '💰 Fee Balance', description: 'Check & pay fees' },
-              { id: 'helpdesk', title: '🎫 Helpdesk / Issues', description: 'Report issues & complaints' },
-              { id: 'admission_start', title: '📋 Admission', description: 'Apply for admission online' }
+              { id: 'rate_meal_breakfast', title: '🥞 Breakfast' },
+              { id: 'rate_meal_lunch', title: '🍛 Lunch' },
+              { id: 'rate_meal_snacks', title: '🥪 Snacks' },
+              { id: 'rate_meal_dinner', title: '🍲 Dinner' }
             ]
           }]
         }
