@@ -110,7 +110,8 @@ class WhatsAppService {
         action: {
           buttons: [
             { type: 'reply', reply: { id: 'make_outing', title: 'Make Outing' } },
-            { type: 'reply', reply: { id: 'rate_food', title: 'Rate Food' } }
+            { type: 'reply', reply: { id: 'rate_food', title: 'Rate Food' } },
+            { type: 'reply', reply: { id: 'main_menu', title: '🔙 Main Menu' } }
           ]
         }
       }
@@ -132,7 +133,8 @@ class WhatsAppService {
               { id: 'rate_meal_breakfast', title: '🥞 Breakfast' },
               { id: 'rate_meal_lunch', title: '🍛 Lunch' },
               { id: 'rate_meal_snacks', title: '🥪 Snacks' },
-              { id: 'rate_meal_dinner', title: '🍲 Dinner' }
+              { id: 'rate_meal_dinner', title: '🍲 Dinner' },
+              { id: 'main_menu', title: '🔙 Main Menu' }
             ]
           }]
         }
@@ -178,6 +180,7 @@ class WhatsAppService {
     }
     // All students can report college issues
     rows.push({ id: 'issue_college', title: '🏫 College Issue', description: 'General campus issues' });
+    rows.push({ id: 'main_menu', title: '🔙 Main Menu', description: 'Return to main menu' });
 
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
@@ -239,7 +242,8 @@ class WhatsAppService {
             rows: [
               { id: 'marks', title: '📊 Marks', description: 'View semester marks' },
               { id: 'attendance', title: '📅 Attendance', description: 'View attendance %' },
-              { id: 'timetable', title: '🕐 Time Table', description: 'View class schedule' }
+              { id: 'timetable', title: '🕐 Time Table', description: 'View class schedule' },
+              { id: 'main_menu', title: '🔙 Main Menu', description: 'Return to main menu' }
             ]
           }]
         }
@@ -259,7 +263,8 @@ class WhatsAppService {
         action: {
           buttons: [
             { type: 'reply', reply: { id: 'fee_check', title: 'Check Balance' } },
-            { type: 'reply', reply: { id: 'fee_payment', title: 'Make Payment' } }
+            { type: 'reply', reply: { id: 'fee_payment', title: 'Make Payment' } },
+            { type: 'reply', reply: { id: 'main_menu', title: '🔙 Main Menu' } }
           ]
         }
       }
@@ -348,6 +353,22 @@ class WhatsAppService {
       messaging_product: 'whatsapp',
       type: 'text',
       text: { body: text }
+    });
+  }
+
+  async sendMainMenuButton(to) {
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        body: { text: 'To go back to the main menu, click below:' },
+        action: {
+          buttons: [
+            { type: 'reply', reply: { id: 'main_menu', title: 'Main Menu' } }
+          ]
+        }
+      }
     });
   }
 

@@ -534,20 +534,24 @@ class ChatService {
       case 'current_updates': {
         const Circular = require('../models/Circular');
         const circulars = await Circular.find({ status: 'sent' }).sort({ sentAt: -1 }).limit(1);
-        return whatsappService.sendLatestCirculars(from, circulars);
+        await whatsappService.sendLatestCirculars(from, circulars);
+        return whatsappService.sendMainMenuButton(from);
       }
 
       case 'academics':
         return whatsappService.sendAcademicsMenu(from);
 
       case 'marks':
-        return whatsappService.sendStudentInfo(from, 'marks', student);
+        await whatsappService.sendStudentInfo(from, 'marks', student);
+        return whatsappService.sendMainMenuButton(from);
 
       case 'attendance':
-        return whatsappService.sendStudentInfo(from, 'attendance', student);
+        await whatsappService.sendStudentInfo(from, 'attendance', student);
+        return whatsappService.sendMainMenuButton(from);
 
       case 'timetable':
-        return whatsappService.sendTimetable(from, student);
+        await whatsappService.sendTimetable(from, student);
+        return whatsappService.sendMainMenuButton(from);
 
       case 'hostel_services':
         return whatsappService.sendHostelMenu(from);
@@ -592,13 +596,15 @@ class ChatService {
       }
 
       case 'transportation':
-        return whatsappService.sendStudentInfo(from, 'transportation', student);
+        await whatsappService.sendStudentInfo(from, 'transportation', student);
+        return whatsappService.sendMainMenuButton(from);
 
       case 'fee_balance':
         return whatsappService.sendFeeMenu(from);
 
       case 'fee_check':
-        return whatsappService.sendStudentInfo(from, 'fee_check', student);
+        await whatsappService.sendStudentInfo(from, 'fee_check', student);
+        return whatsappService.sendMainMenuButton(from);
 
       case 'fee_payment':
         return whatsappService.sendStudentInfo(from, 'fee_payment', student);
@@ -616,10 +622,11 @@ class ChatService {
       case 'check_bus': {
         const trans = student.transportation;
         if (trans && (trans.busName || trans.boardingPoint)) {
-          return whatsappService.sendTextMessage(from, `🚌 *Your Boarding Details*\n\n*Bus Name:* ${trans.busName || 'Not assigned'}\n*Boarding Point:* ${trans.boardingPoint || 'Not assigned'}\n*Time:* ${trans.time || 'Not assigned'}`);
+          await whatsappService.sendTextMessage(from, `🚌 *Your Boarding Details*\n\n*Bus Name:* ${trans.busName || 'Not assigned'}\n*Boarding Point:* ${trans.boardingPoint || 'Not assigned'}\n*Time:* ${trans.time || 'Not assigned'}`);
         } else {
-          return whatsappService.sendTextMessage(from, `🚌 *Boarding Details Not Found*\n\nWe couldn't find your specific bus allocation in the master list. Please contact your admin if this is a mistake.`);
+          await whatsappService.sendTextMessage(from, `🚌 *Boarding Details Not Found*\n\nWe couldn't find your specific bus allocation in the master list. Please contact your admin if this is a mistake.`);
         }
+        return whatsappService.sendMainMenuButton(from);
       }
 
       default:
