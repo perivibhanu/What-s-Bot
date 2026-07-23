@@ -77,10 +77,6 @@ class ChatService {
           // Check if exactly 45s has passed without new interaction
           if (currentSession && (Date.now() - currentSession.lastInteraction >= 44000)) {
             currentSession.currentState = 'initial';
-            currentSession.userType = 'visitor';
-            currentSession.studentId = undefined;
-            currentSession.staffId = undefined;
-            currentSession.wardenId = undefined;
             currentSession.tempRegNumber = undefined;
             await currentSession.save();
 
