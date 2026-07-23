@@ -495,13 +495,14 @@ class ChatService {
     }
 
     const FoodFeedback = require('../models/FoodFeedback');
-    const promises = [];
-    if (breakfast !== null) promises.push(FoodFeedback.create({ studentId: session.studentId, mealType: 'breakfast', rating: breakfast }));
-    if (lunch !== null) promises.push(FoodFeedback.create({ studentId: session.studentId, mealType: 'lunch', rating: lunch }));
-    if (snacks !== null) promises.push(FoodFeedback.create({ studentId: session.studentId, mealType: 'snacks', rating: snacks }));
-    if (dinner !== null) promises.push(FoodFeedback.create({ studentId: session.studentId, mealType: 'dinner', rating: dinner }));
+    const feedbackData = { studentId: session.studentId };
+    
+    if (breakfast !== null) feedbackData.breakfastRating = breakfast;
+    if (lunch !== null) feedbackData.lunchRating = lunch;
+    if (snacks !== null) feedbackData.snacksRating = snacks;
+    if (dinner !== null) feedbackData.dinnerRating = dinner;
 
-    await Promise.all(promises);
+    await FoodFeedback.create(feedbackData);
     
     session.currentState = 'registered_welcome';
     await session.save();

@@ -37,6 +37,7 @@ exports.handleMessage = async (req, res) => {
   } catch (error) {
     console.error('Webhook error:', error);
     console.error('Error stack:', error.stack);
-    res.sendStatus(500);
+    // Always return 200 so Meta doesn't retry and spam the webhook
+    res.sendStatus(200);
   }
 };

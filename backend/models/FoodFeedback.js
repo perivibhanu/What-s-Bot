@@ -3,9 +3,10 @@ const mongoose = require('mongoose');
 const foodFeedbackSchema = new mongoose.Schema({
   studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true },
   date: { type: Date, default: Date.now },
-  breakfastRating: { type: Number, min: 1, max: 10, required: true },
-  lunchRating: { type: Number, min: 1, max: 10, required: true },
-  dinnerRating: { type: Number, min: 1, max: 10, required: true }
+  breakfastRating: { type: Number, min: 1, max: 10 },
+  lunchRating: { type: Number, min: 1, max: 10 },
+  snacksRating: { type: Number, min: 1, max: 10 },
+  dinnerRating: { type: Number, min: 1, max: 10 }
 }, { timestamps: true });
 
 // Prevent multiple feedback submissions per student per day
