@@ -13,9 +13,16 @@ const normalizePhone = (phone) => {
   return digits;
 };
 
+const activeTimeouts = new Map();
+
 class ChatService {
   async handleIncomingMessage(from, message) {
     let session = await ChatSession.findOne({ phoneNumber: from });
+
+    if (activeTimeouts.has(from)) {
+      clearTimeout(activeTimeouts.get(from));
+      activeTimeouts.delete(from);
+    }
 
     if (!session) {
       session = await ChatSession.create({ phoneNumber: from, currentState: 'initial' });
@@ -62,6 +69,30 @@ class ChatService {
 
     await this.processMessage(session, messageText, from);
     await session.save();
+
+    if (session.currentState !== 'initial') {
+      const timeoutId = setTimeout(async () => {
+        try {
+          const currentSession = await ChatSession.findOne({ phoneNumber: from });
+          // Check if exactly 45s has passed without new interaction
+          if (currentSession && (Date.now() - currentSession.lastInteraction >= 44000)) {
+            currentSession.currentState = 'initial';
+            currentSession.userType = 'visitor';
+            currentSession.studentId = undefined;
+            currentSession.staffId = undefined;
+            currentSession.wardenId = undefined;
+            currentSession.tempRegNumber = undefined;
+            await currentSession.save();
+
+            const whatsappService = require('./whatsappService');
+            await whatsappService.sendTextMessage(from, "It seems you've been inactive. Please clear this chat for safety.\n\nTo continue, please type 'Hi' to access the main menu");
+          }
+        } catch (err) {
+          console.error('Error in inactivity timeout:', err);
+        }
+      }, 45000);
+      activeTimeouts.set(from, timeoutId);
+    }
   }
 
   async processMessage(session, messageText, from) {
