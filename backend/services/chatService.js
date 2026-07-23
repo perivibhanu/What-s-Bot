@@ -266,6 +266,9 @@ class ChatService {
       case 'awaiting_outing_details':
         return this.handleHelpdeskIssue(session, msgLower, messageText, from);
 
+      case 'awaiting_food_ratings':
+        return this.handleAllFoodRatings(session, messageText, from);
+
       default:
         session.currentState = 'visitor_welcome';
         return whatsappService.sendInitialWelcome(from);
@@ -434,6 +437,48 @@ class ChatService {
     return whatsappService.sendRegisteredWelcome(from, student);
   }
 
+  async handleAllFoodRatings(session, text, from) {
+    if (!text) {
+       return whatsappService.sendTextMessage(from, '⚠️ Please provide your ratings in text format.');
+    }
+    const student = await require('../models/Student').findById(session.studentId);
+    
+    // Naive parsing: looking for numbers near meal names
+    const extractRating = (mealName) => {
+       const regex = new RegExp(`${mealName}\\s*:\\s*([0-9]{1,2})`, 'i');
+       const match = text.match(regex);
+       if (match && match[1]) {
+         const score = parseInt(match[1], 10);
+         if (score >= 1 && score <= 10) return score;
+       }
+       return null;
+    };
+
+    const breakfast = extractRating('Breakfast');
+    const lunch = extractRating('Lunch');
+    const snacks = extractRating('Snacks');
+    const dinner = extractRating('Dinner');
+
+    if (breakfast === null && lunch === null && snacks === null && dinner === null) {
+      return whatsappService.sendTextMessage(from, '❌ We could not understand your ratings. Please use the format:\\nBreakfast: 8\\nLunch: 7\\nSnacks: 9\\nDinner: 6');
+    }
+
+    const FoodFeedback = require('../models/FoodFeedback');
+    const promises = [];
+    if (breakfast !== null) promises.push(FoodFeedback.create({ studentId: session.studentId, mealType: 'breakfast', rating: breakfast }));
+    if (lunch !== null) promises.push(FoodFeedback.create({ studentId: session.studentId, mealType: 'lunch', rating: lunch }));
+    if (snacks !== null) promises.push(FoodFeedback.create({ studentId: session.studentId, mealType: 'snacks', rating: snacks }));
+    if (dinner !== null) promises.push(FoodFeedback.create({ studentId: session.studentId, mealType: 'dinner', rating: dinner }));
+
+    await Promise.all(promises);
+    
+    session.currentState = 'registered_welcome';
+    await session.save();
+
+    await whatsappService.sendTextMessage(from, '✅ Thank you! Your food ratings have been recorded successfully.');
+    return whatsappService.sendRegisteredWelcome(from, student);
+  }
+
   // ── Helpdesk / Issue Handlers ───────────────────────────────────────────────
   async handleHelpdeskIssue(session, msgLower, originalText, from) {
     const student = await Student.findById(session.studentId);
@@ -563,38 +608,9 @@ class ChatService {
         return whatsappService.sendTextMessage(from, '🚪 *Outing Request*\n\nPlease reply with your outing details in the following format:\n\nReason: [Your reason]\nDate & Time: [When you want to leave]');
 
       case 'rate_food':
-        return whatsappService.sendMealSelectionMenu(from);
-
-      case 'rate_meal_breakfast':
-      case 'rate_meal_lunch':
-      case 'rate_meal_snacks':
-      case 'rate_meal_dinner': {
-        const meal = action.split('_')[2];
-        session.tempFeedback = { mealType: meal };
+        session.currentState = 'awaiting_food_ratings';
         await session.save();
-        return whatsappService.sendRatingList(from, meal);
-      }
-
-      case 'rating_10':
-      case 'rating_8':
-      case 'rating_6':
-      case 'rating_4':
-      case 'rating_2': {
-        if (!session.tempFeedback || !session.tempFeedback.mealType) {
-          return whatsappService.sendTextMessage(from, 'Session expired. Please start the food rating again.');
-        }
-        const score = parseInt(action.split('_')[1]);
-        const FoodFeedback = require('../models/FoodFeedback');
-        await FoodFeedback.create({
-          studentId: session.studentId,
-          mealType: session.tempFeedback.mealType,
-          rating: score
-        });
-        session.tempFeedback = {};
-        await session.save();
-        await whatsappService.sendTextMessage(from, '✅ Thank you for your feedback! Your rating has been recorded.');
-        return whatsappService.sendRegisteredWelcome(from, student);
-      }
+        return whatsappService.sendTextMessage(from, '🍽️ *Rate Today\\'s Meals*\n\nPlease reply with a single message containing your ratings (1 to 10) for all meals like this:\n\nBreakfast: 8\nLunch: 7\nSnacks: 9\nDinner: 6');
 
       case 'transportation':
         await whatsappService.sendStudentInfo(from, 'transportation', student);
