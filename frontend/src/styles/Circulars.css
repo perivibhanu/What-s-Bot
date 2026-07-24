@@ -11,7 +11,7 @@
 }
 
 .circulars-header button {
-  background: #3498db;
+  background: #5c1926;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -22,7 +22,7 @@
 }
 
 .circulars-header button:hover {
-  background: #2980b9;
+  background: #7a2333;
 }
 
 .circulars-grid {
@@ -245,12 +245,12 @@
 }
 
 .modal-actions button[type="submit"] {
-  background: #3498db;
+  background: #5c1926;
   color: white;
 }
 
 .modal-actions button[type="submit"]:hover:not(:disabled) {
-  background: #2980b9;
+  background: #7a2333;
 }
 
 .modal-actions button[type="submit"]:disabled {

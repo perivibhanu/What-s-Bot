@@ -13,7 +13,7 @@ body {
 /* ── Sidebar ─────────────────────────────────────────────────────────────── */
 .sidebar {
   width: 260px;
-  background: #1a1a2e; /* Deep modern blue */
+  background: #5c1926; /* Academic Warmth Maroon */
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -57,7 +57,7 @@ body {
   margin: 0 0 8px 12px;
   font-size: 11px;
   font-weight: 700;
-  color: #6c757d;
+  color: #e2d1c3; /* Warmer muted text */
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -65,7 +65,7 @@ body {
 /* ── Menu Items ──────────────────────────────────────────────────────────── */
 .menu-item {
   text-decoration: none;
-  color: #aeb4be;
+  color: #e2d1c3; /* Warmer text */
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 14px;
@@ -82,10 +82,10 @@ body {
 }
 
 .menu-item.active {
-  background: #667eea;
+  background: #7a2333; /* Lighter maroon for active */
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+  box-shadow: 0 4px 12px rgba(122, 35, 51, 0.3);
 }
 
 /* ── Logout Button ───────────────────────────────────────────────────────── */
@@ -114,8 +114,8 @@ body {
   flex: 1;
   padding: 32px;
   overflow-y: auto;
-  background-color: #f8f9fc;
-  background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+  background-color: #f9f5f0; /* Academic warm beige */
+  background-image: radial-gradient(#e2d1c3 1.5px, transparent 1.5px);
   background-size: 30px 30px;
 }
 
