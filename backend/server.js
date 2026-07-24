@@ -61,10 +61,16 @@ app.get('/', (req, res) => {
   });
 });
 
+const { apiLimiter, authLimiter } = require('./middleware/rateLimiter');
+
+// Apply general rate limiting to all /api routes
+app.use('/api/', apiLimiter);
+
 app.use('/webhook', require('./routes/webhook'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/students', require('./routes/students'));
-app.use('/api/auth', require('./routes/auth'));
+// Apply stricter rate limiting specifically to auth routes
+app.use('/api/auth', authLimiter, require('./routes/auth'));
 app.use('/api/circulars', require('./routes/circulars'));
 app.use('/api/marks', require('./routes/marks'));
 app.use('/api/timetables', require('./routes/timetables'));
