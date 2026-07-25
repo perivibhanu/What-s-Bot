@@ -93,7 +93,7 @@ class ChatService {
 
   async processMessage(session, messageText, from) {
     const msgLower = messageText.toLowerCase();
-    const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai', 'back', 'menu', 'main menu'].includes(msgLower);
+    const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai', 'back', 'menu', 'main menu', 'main_menu'].includes(msgLower);
 
     // ── Auto-detect staff or warden member ──────────────────────────────────────────────
     if (isGreeting && session.userType !== 'staff' && session.userType !== 'warden') {
@@ -216,10 +216,16 @@ class ChatService {
         }
         if (msgLower === 'more_options') {
           session.currentState = 'more_options';
-          if (session.currentTopic && session.currentTopic.startsWith('dept_')) {
+          const depts = ['aids', 'cse', 'ece', 'eee', 'it', 'mech', 'mechatronics'];
+          
+          if (session.currentTopic) {
+             if (session.currentTopic.startsWith('dept_')) {
+                const parts = session.currentTopic.split('_');
+                return whatsappService.sendDeptMoreOptionsMenu(from, parts[1].toUpperCase(), parts[1]);
+             }
              const parts = session.currentTopic.split('_');
-             if (parts.length === 2) {
-               return whatsappService.sendDeptMoreOptionsMenu(from, parts[1].toUpperCase(), session.currentTopic);
+             if (depts.includes(parts[0])) {
+                return whatsappService.sendDeptMoreOptionsMenu(from, parts[0].toUpperCase(), parts[0]);
              }
           }
           return whatsappService.sendMoreOptionsMenu(from);

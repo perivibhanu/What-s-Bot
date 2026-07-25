@@ -920,11 +920,21 @@ class WhatsAppService {
       });
     }
 
-    if (isDeptSubtopic) {
-      return this.sendDeptMoreOptionsMenu(to, parts[1].toUpperCase(), `dept_${parts[1]}`);
-    }
-    
-    return this.sendMoreOptionsMenu(to);
+    // For subtopics and general topics, offer Back and Main Menu
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        body: { text: 'Would you like to explore more?' },
+        action: {
+          buttons: [
+            { type: 'reply', reply: { id: 'more_options', title: '🔙 Back' } },
+            { type: 'reply', reply: { id: 'main_menu', title: '🏠 Main Menu' } }
+          ]
+        }
+      }
+    });
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
