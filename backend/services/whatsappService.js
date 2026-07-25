@@ -778,12 +778,12 @@ class WhatsAppService {
           sections: [{
             title: `${deptTitle} Highlights`,
             rows: [
-              { id: `topic_${deptKey}_placements`,       title: '💼 Placements',    description: 'Career & placement records' },
-              { id: `topic_${deptKey}_projects`,         title: '🔬 Projects',      description: 'Student innovations' },
-              { id: `topic_${deptKey}_academics`,        title: '📚 Academics',     description: 'Academic excellence' },
-              { id: `topic_${deptKey}_achievements`,     title: '🏆 Achievements',  description: 'Awards & recognitions' },
-              { id: `topic_${deptKey}_industrial_visit`, title: '🏭 Ind. Visit',    description: 'Industry exposure' },
-              { id: `topic_${deptKey}_sports`,           title: '⚽ Sports',        description: 'Sports & recreation' }
+              { id: `topic_dept_${deptKey}_placements`,       title: '💼 Placements',    description: 'Career & placement records' },
+              { id: `topic_dept_${deptKey}_projects`,         title: '🔬 Projects',      description: 'Student innovations' },
+              { id: `topic_dept_${deptKey}_academics`,        title: '📚 Academics',     description: 'Academic excellence' },
+              { id: `topic_dept_${deptKey}_achievements`,     title: '🏆 Achievements',  description: 'Awards & recognitions' },
+              { id: `topic_dept_${deptKey}_industrial_visit`, title: '🏭 Ind. Visit',    description: 'Industry exposure' },
+              { id: `topic_dept_${deptKey}_sports`,           title: '⚽ Sports',        description: 'Sports & recreation' }
             ]
           }]
         }
