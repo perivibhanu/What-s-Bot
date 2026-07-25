@@ -74,8 +74,8 @@ class ChatService {
       const timeoutId = setTimeout(async () => {
         try {
           const currentSession = await ChatSession.findOne({ phoneNumber: from });
-          // Check if exactly 45s has passed without new interaction
-          if (currentSession && (Date.now() - currentSession.lastInteraction >= 44000)) {
+          // Check if exactly 10m has passed without new interaction
+          if (currentSession && (Date.now() - currentSession.lastInteraction >= 599000)) {
             currentSession.currentState = 'initial';
             currentSession.tempRegNumber = undefined;
             await currentSession.save();
@@ -86,7 +86,7 @@ class ChatService {
         } catch (err) {
           console.error('Error in inactivity timeout:', err);
         }
-      }, 45000);
+      }, 600000); // 10 minutes
       activeTimeouts.set(from, timeoutId);
     }
   }
