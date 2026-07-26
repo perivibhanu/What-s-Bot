@@ -139,6 +139,32 @@ class WhatsAppService {
     });
   }
 
+  async sendWardenSelectionMenu(to, wardens) {
+    const rows = wardens.map(w => ({
+      id: `select_warden_${w._id}`,
+      title: (w.name || 'Warden').substring(0, 24),
+      description: `Block: ${w.block || 'Hostel'}`.substring(0, 72)
+    }));
+
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: {
+          text: '🏢 *Select Your Hostel Warden*\n\nPlease choose your block/hostel warden to send your outing request to:'
+        },
+        action: {
+          button: 'Select Warden',
+          sections: [{
+            title: 'Hostel Wardens',
+            rows: rows
+          }]
+        }
+      }
+    });
+  }
+
   async sendMealSelectionMenu(to) {
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',

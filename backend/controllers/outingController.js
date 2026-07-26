@@ -1,12 +1,13 @@
 const Outing = require('../models/Outing');
 
-// Get all active outings (Status: 'Out')
+// Get all outings (Active, Returned, Pending)
 exports.getActiveOutings = async (req, res) => {
   try {
-    const outings = await Outing.find({ status: 'Out' })
+    const outings = await Outing.find({})
       .populate('studentId', 'name registrationNumber mobileNumber department')
       .populate('wardenId', 'name block')
-      .sort({ requestTime: -1 });
+      .sort({ requestTime: -1 })
+      .limit(100);
     res.json(outings);
   } catch (err) {
     console.error('Error fetching active outings:', err);

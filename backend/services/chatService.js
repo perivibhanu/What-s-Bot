@@ -116,8 +116,17 @@ class ChatService {
       const Outing = require('../models/Outing');
       const outing = await Outing.findOne({
         studentId: session.studentId,
-        status: { $in: ['Out', 'Pending'] }
+        status: 'Out'
       }).sort({ requestTime: -1 });
+
+      if (!outing) {
+        session.currentState = 'initial';
+        await session.save();
+        return whatsappService.sendTextMessage(from,
+          `❌ *Not Eligible for Outing Return*\n\n` +
+          `You do not have an active approved outing permit in 'Out' status. Only students who have received warden permission and left campus can use the Outing Return check-in.`
+        );
+      }
 
       if (distance <= 1.0) {
         if (outing) {
@@ -630,12 +639,19 @@ class ChatService {
       const Student = require('../models/Student');
       
       try {
-        let warden = await Warden.findOne();
+        let wardenId = session.selectedWardenId;
+        let warden = null;
+        if (wardenId) {
+          warden = await Warden.findById(wardenId);
+        }
+        if (!warden) {
+          warden = await Warden.findOne();
+        }
         if (!warden) {
           return whatsappService.sendTextMessage(from, '❌ No wardens available in the system. Cannot process outing.');
         }
 
-        await Outing.create({
+        const outing = await Outing.create({
           studentId: session.studentId,
           wardenId: warden._id,
           reason: originalText,
@@ -645,8 +661,20 @@ class ChatService {
         session.currentState = 'registered_welcome';
         await session.save();
         
-        await whatsappService.sendTextMessage(from, `✅ *Outing Request Submitted!*\n\nYour request has been sent to the warden for approval.\nYou will be notified once it's approved.`);
         const student = await Student.findById(session.studentId);
+        await whatsappService.sendTextMessage(from, `✅ *Outing Request Submitted to Warden ${warden.name}!*\n\nYour request has been sent for approval. You will be notified once it's approved.`);
+
+        if (warden.mobileNumber) {
+          await whatsappService.sendTextMessage(warden.mobileNumber,
+            `🚪 *New Outing Request*\n\n` +
+            `👤 *Student:* ${student.name} (${student.regNumber})\n` +
+            `📄 *Reason & Time:* ${originalText}\n` +
+            `🔑 *Request ID:* \`${outing._id}\`\n\n` +
+            `_To approve, reply:_ *APP ${student.regNumber}*\n` +
+            `_To reject, reply:_ *REJ ${student.regNumber}*`
+          );
+        }
+
         return whatsappService.sendRegisteredWelcome(from, student);
       } catch (err) {
         console.error('Error saving outing:', err);
@@ -668,6 +696,27 @@ class ChatService {
       session.currentState = 'initial';
       session.studentId = null;
       return whatsappService.sendTextMessage(from, 'Session expired. Please send "hi" to start again.');
+    }
+
+    if (action.startsWith('select_warden_')) {
+      const wardenId = action.replace('select_warden_', '').trim();
+      const Warden = require('../models/Warden');
+      const selectedWarden = await Warden.findById(wardenId);
+
+      if (!selectedWarden) {
+        return whatsappService.sendTextMessage(from, '❌ Selected warden not found. Please try again.');
+      }
+
+      session.selectedWardenId = selectedWarden._id;
+      session.currentState = 'awaiting_outing_details';
+      await session.save();
+
+      return whatsappService.sendTextMessage(from,
+        `🚪 *Outing Request to Warden: ${selectedWarden.name} (${selectedWarden.block || 'Hostel'})*\n\n` +
+        `Please reply with your outing details in the following format:\n\n` +
+        `Reason: [Your reason]\n` +
+        `Date & Time: [When you want to leave]`
+      );
     }
 
     switch (action) {
@@ -696,17 +745,43 @@ class ChatService {
       case 'hostel_services':
         return whatsappService.sendHostelMenu(from);
 
-      case 'make_outing':
-        session.currentState = 'awaiting_outing_details';
+      case 'make_outing': {
+        const Warden = require('../models/Warden');
+        const wardens = await Warden.find({});
+        if (!wardens || wardens.length === 0) {
+          return whatsappService.sendTextMessage(from, '❌ No wardens available in the system. Cannot process outing.');
+        }
+        if (wardens.length === 1) {
+          session.selectedWardenId = wardens[0]._id;
+          session.currentState = 'awaiting_outing_details';
+          await session.save();
+          return whatsappService.sendTextMessage(from, `🚪 *Outing Request to Warden: ${wardens[0].name}*\n\nPlease reply with your outing details in the following format:\n\nReason: [Your reason]\nDate & Time: [When you want to leave]`);
+        }
+        session.currentState = 'selecting_outing_warden';
         await session.save();
-        return whatsappService.sendTextMessage(from, '🚪 *Outing Request*\n\nPlease reply with your outing details in the following format:\n\nReason: [Your reason]\nDate & Time: [When you want to leave]');
+        return whatsappService.sendWardenSelectionMenu(from, wardens);
+      }
 
-      case 'return_outing':
+      case 'return_outing': {
+        const Outing = require('../models/Outing');
+        const activeOuting = await Outing.findOne({
+          studentId: session.studentId,
+          status: 'Out'
+        });
+
+        if (!activeOuting) {
+          return whatsappService.sendTextMessage(from,
+            "❌ *Not Eligible for Outing Return*\n\n" +
+            "You do not have an active approved outing permit. Only students who have received warden approval and left campus can use the Outing Return check-in."
+          );
+        }
+
         session.currentState = 'awaiting_outing_location';
         await session.save();
         return whatsappService.sendLocationRequest(from,
           "📍 *Outing Check-In (Return to Campus)*\n\nTo automatically record your return to campus, please tap the button below and share your *current location*.\n\n_Note: You must be within a 1 km radius of Velammal Institute of Technology campus._"
         );
+      }
 
       case 'rate_food':
         session.currentState = 'awaiting_food_ratings';
@@ -839,7 +914,10 @@ class ChatService {
       case 'pending':
       case 'warden_pending_outings': {
         const Outing = require('../models/Outing');
-        const pendingOutings = await Outing.find({ status: 'Pending' }).populate('studentId').sort({ requestTime: -1 }).limit(10);
+        const pendingOutings = await Outing.find({
+          status: 'Pending',
+          $or: [{ wardenId: session.wardenId }, { wardenId: { $exists: false } }]
+        }).populate('studentId').sort({ requestTime: -1 }).limit(10);
 
         if (!pendingOutings || pendingOutings.length === 0) {
           return whatsappService.sendTextMessage(from, '🚪 *Pending Outing Requests*\n\n✅ There are currently no pending outing requests.');

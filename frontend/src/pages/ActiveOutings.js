@@ -31,8 +31,8 @@ function ActiveOutings() {
   return (
     <Layout>
       <div className="page-header">
-        <h1>🏠 Active Outings</h1>
-        <p style={{color: '#64748b'}}>Students currently outside the hostel.</p>
+        <h1>🏠 Hostel Outings & Timings</h1>
+        <p style={{color: '#64748b'}}>Live tracking of student outings, check-in status, and return timings.</p>
       </div>
 
       {error && <div className="error-message">{error}</div>}
@@ -46,23 +46,38 @@ function ActiveOutings() {
               <th>REG NO</th>
               <th>WARDEN / BLOCK</th>
               <th>REASON</th>
+              <th>STATUS</th>
               <th>TIME OUT</th>
+              <th>RETURN TIME</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="6" style={{textAlign: 'center'}}>Loading...</td></tr>
+              <tr><td colSpan="8" style={{textAlign: 'center'}}>Loading...</td></tr>
             ) : outings.length === 0 ? (
-              <tr><td colSpan="6" style={{textAlign: 'center'}}>No students are currently outside.</td></tr>
+              <tr><td colSpan="8" style={{textAlign: 'center'}}>No outings recorded yet.</td></tr>
             ) : (
               outings.map((outing, index) => (
                 <tr key={outing._id}>
                   <td>{index + 1}</td>
-                  <td>{outing.studentId?.name}</td>
-                  <td>{outing.studentId?.registrationNumber}</td>
-                  <td>{outing.wardenId?.name} ({outing.wardenId?.block})</td>
+                  <td>{outing.studentId?.name || 'Student'}</td>
+                  <td>{outing.studentId?.registrationNumber || '-'}</td>
+                  <td>{outing.wardenId?.name ? `${outing.wardenId.name} (${outing.wardenId.block || 'Hostel'})` : 'Hostel Warden'}</td>
                   <td>{outing.reason}</td>
-                  <td>{new Date(outing.requestTime).toLocaleString()}</td>
+                  <td>
+                    <span style={{
+                      padding: '4px 10px',
+                      borderRadius: '12px',
+                      fontWeight: '600',
+                      fontSize: '0.8rem',
+                      backgroundColor: outing.status === 'Returned' ? '#dcfce7' : outing.status === 'Out' ? '#e0f2fe' : outing.status === 'Pending' ? '#fef9c3' : '#fee2e2',
+                      color: outing.status === 'Returned' ? '#166534' : outing.status === 'Out' ? '#0369a1' : outing.status === 'Pending' ? '#854d0e' : '#991b1b'
+                    }}>
+                      {outing.status}
+                    </span>
+                  </td>
+                  <td>{outing.requestTime ? new Date(outing.requestTime).toLocaleString('en-IN') : '-'}</td>
+                  <td>{outing.actualReturnTime ? new Date(outing.actualReturnTime).toLocaleTimeString('en-IN') : '-'}</td>
                 </tr>
               ))
             )}
