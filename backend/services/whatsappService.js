@@ -103,16 +103,37 @@ class WhatsAppService {
       messaging_product: 'whatsapp',
       type: 'interactive',
       interactive: {
-        type: 'button',
+        type: 'list',
         body: {
-          text: '🏨 *Hostel Services*\n\nWhat would you like to do?'
+          text: '🏨 *Hostel Services*\n\nSelect an option below to manage outings or food ratings:'
         },
         action: {
-          buttons: [
-            { type: 'reply', reply: { id: 'make_outing', title: 'Make Outing' } },
-            { type: 'reply', reply: { id: 'rate_food', title: 'Rate Food' } },
-            { type: 'reply', reply: { id: 'main_menu', title: '🔙 Main Menu' } }
-          ]
+          button: 'Select Option',
+          sections: [{
+            title: 'Hostel Options',
+            rows: [
+              { id: 'make_outing', title: '🚪 Make Outing', description: 'Request a new outing permit' },
+              { id: 'return_outing', title: '📍 Outing Return', description: 'Share location to mark campus check-in' },
+              { id: 'rate_food', title: '🍽️ Rate Food', description: 'Rate breakfast, lunch, snacks, dinner' },
+              { id: 'main_menu', title: '🔙 Main Menu', description: 'Return to main dashboard' }
+            ]
+          }]
+        }
+      }
+    });
+  }
+
+  async sendLocationRequest(to, text) {
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'location_request_message',
+        body: {
+          text: text
+        },
+        action: {
+          name: 'send_location'
         }
       }
     });

@@ -67,7 +67,7 @@ class ChatService {
       else if (interactive.type === 'list_reply') messageText = interactive.list_reply.id;
     }
 
-    await this.processMessage(session, messageText, from);
+    await this.processMessage(session, messageText, from, message);
     await session.save();
 
     if (session.currentState !== 'initial') {
@@ -91,7 +91,61 @@ class ChatService {
     }
   }
 
-  async processMessage(session, messageText, from) {
+  calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
+  }
+
+  async processMessage(session, messageText, from, rawMessage = null) {
+    // ── Handle GPS Location for Outing Return ──────────────────────────────────────────
+    if (rawMessage && rawMessage.type === 'location' && rawMessage.location) {
+      const { latitude, longitude } = rawMessage.location;
+      // Velammal Institute of Technology Coordinates: 13°53'55.3"N 79°55'41.0"E
+      const COLLEGE_LAT = 13.898697;
+      const COLLEGE_LON = 79.928052;
+      const distance = this.calculateDistance(latitude, longitude, COLLEGE_LAT, COLLEGE_LON);
+      console.log(`📍 Location received from ${from}: (${latitude}, ${longitude}) - Distance to campus: ${distance.toFixed(2)} km`);
+
+      const Outing = require('../models/Outing');
+      const outing = await Outing.findOne({
+        studentId: session.studentId,
+        status: { $in: ['Out', 'Pending'] }
+      }).sort({ requestTime: -1 });
+
+      if (distance <= 1.0) {
+        if (outing) {
+          outing.status = 'Returned';
+          outing.actualReturnTime = new Date();
+          await outing.save();
+        }
+        session.currentState = 'initial';
+        await whatsappService.sendTextMessage(from,
+          `✅ *Outing Return Verified!*\n\n` +
+          `📍 *Location Check:* Verified within Campus (${distance.toFixed(2)} km from college center)\n` +
+          `🕒 *Return Time:* ${new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })}\n\n` +
+          `Welcome back to Velammal Institute of Technology! Your return has been automatically recorded in the hostel system.`
+        );
+        return whatsappService.sendMainMenuButton(from);
+      } else {
+        await whatsappService.sendTextMessage(from,
+          `❌ *Location Verification Failed*\n\n` +
+          `Your current location is *${distance.toFixed(2)} km* away from campus.\n` +
+          `Outing check-in is only permitted within a *1 km radius* of Velammal Institute of Technology (13.898697, 79.928052).\n\n` +
+          `Please try checking in again when you reach the college campus.`
+        );
+        return whatsappService.sendLocationRequest(from,
+          "📍 *Try Outing Check-In Again*\n\nTap below to re-share your current location once you arrive on campus."
+        );
+      }
+    }
+
     const msgLower = messageText.toLowerCase();
     const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai', 'back', 'menu', 'main menu', 'main_menu'].includes(msgLower);
 
@@ -599,6 +653,12 @@ class ChatService {
         return whatsappService.sendTextMessage(from, '❌ Failed to submit outing request. Please try again later.');
       }
     }
+
+    if (session.currentState === 'awaiting_outing_location') {
+      return whatsappService.sendLocationRequest(from,
+        "⚠️ *Please Share Your Location*\n\nTo verify your return to campus, you must tap the button below and send your *current GPS location*."
+      );
+    }
   }
 
   // ── Registered student menu actions ──────────────────────────────────────────
@@ -640,6 +700,13 @@ class ChatService {
         session.currentState = 'awaiting_outing_details';
         await session.save();
         return whatsappService.sendTextMessage(from, '🚪 *Outing Request*\n\nPlease reply with your outing details in the following format:\n\nReason: [Your reason]\nDate & Time: [When you want to leave]');
+
+      case 'return_outing':
+        session.currentState = 'awaiting_outing_location';
+        await session.save();
+        return whatsappService.sendLocationRequest(from,
+          "📍 *Outing Check-In (Return to Campus)*\n\nTo automatically record your return to campus, please tap the button below and share your *current location*.\n\n_Note: You must be within a 1 km radius of Velammal Institute of Technology campus._"
+        );
 
       case 'rate_food':
         session.currentState = 'awaiting_food_ratings';
