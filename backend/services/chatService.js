@@ -834,6 +834,34 @@ class ChatService {
       case 'warden_outing':
         return whatsappService.sendTextMessage(from, '🚪 *Outings*\n\nPlease reply with:\n1. *NEW* - to view pending requests\n2. *RET [RegNo] [OTP]* - to mark a student returned (e.g. RET VCET-2026-00004 4829)');
       
+      case '1':
+      case 'new':
+      case 'pending':
+      case 'warden_pending_outings': {
+        const Outing = require('../models/Outing');
+        const pendingOutings = await Outing.find({ status: 'Pending' }).populate('studentId').sort({ requestTime: -1 }).limit(10);
+
+        if (!pendingOutings || pendingOutings.length === 0) {
+          return whatsappService.sendTextMessage(from, '🚪 *Pending Outing Requests*\n\n✅ There are currently no pending outing requests.');
+        }
+
+        let replyText = '🚪 *Pending Outing Requests*\n\n';
+        pendingOutings.forEach((out, index) => {
+          const stu = out.studentId || {};
+          const name = stu.name || 'Student';
+          const regNo = stu.regNumber || 'N/A';
+          const timeStr = out.requestTime ? new Date(out.requestTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : 'N/A';
+          replyText += `*#${index + 1}. ${name} (${regNo})*\n`;
+          replyText += `📄 *Reason:* ${out.reason}\n`;
+          replyText += `🕒 *Requested:* ${timeStr}\n`;
+          replyText += `🔑 *Request ID:* \`${out._id}\`\n\n`;
+        });
+        replyText += `_To approve an outing, reply:_ *APP 1* (for #1) or *APP [RegNo]*\n`;
+        replyText += `_To reject an outing, reply:_ *REJ 1* (for #1) or *REJ [RegNo]*`;
+
+        return whatsappService.sendTextMessage(from, replyText);
+      }
+
       case 'warden_complaint':
         session.currentState = 'warden_awaiting_complaint';
         await session.save();
@@ -864,10 +892,129 @@ class ChatService {
           }
         }
 
-        // Handle RET command
+        // Handle APP (Approve Outing): APP 1 or APP [RegNo]
+        if (actionLower.startsWith('app ')) {
+          const queryParam = actionLower.replace('app ', '').trim();
+          const Outing = require('../models/Outing');
+          const Student = require('../models/Student');
+          const ChatSession = require('../models/ChatSession');
+
+          let outing = null;
+          const numIdx = parseInt(queryParam, 10);
+          if (!isNaN(numIdx) && numIdx > 0 && String(numIdx) === queryParam) {
+            const pendingOutings = await Outing.find({ status: 'Pending' }).populate('studentId').sort({ requestTime: -1 });
+            if (pendingOutings[numIdx - 1]) outing = pendingOutings[numIdx - 1];
+          } else {
+            const student = await Student.findOne({ regNumber: { $regex: new RegExp(`^${queryParam}$`, 'i') } });
+            if (student) {
+              outing = await Outing.findOne({ studentId: student._id, status: 'Pending' }).sort({ requestTime: -1 }).populate('studentId');
+            } else {
+              outing = await Outing.findById(queryParam).populate('studentId');
+            }
+          }
+
+          if (!outing) {
+            return whatsappService.sendTextMessage(from, `❌ Could not find a pending outing request matching "${queryParam}".`);
+          }
+
+          outing.status = 'Out';
+          outing.returnOTP = Math.floor(1000 + Math.random() * 9000).toString();
+          await outing.save();
+
+          const stu = outing.studentId || {};
+          await whatsappService.sendTextMessage(from,
+            `✅ *Outing Approved!*\n\n` +
+            `👤 *Student:* ${stu.name || 'Student'} (${stu.regNumber || 'N/A'})\n` +
+            `🔑 *Return OTP:* ${outing.returnOTP}\n\n` +
+            `The student has been notified automatically.`
+          );
+
+          const studentSession = await ChatSession.findOne({ studentId: stu._id });
+          const studentPhone = studentSession ? studentSession.phoneNumber : (stu.phoneNumber || stu.mobileNumber);
+          if (studentPhone) {
+            await whatsappService.sendTextMessage(studentPhone,
+              `✅ *Your Outing Request is APPROVED!*\n\n` +
+              `📄 *Reason:* ${outing.reason}\n` +
+              `🔑 *Return OTP:* ${outing.returnOTP}\n\n` +
+              `_Have a safe trip! When you return to campus, tap "📍 Outing Return" in your Hostel Menu to share your location and check in._`
+            );
+          }
+          return;
+        }
+
+        // Handle REJ (Reject Outing): REJ 1 or REJ [RegNo]
+        if (actionLower.startsWith('rej ')) {
+          const queryParam = actionLower.replace('rej ', '').trim();
+          const Outing = require('../models/Outing');
+          const Student = require('../models/Student');
+          const ChatSession = require('../models/ChatSession');
+
+          let outing = null;
+          const numIdx = parseInt(queryParam, 10);
+          if (!isNaN(numIdx) && numIdx > 0 && String(numIdx) === queryParam) {
+            const pendingOutings = await Outing.find({ status: 'Pending' }).populate('studentId').sort({ requestTime: -1 });
+            if (pendingOutings[numIdx - 1]) outing = pendingOutings[numIdx - 1];
+          } else {
+            const student = await Student.findOne({ regNumber: { $regex: new RegExp(`^${queryParam}$`, 'i') } });
+            if (student) {
+              outing = await Outing.findOne({ studentId: student._id, status: 'Pending' }).sort({ requestTime: -1 }).populate('studentId');
+            } else {
+              outing = await Outing.findById(queryParam).populate('studentId');
+            }
+          }
+
+          if (!outing) {
+            return whatsappService.sendTextMessage(from, `❌ Could not find a pending outing request matching "${queryParam}".`);
+          }
+
+          outing.status = 'Rejected';
+          await outing.save();
+
+          const stu = outing.studentId || {};
+          await whatsappService.sendTextMessage(from, `❌ *Outing Rejected* for ${stu.name || 'Student'} (${stu.regNumber || 'N/A'}).`);
+
+          const studentSession = await ChatSession.findOne({ studentId: stu._id });
+          const studentPhone = studentSession ? studentSession.phoneNumber : (stu.phoneNumber || stu.mobileNumber);
+          if (studentPhone) {
+            await whatsappService.sendTextMessage(studentPhone,
+              `❌ *Your Outing Request was REJECTED by the Warden.*\n\n📄 *Reason:* ${outing.reason}\n\n_Please contact your hostel warden for further details._`
+            );
+          }
+          return;
+        }
+
+        // Handle RET command: RET [RegNo] [OTP]
         if (actionLower.startsWith('ret ')) {
-          // To be implemented in the Outing flow
-          return whatsappService.sendTextMessage(from, 'Outing return feature under development.');
+          const parts = actionLower.split(/\s+/);
+          if (parts.length < 3) {
+            return whatsappService.sendTextMessage(from, '⚠️ *Invalid Format*\n\nUsage: *RET [RegNo] [OTP]*\nExample: `RET VCET-2026-00004 4829`');
+          }
+          const regNo = parts[1].trim();
+          const otp = parts[2].trim();
+
+          const Student = require('../models/Student');
+          const Outing = require('../models/Outing');
+
+          const student = await Student.findOne({ regNumber: { $regex: new RegExp(`^${regNo}$`, 'i') } });
+          if (!student) {
+            return whatsappService.sendTextMessage(from, `❌ Student with RegNo "${regNo}" not found.`);
+          }
+
+          const outing = await Outing.findOne({
+            studentId: student._id,
+            status: 'Out',
+            returnOTP: otp
+          });
+
+          if (!outing) {
+            return whatsappService.sendTextMessage(from, `❌ No active outing found for "${regNo}" with OTP "${otp}".`);
+          }
+
+          outing.status = 'Returned';
+          outing.actualReturnTime = new Date();
+          await outing.save();
+
+          return whatsappService.sendTextMessage(from, `✅ *Outing Return Marked!*\n\nStudent *${student.name}* (${student.regNumber}) has been checked back into the hostel.`);
         }
 
         return whatsappService.sendWardenWelcome(from, warden.name, warden.block);
