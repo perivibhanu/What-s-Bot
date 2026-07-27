@@ -30,6 +30,7 @@ function GuardScanner() {
         scannerRef.current.clear().catch(e => console.error(e));
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanning, gateNumber, direction]);
 
   const onScanSuccess = (decodedText) => {
