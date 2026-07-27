@@ -68,6 +68,9 @@ function Layout({ children }) {
             <Link to="/active-outings" className={`menu-item ${isActive('/active-outings')}`}>
               🏠 Active Outings
             </Link>
+            <Link to="/guard-scanner" className={`menu-item ${isActive('/guard-scanner')}`}>
+              🛡️ Gate QR Scanner
+            </Link>
             <Link to="/late-comers" className={`menu-item ${isActive('/late-comers')}`}>
               🚨 Late Comers
             </Link>

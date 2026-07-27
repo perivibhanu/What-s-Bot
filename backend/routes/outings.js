@@ -7,5 +7,6 @@ router.use(authMiddleware);
 
 router.get('/active', outingController.getActiveOutings);
 router.get('/late', outingController.getLateComers);
+router.post('/scan', outingController.scanGateQR);
 
 module.exports = router;

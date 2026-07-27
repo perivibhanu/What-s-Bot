@@ -44,18 +44,19 @@ function ActiveOutings() {
               <th>#</th>
               <th>STUDENT</th>
               <th>REG NO</th>
-              <th>WARDEN / BLOCK</th>
-              <th>REASON</th>
+              <th>WARDEN</th>
               <th>STATUS</th>
-              <th>TIME OUT</th>
-              <th>RETURN TIME</th>
+              <th>GATE 1 (EXIT)</th>
+              <th>GATE 2 (EXIT)</th>
+              <th>GATE 2 (RET)</th>
+              <th>GATE 1 / GPS (RET)</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="8" style={{textAlign: 'center'}}>Loading...</td></tr>
+              <tr><td colSpan="9" style={{textAlign: 'center'}}>Loading...</td></tr>
             ) : outings.length === 0 ? (
-              <tr><td colSpan="8" style={{textAlign: 'center'}}>No outings recorded yet.</td></tr>
+              <tr><td colSpan="9" style={{textAlign: 'center'}}>No outings recorded yet.</td></tr>
             ) : (
               outings.map((outing, index) => (
                 <tr key={outing._id}>
@@ -63,7 +64,6 @@ function ActiveOutings() {
                   <td>{outing.studentId?.name || 'Student'}</td>
                   <td>{outing.studentId?.registrationNumber || '-'}</td>
                   <td>{outing.wardenId?.name ? `${outing.wardenId.name} (${outing.wardenId.block || 'Hostel'})` : 'Hostel Warden'}</td>
-                  <td>{outing.reason}</td>
                   <td>
                     <span style={{
                       padding: '4px 10px',
@@ -76,8 +76,10 @@ function ActiveOutings() {
                       {outing.status}
                     </span>
                   </td>
-                  <td>{outing.requestTime ? new Date(outing.requestTime).toLocaleString('en-IN') : '-'}</td>
-                  <td>{outing.actualReturnTime ? new Date(outing.actualReturnTime).toLocaleTimeString('en-IN') : '-'}</td>
+                  <td>{outing.gate1ExitTime ? new Date(outing.gate1ExitTime).toLocaleTimeString('en-IN') : '-'}</td>
+                  <td>{outing.gate2ExitTime ? new Date(outing.gate2ExitTime).toLocaleTimeString('en-IN') : (outing.status === 'Out' || outing.status === 'Returned' ? 'Logged' : '-')}</td>
+                  <td>{outing.gate2ReturnTime ? new Date(outing.gate2ReturnTime).toLocaleTimeString('en-IN') : '-'}</td>
+                  <td>{outing.gate1ReturnTime ? new Date(outing.gate1ReturnTime).toLocaleTimeString('en-IN') : (outing.actualReturnTime ? new Date(outing.actualReturnTime).toLocaleTimeString('en-IN') : '-')}</td>
                 </tr>
               ))
             )}

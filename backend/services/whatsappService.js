@@ -57,6 +57,17 @@ class WhatsAppService {
     return this.sendMessage(to, message);
   }
 
+  async sendImageMessage(to, imageUrl, caption) {
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'image',
+      image: {
+        link: imageUrl,
+        caption: caption
+      }
+    });
+  }
+
   async sendRegisteredWelcome(to, student) {
     const welcomeText = student?.name 
       ? `Welcome to Velammal Institute of Technology! 👋\n\nHello ${student.name}, how can we assist you today?`

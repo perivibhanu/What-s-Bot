@@ -997,24 +997,34 @@ class ChatService {
 
           outing.status = 'Out';
           outing.returnOTP = Math.floor(1000 + Math.random() * 9000).toString();
+          const stu = outing.studentId || {};
+          outing.qrToken = `VCET-OUT-${outing._id}-${stu.regNumber || 'N/A'}`;
           await outing.save();
 
-          const stu = outing.studentId || {};
           await whatsappService.sendTextMessage(from,
             `✅ *Outing Approved!*\n\n` +
             `👤 *Student:* ${stu.name || 'Student'} (${stu.regNumber || 'N/A'})\n` +
             `🔑 *Return OTP:* ${outing.returnOTP}\n\n` +
-            `The student has been notified automatically.`
+            `The student has been sent their Digital Outing Pass QR Code on WhatsApp automatically.`
           );
 
           const studentSession = await ChatSession.findOne({ studentId: stu._id });
           const studentPhone = studentSession ? studentSession.phoneNumber : (stu.phoneNumber || stu.mobileNumber);
           if (studentPhone) {
+            const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(outing.qrToken)}`;
+            
+            await whatsappService.sendImageMessage(studentPhone, qrImageUrl,
+              `🛡️ *VELAMMAL DIGITAL OUTING PASS*\n\n` +
+              `👤 *Student:* ${stu.name || 'Student'} (${stu.regNumber || 'N/A'})\n` +
+              `📄 *Reason:* ${outing.reason}\n` +
+              `🔑 *OTP:* ${outing.returnOTP}\n\n` +
+              `_Show this QR Code to security guards at Gate 1 (Hostel) & Gate 2 (Main Campus Gate) for check-out and check-in._`
+            );
+
             await whatsappService.sendTextMessage(studentPhone,
               `✅ *Your Outing Request is APPROVED!*\n\n` +
-              `📄 *Reason:* ${outing.reason}\n` +
-              `🔑 *Return OTP:* ${outing.returnOTP}\n\n` +
-              `_Have a safe trip! When you return to campus, tap "📍 Outing Return" in your Hostel Menu to share your location and check in._`
+              `Show the QR Code above to security guards at Gate 1 (Hostel) & Gate 2 (Main College Gate).\n\n` +
+              `_When returning to campus, scan your QR Code at the gates AND/OR tap "📍 Outing Return" in your Hostel Menu to check in via location!_`
             );
           }
           return;

@@ -28,6 +28,7 @@ import HostelFeedback from './pages/HostelFeedback';
 import HostelWardens from './pages/HostelWardens';
 import ActiveOutings from './pages/ActiveOutings';
 import LateComers from './pages/LateComers';
+import GuardScanner from './pages/GuardScanner';
 
 import IssuesFeedback from './pages/IssuesFeedback';
 import StaffIssuesFeedback from './pages/StaffIssuesFeedback';
@@ -95,6 +96,7 @@ function App() {
         <Route path="/admissions" element={<PrivateRoute allowedRole="super_admin"><Admissions /></PrivateRoute>} />
         <Route path="/fee-defaulters" element={<PrivateRoute allowedRole="super_admin"><FeeDefaulters /></PrivateRoute>} />
         <Route path="/active-outings" element={<PrivateRoute allowedRole="super_admin"><ActiveOutings /></PrivateRoute>} />
+        <Route path="/guard-scanner" element={<PrivateRoute allowedRole="super_admin"><GuardScanner /></PrivateRoute>} />
         <Route path="/late-comers" element={<PrivateRoute allowedRole="super_admin"><LateComers /></PrivateRoute>} />
         
         {/* Feedback Routes */}

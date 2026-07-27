@@ -35,6 +35,23 @@ const outingSchema = new mongoose.Schema({
   },
   otpExpiry: {
     type: Date
+  },
+  qrToken: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  gate1ExitTime: {
+    type: Date
+  },
+  gate2ExitTime: {
+    type: Date
+  },
+  gate2ReturnTime: {
+    type: Date
+  },
+  gate1ReturnTime: {
+    type: Date
   }
 });
 
