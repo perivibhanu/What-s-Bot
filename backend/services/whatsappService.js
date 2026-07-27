@@ -68,6 +68,33 @@ class WhatsAppService {
     });
   }
 
+  async sendOutingApprovalButtons(to, outing, student) {
+    const timeStr = outing.requestTime ? new Date(outing.requestTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : 'N/A';
+    const regNo = student?.regNumber || student?.registrationNumber || 'N/A';
+    const message = {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        body: {
+          text: `🚪 *Pending Outing Request*\n\n` +
+                `👤 *Student:* ${student?.name || 'Student'}\n` +
+                `🆔 *Reg No:* ${regNo}\n` +
+                `📄 *Reason:* ${outing.reason}\n` +
+                `🕒 *Requested:* ${timeStr}\n` +
+                `🔑 *Request ID:* \`${outing._id}\``
+        },
+        action: {
+          buttons: [
+            { type: 'reply', reply: { id: `APP ${regNo}`, title: '✅ Approve' } },
+            { type: 'reply', reply: { id: `REJ ${regNo}`, title: '❌ Reject' } }
+          ]
+        }
+      }
+    };
+    return this.sendMessage(to, message);
+  }
+
   async sendRegisteredWelcome(to, student) {
     const welcomeText = student?.name 
       ? `Welcome to Velammal Institute of Technology! 👋\n\nHello ${student.name}, how can we assist you today?`

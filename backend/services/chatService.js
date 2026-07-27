@@ -665,14 +665,7 @@ class ChatService {
         await whatsappService.sendTextMessage(from, `✅ *Outing Request Submitted to Warden ${warden.name}!*\n\nYour request has been sent for approval. You will be notified once it's approved.`);
 
         if (warden.mobileNumber) {
-          await whatsappService.sendTextMessage(warden.mobileNumber,
-            `🚪 *New Outing Request*\n\n` +
-            `👤 *Student:* ${student.name} (${student.regNumber})\n` +
-            `📄 *Reason & Time:* ${originalText}\n` +
-            `🔑 *Request ID:* \`${outing._id}\`\n\n` +
-            `_To approve, reply:_ *APP ${student.regNumber}*\n` +
-            `_To reject, reply:_ *REJ ${student.regNumber}*`
-          );
+          await whatsappService.sendOutingApprovalButtons(warden.mobileNumber, outing, student);
         }
 
         return whatsappService.sendRegisteredWelcome(from, student);
@@ -923,21 +916,12 @@ class ChatService {
           return whatsappService.sendTextMessage(from, '🚪 *Pending Outing Requests*\n\n✅ There are currently no pending outing requests.');
         }
 
-        let replyText = '🚪 *Pending Outing Requests*\n\n';
-        pendingOutings.forEach((out, index) => {
-          const stu = out.studentId || {};
-          const name = stu.name || 'Student';
-          const regNo = stu.regNumber || 'N/A';
-          const timeStr = out.requestTime ? new Date(out.requestTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : 'N/A';
-          replyText += `*#${index + 1}. ${name} (${regNo})*\n`;
-          replyText += `📄 *Reason:* ${out.reason}\n`;
-          replyText += `🕒 *Requested:* ${timeStr}\n`;
-          replyText += `🔑 *Request ID:* \`${out._id}\`\n\n`;
-        });
-        replyText += `_To approve an outing, reply:_ *APP 1* (for #1) or *APP [RegNo]*\n`;
-        replyText += `_To reject an outing, reply:_ *REJ 1* (for #1) or *REJ [RegNo]*`;
+        await whatsappService.sendTextMessage(from, `🚪 *Pending Outing Requests (${pendingOutings.length})*\n\n_Tap ✅ Approve or ❌ Reject on each request card below:_`);
 
-        return whatsappService.sendTextMessage(from, replyText);
+        for (const out of pendingOutings.slice(0, 5)) {
+          await whatsappService.sendOutingApprovalButtons(from, out, out.studentId || {});
+        }
+        return;
       }
 
       case 'warden_complaint':
@@ -970,7 +954,7 @@ class ChatService {
           }
         }
 
-        // Handle APP (Approve Outing): APP 1 or APP [RegNo]
+        // Handle APP (Approve Outing): APP [RegNo] via Interactive Button or text
         if (actionLower.startsWith('app ')) {
           const queryParam = actionLower.replace('app ', '').trim();
           const Outing = require('../models/Outing');
@@ -978,21 +962,15 @@ class ChatService {
           const ChatSession = require('../models/ChatSession');
 
           let outing = null;
-          const numIdx = parseInt(queryParam, 10);
-          if (!isNaN(numIdx) && numIdx > 0 && String(numIdx) === queryParam) {
-            const pendingOutings = await Outing.find({ status: 'Pending' }).populate('studentId').sort({ requestTime: -1 });
-            if (pendingOutings[numIdx - 1]) outing = pendingOutings[numIdx - 1];
+          const student = await Student.findOne({ regNumber: { $regex: new RegExp(`^${queryParam}$`, 'i') } });
+          if (student) {
+            outing = await Outing.findOne({ studentId: student._id, status: 'Pending' }).sort({ requestTime: -1 }).populate('studentId');
           } else {
-            const student = await Student.findOne({ regNumber: { $regex: new RegExp(`^${queryParam}$`, 'i') } });
-            if (student) {
-              outing = await Outing.findOne({ studentId: student._id, status: 'Pending' }).sort({ requestTime: -1 }).populate('studentId');
-            } else {
-              outing = await Outing.findById(queryParam).populate('studentId');
-            }
+            outing = await Outing.findById(queryParam).populate('studentId').catch(() => null);
           }
 
           if (!outing) {
-            return whatsappService.sendTextMessage(from, `❌ Could not find a pending outing request matching "${queryParam}".`);
+            return whatsappService.sendTextMessage(from, `❌ Could not find a pending outing request matching Reg No "${queryParam}". Please tap the ✅ Approve button on the request card.`);
           }
 
           outing.status = 'Out';
@@ -1030,7 +1008,7 @@ class ChatService {
           return;
         }
 
-        // Handle REJ (Reject Outing): REJ 1 or REJ [RegNo]
+        // Handle REJ (Reject Outing): REJ [RegNo] via Interactive Button or text
         if (actionLower.startsWith('rej ')) {
           const queryParam = actionLower.replace('rej ', '').trim();
           const Outing = require('../models/Outing');
@@ -1038,21 +1016,15 @@ class ChatService {
           const ChatSession = require('../models/ChatSession');
 
           let outing = null;
-          const numIdx = parseInt(queryParam, 10);
-          if (!isNaN(numIdx) && numIdx > 0 && String(numIdx) === queryParam) {
-            const pendingOutings = await Outing.find({ status: 'Pending' }).populate('studentId').sort({ requestTime: -1 });
-            if (pendingOutings[numIdx - 1]) outing = pendingOutings[numIdx - 1];
+          const student = await Student.findOne({ regNumber: { $regex: new RegExp(`^${queryParam}$`, 'i') } });
+          if (student) {
+            outing = await Outing.findOne({ studentId: student._id, status: 'Pending' }).sort({ requestTime: -1 }).populate('studentId');
           } else {
-            const student = await Student.findOne({ regNumber: { $regex: new RegExp(`^${queryParam}$`, 'i') } });
-            if (student) {
-              outing = await Outing.findOne({ studentId: student._id, status: 'Pending' }).sort({ requestTime: -1 }).populate('studentId');
-            } else {
-              outing = await Outing.findById(queryParam).populate('studentId');
-            }
+            outing = await Outing.findById(queryParam).populate('studentId').catch(() => null);
           }
 
           if (!outing) {
-            return whatsappService.sendTextMessage(from, `❌ Could not find a pending outing request matching "${queryParam}".`);
+            return whatsappService.sendTextMessage(from, `❌ Could not find a pending outing request matching Reg No "${queryParam}". Please tap the ❌ Reject button on the request card.`);
           }
 
           outing.status = 'Rejected';
