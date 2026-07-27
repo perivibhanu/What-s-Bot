@@ -433,6 +433,58 @@ class WhatsAppService {
     });
   }
 
+  async sendSecurityGuardWelcome(to, guardName, gateAssigned) {
+    const welcomeText = guardName 
+      ? `Welcome back, ${guardName}! 🛡️\n*Assigned Gate:* ${gateAssigned || 'Gate 1'}\n\nPlease select a security action:`
+      : 'Welcome back, Security Guard! 🛡️\n\nPlease select a security action:';
+    
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: { text: welcomeText },
+        action: {
+          button: 'Security Menu',
+          sections: [{
+            title: 'Gate Services',
+            rows: [
+              { id: 'security_open_scanner', title: '📸 Open QR Scanner', description: 'Scan Student Outing Pass' },
+              { id: 'security_gate_logs', title: '📋 Today Gate Logs', description: 'View active outing counts' },
+              { id: 'security_report_issue', title: '🚨 Report Gate Issue', description: 'Send emergency alert to Warden' }
+            ]
+          }]
+        }
+      }
+    });
+  }
+
+  async sendDriverWelcome(to, driverName, busNumber, routeNumber) {
+    const welcomeText = driverName 
+      ? `Welcome back, ${driverName}! 🚌\n*Bus No:* ${busNumber || 'N/A'} | *Route:* ${routeNumber || 'N/A'}\n\nPlease select an option:`
+      : 'Welcome back, Driver! 🚌\n\nPlease select an option:';
+    
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: { text: welcomeText },
+        action: {
+          button: 'Driver Menu',
+          sections: [{
+            title: 'Bus Fleet Services',
+            rows: [
+              { id: 'driver_start_trip', title: '📍 Share Trip GPS', description: 'Share live GPS with parents' },
+              { id: 'driver_route_info', title: '🗺️ Route & Stops', description: 'View bus route schedule' },
+              { id: 'driver_report_issue', title: '⚠️ Report Bus Issue', description: 'Notify Transport Admin' }
+            ]
+          }]
+        }
+      }
+    });
+  }
+
   async sendTextMessage(to, text) {
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',

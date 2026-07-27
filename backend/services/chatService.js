@@ -158,8 +158,8 @@ class ChatService {
     const msgLower = messageText.toLowerCase();
     const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai', 'back', 'menu', 'main menu', 'main_menu'].includes(msgLower);
 
-    // ── Auto-detect staff or warden member ──────────────────────────────────────────────
-    if (isGreeting && session.userType !== 'staff' && session.userType !== 'warden') {
+    // ── Auto-detect staff, warden, security guard, or driver ────────────────────────────
+    if (isGreeting) {
       const Warden = require('../models/Warden');
       const wardenList = await Warden.find({});
       const wardenMember = wardenList.find(w => normalizePhone(w.mobileNumber) === normalizePhone(from));
@@ -180,6 +180,28 @@ class ChatService {
         session.currentState = 'staff_welcome';
         await session.save();
         return whatsappService.sendStaffWelcome(from, staffMember.name);
+      }
+
+      const SecurityGuard = require('../models/SecurityGuard');
+      const guardList = await SecurityGuard.find({});
+      const guardMember = guardList.find(g => normalizePhone(g.mobileNumber) === normalizePhone(from));
+      if (guardMember) {
+        session.userType = 'security';
+        session.securityId = guardMember._id;
+        session.currentState = 'security_welcome';
+        await session.save();
+        return whatsappService.sendSecurityGuardWelcome(from, guardMember.name, guardMember.gateAssigned);
+      }
+
+      const Driver = require('../models/Driver');
+      const driverList = await Driver.find({});
+      const driverMember = driverList.find(d => normalizePhone(d.mobileNumber) === normalizePhone(from));
+      if (driverMember) {
+        session.userType = 'driver';
+        session.driverId = driverMember._id;
+        session.currentState = 'driver_welcome';
+        await session.save();
+        return whatsappService.sendDriverWelcome(from, driverMember.name, driverMember.busNumber, driverMember.routeNumber);
       }
     }
 
@@ -202,7 +224,29 @@ class ChatService {
     }
 
     if (session.userType === 'warden') {
-      return this.handleWardenAction(session, messageText, from); // Pass raw messageText because images might not have text
+      return this.handleWardenAction(session, messageText, from);
+    }
+
+    if (session.userType === 'security' && isGreeting) {
+      session.currentState = 'security_welcome';
+      const SecurityGuard = require('../models/SecurityGuard');
+      const guardMember = await SecurityGuard.findById(session.securityId);
+      return whatsappService.sendSecurityGuardWelcome(from, guardMember?.name, guardMember?.gateAssigned);
+    }
+
+    if (session.userType === 'security') {
+      return this.handleSecurityGuardAction(session, messageText, from);
+    }
+
+    if (session.userType === 'driver' && isGreeting) {
+      session.currentState = 'driver_welcome';
+      const Driver = require('../models/Driver');
+      const driverMember = await Driver.findById(session.driverId);
+      return whatsappService.sendDriverWelcome(from, driverMember?.name, driverMember?.busNumber, driverMember?.routeNumber);
+    }
+
+    if (session.userType === 'driver') {
+      return this.handleDriverAction(session, messageText, from);
     }
 
     // ── Already verified student sends greeting → show main menu ─────────────
@@ -1079,6 +1123,79 @@ class ChatService {
 
         return whatsappService.sendWardenWelcome(from, warden.name, warden.block);
     }
+  }
+
+  async handleSecurityGuardAction(session, messageText, from) {
+    const actionLower = (messageText || '').toLowerCase().trim();
+    const SecurityGuard = require('../models/SecurityGuard');
+    const Outing = require('../models/Outing');
+    const guard = await SecurityGuard.findById(session.securityId);
+    const guardName = guard ? guard.name : 'Security Guard';
+    const gateName = guard ? guard.gateAssigned : 'Gate 1';
+
+    if (actionLower === 'security_open_scanner' || actionLower === '1' || actionLower === 'scan' || actionLower === 'scanner') {
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      return whatsappService.sendTextMessage(from,
+        `🛡️ *Velammal Gate QR Scanner*\n\n` +
+        `Open the security guard QR scanner below on your mobile or tablet to scan student Outing Passes:\n` +
+        `🔗 ${frontendUrl}/guard-scanner`
+      );
+    }
+
+    if (actionLower === 'security_gate_logs' || actionLower === '2' || actionLower === 'logs') {
+      const outCount = await Outing.countDocuments({ status: 'Out' });
+      const returnedCount = await Outing.countDocuments({ status: 'Returned' });
+      return whatsappService.sendTextMessage(from,
+        `📋 *Today's Campus Gate Summary*\n\n` +
+        `🚪 *Students Currently OUT:* ${outCount}\n` +
+        `🔙 *Students Returned Today:* ${returnedCount}\n\n` +
+        `_Assigned Gate:_ *${gateName}*`
+      );
+    }
+
+    if (actionLower === 'security_report_issue' || actionLower === '3' || actionLower === 'report') {
+      return whatsappService.sendTextMessage(from,
+        `🚨 *Gate Emergency / Issue Alert*\n\n` +
+        `Please reply with a description of the emergency or gate issue. It will be logged for the Hostel Wardens & Admin.`
+      );
+    }
+
+    return whatsappService.sendSecurityGuardWelcome(from, guardName, gateName);
+  }
+
+  async handleDriverAction(session, messageText, from) {
+    const actionLower = (messageText || '').toLowerCase().trim();
+    const Driver = require('../models/Driver');
+    const driver = await Driver.findById(session.driverId);
+    const driverName = driver ? driver.name : 'Driver';
+    const busNo = driver ? driver.busNumber : 'N/A';
+    const routeNo = driver ? driver.routeNumber : 'N/A';
+
+    if (actionLower === 'driver_start_trip' || actionLower === '1' || actionLower === 'gps' || actionLower === 'location') {
+      return whatsappService.sendTextMessage(from,
+        `📍 *Start Bus Trip & GPS Broadcast*\n\n` +
+        `Please use the WhatsApp attachment icon (📎) ➔ *Location* ➔ *Share Live Location* to broadcast live bus GPS to parents on *Route ${routeNo}*!`
+      );
+    }
+
+    if (actionLower === 'driver_route_info' || actionLower === '2' || actionLower === 'route' || actionLower === 'info') {
+      return whatsappService.sendTextMessage(from,
+        `🚌 *Bus & Route Information*\n\n` +
+        `🧑‍✈️ *Driver:* ${driverName}\n` +
+        `🚐 *Bus Number:* ${busNo}\n` +
+        `🗺️ *Route:* ${routeNo}\n` +
+        `🟢 *Status:* Active & On-Schedule`
+      );
+    }
+
+    if (actionLower === 'driver_report_issue' || actionLower === '3' || actionLower === 'issue') {
+      return whatsappService.sendTextMessage(from,
+        `⚠️ *Report Bus Delay / Issue*\n\n` +
+        `Please reply with the reason for delay or maintenance issue. It will be sent to the Transport Coordinator.`
+      );
+    }
+
+    return whatsappService.sendDriverWelcome(from, driverName, busNo, routeNo);
   }
 }
 

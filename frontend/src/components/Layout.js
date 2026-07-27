@@ -61,6 +61,12 @@ function Layout({ children }) {
             <Link to="/hostel-wardens" className={`menu-item ${isActive('/hostel-wardens')}`}>
               👨‍✈️ Hostel Warden
             </Link>
+            <Link to="/security-guards" className={`menu-item ${isActive('/security-guards')}`}>
+              🛡️ Security Guards
+            </Link>
+            <Link to="/drivers" className={`menu-item ${isActive('/drivers')}`}>
+              🚌 Drivers
+            </Link>
           </div>
 
           <div className="menu-group">

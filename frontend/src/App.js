@@ -29,6 +29,8 @@ import HostelWardens from './pages/HostelWardens';
 import ActiveOutings from './pages/ActiveOutings';
 import LateComers from './pages/LateComers';
 import GuardScanner from './pages/GuardScanner';
+import SecurityGuards from './pages/SecurityGuards';
+import Drivers from './pages/Drivers';
 
 import IssuesFeedback from './pages/IssuesFeedback';
 import StaffIssuesFeedback from './pages/StaffIssuesFeedback';
@@ -82,6 +84,8 @@ function App() {
         <Route path="/students/:id" element={<PrivateRoute><StudentDetails /></PrivateRoute>} />
         <Route path="/staff" element={<PrivateRoute><StaffManagement /></PrivateRoute>} />
         <Route path="/hostel-wardens" element={<PrivateRoute><HostelWardens /></PrivateRoute>} />
+        <Route path="/security-guards" element={<PrivateRoute><SecurityGuards /></PrivateRoute>} />
+        <Route path="/drivers" element={<PrivateRoute><Drivers /></PrivateRoute>} />
         <Route path="/staff-messages" element={<PrivateRoute><StaffMessages /></PrivateRoute>} />
 
         {/* Super Admin Routes */}

@@ -83,6 +83,8 @@ app.use('/api/admissions', require('./routes/admission'));
 app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/wardens', require('./routes/wardens'));
 app.use('/api/outings', require('./routes/outings'));
+app.use('/api/security-guards', require('./routes/securityGuards'));
+app.use('/api/drivers', require('./routes/drivers'));
 
 const PORT = process.env.PORT || 5000;
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
