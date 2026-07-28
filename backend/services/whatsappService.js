@@ -435,8 +435,8 @@ class WhatsAppService {
 
   async sendSecurityGuardWelcome(to, guardName, gateAssigned) {
     const welcomeText = guardName 
-      ? `Welcome back, ${guardName}! 🛡️\n*Assigned Gate:* ${gateAssigned || 'Gate 1'}\n\nPlease select a security action:`
-      : 'Welcome back, Security Guard! 🛡️\n\nPlease select a security action:';
+      ? `Welcome back, *${guardName}*! 🛡️\n*Current Saved Post:* ${gateAssigned || 'Gate 1 (Hostel Gate)'}\n\n👉 *Choose your active Gate below* for today's shift (saved until you send 'Hi' again).\n\n*How to scan Student Outing Passes in WhatsApp:*\n1️⃣ *Send a Photo 📷* of the student's QR code here\n2️⃣ Or *Type/Paste* their Registration Number (e.g. 113323106071)\n3️⃣ Or use *🔗 Open Web Scanner* below for live video scanning.`
+      : 'Welcome back, Security Guard! 🛡️\n\nPlease select your active gate for today:';
     
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
@@ -445,15 +445,24 @@ class WhatsAppService {
         type: 'list',
         body: { text: welcomeText },
         action: {
-          button: 'Security Menu',
-          sections: [{
-            title: 'Gate Services',
-            rows: [
-              { id: 'security_open_scanner', title: '📸 Open QR Scanner', description: 'Scan Student Outing Pass' },
-              { id: 'security_gate_logs', title: '📋 Today Gate Logs', description: 'View active outing counts' },
-              { id: 'security_report_issue', title: '🚨 Report Gate Issue', description: 'Send emergency alert to Warden' }
-            ]
-          }]
+          button: 'Select Action / Gate',
+          sections: [
+            {
+              title: '📍 Set My Active Gate Post',
+              rows: [
+                { id: 'select_gate_1', title: '🏢 Select Gate 1', description: 'Hostel Gate (Save for shift)' },
+                { id: 'select_gate_2', title: '🏛️ Select Gate 2', description: 'Main Gate (Save for shift)' }
+              ]
+            },
+            {
+              title: '🛡️ Gate Operations',
+              rows: [
+                { id: 'security_open_scanner', title: '🔗 Open Web Scanner', description: 'Live mobile video scanner' },
+                { id: 'security_gate_logs', title: '📋 Today Gate Summary', description: 'View active outing counts' },
+                { id: 'security_report_issue', title: '🚨 Report Gate Issue', description: 'Send emergency alert' }
+              ]
+            }
+          ]
         }
       }
     });
@@ -1102,6 +1111,26 @@ class WhatsAppService {
         }
       }
     });
+  }
+
+  async downloadMedia(mediaId) {
+    try {
+      if (!this.token) return null;
+      const metaRes = await axios.get(`https://graph.facebook.com/v18.0/${mediaId}`, {
+        headers: { Authorization: `Bearer ${this.token}` }
+      });
+      const mediaUrl = metaRes.data.url;
+      if (!mediaUrl) return null;
+
+      const imgRes = await axios.get(mediaUrl, {
+        headers: { Authorization: `Bearer ${this.token}` },
+        responseType: 'arraybuffer'
+      });
+      return Buffer.from(imgRes.data);
+    } catch (err) {
+      console.error('Error downloading WhatsApp media:', err.message);
+      return null;
+    }
   }
 }
 

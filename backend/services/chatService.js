@@ -190,7 +190,7 @@ class ChatService {
         session.securityId = guardMember._id;
         session.currentState = 'security_welcome';
         await session.save();
-        return whatsappService.sendSecurityGuardWelcome(from, guardMember.name, guardMember.gateAssigned);
+        return whatsappService.sendSecurityGuardWelcome(from, guardMember.name, session.activeGate || guardMember.gateAssigned);
       }
 
       const Driver = require('../models/Driver');
@@ -231,11 +231,11 @@ class ChatService {
       session.currentState = 'security_welcome';
       const SecurityGuard = require('../models/SecurityGuard');
       const guardMember = await SecurityGuard.findById(session.securityId);
-      return whatsappService.sendSecurityGuardWelcome(from, guardMember?.name, guardMember?.gateAssigned);
+      return whatsappService.sendSecurityGuardWelcome(from, guardMember?.name, session.activeGate || guardMember?.gateAssigned);
     }
 
     if (session.userType === 'security') {
-      return this.handleSecurityGuardAction(session, messageText, from);
+      return this.handleSecurityGuardAction(session, messageText, from, rawMessage);
     }
 
     if (session.userType === 'driver' && isGreeting) {
@@ -1125,18 +1125,92 @@ class ChatService {
     }
   }
 
-  async handleSecurityGuardAction(session, messageText, from) {
+  async handleSecurityGuardAction(session, messageText, from, rawMessage = null) {
     const actionLower = (messageText || '').toLowerCase().trim();
     const SecurityGuard = require('../models/SecurityGuard');
     const Outing = require('../models/Outing');
     const guard = await SecurityGuard.findById(session.securityId);
     const guardName = guard ? guard.name : 'Security Guard';
-    const gateName = guard ? guard.gateAssigned : 'Gate 1';
+    const gateName = session.activeGate || (guard ? guard.gateAssigned : 'Gate 1 (Hostel Gate)');
 
+    // ── 1) GATE SELECTION: Save gate choice until "Hi" is sent again ──
+    if (actionLower === 'select_gate_1') {
+      session.activeGate = 'Gate 1 (Hostel Gate)';
+      await session.save();
+      if (guard) {
+        guard.gateAssigned = 'Gate 1 (Hostel Gate)';
+        await guard.save();
+      }
+      return whatsappService.sendTextMessage(from,
+        `✅ *Active Post Saved:* 🏢 Gate 1 (Hostel Gate)\n\n` +
+        `Your shift location is saved until you send 'Hi' again to change it.\n\n` +
+        `👉 *How to Scan & Record Outing Passes in WhatsApp:*\n` +
+        `1️⃣ *Send a Photo 📷* of the student's QR Code here\n` +
+        `2️⃣ Or *Type/Paste* their Registration Number (e.g. 113323106071) or QR token\n` +
+        `3️⃣ Or tap *🔗 Open Web Scanner* in the menu.`
+      );
+    }
+
+    if (actionLower === 'select_gate_2') {
+      session.activeGate = 'Gate 2 (Main Gate)';
+      await session.save();
+      if (guard) {
+        guard.gateAssigned = 'Gate 2 (Main Gate)';
+        await guard.save();
+      }
+      return whatsappService.sendTextMessage(from,
+        `✅ *Active Post Saved:* 🏛️ Gate 2 (Main Gate)\n\n` +
+        `Your shift location is saved until you send 'Hi' again to change it.\n\n` +
+        `👉 *How to Scan & Record Outing Passes in WhatsApp:*\n` +
+        `1️⃣ *Send a Photo 📷* of the student's QR Code here\n` +
+        `2️⃣ Or *Type/Paste* their Registration Number (e.g. 113323106071) or QR token\n` +
+        `3️⃣ Or tap *🔗 Open Web Scanner* in the menu.`
+      );
+    }
+
+    // ── 2) QR CODE IMAGE UPLOAD in WhatsApp ──
+    if (rawMessage && rawMessage.type === 'image') {
+      const mediaId = rawMessage.image?.id;
+      if (!mediaId) {
+        return whatsappService.sendTextMessage(from, `⚠️ Could not receive image. Please try again or type the student's Registration Number.`);
+      }
+      await whatsappService.sendTextMessage(from, `⏳ *Scanning QR Code Photo...*`);
+      const imgBuffer = await whatsappService.downloadMedia(mediaId);
+      if (!imgBuffer) {
+        return whatsappService.sendTextMessage(from, `❌ Could not download image from WhatsApp. Please type the Registration Number directly.`);
+      }
+      try {
+        const Jimp = require('jimp');
+        const jsQR = require('jsqr');
+        const image = await Jimp.read(imgBuffer);
+        const imageData = {
+          data: new Uint8ClampedArray(image.bitmap.data),
+          width: image.bitmap.width,
+          height: image.bitmap.height
+        };
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        if (code && code.data) {
+          return this.processGuardStudentScan(session, code.data, from, gateName);
+        } else {
+          return whatsappService.sendTextMessage(from, `⚠️ *Could not detect QR Code in the photo.*\nPlease ensure the photo is clear and well-lit, or simply text the Student's 10-12 digit Registration Number.`);
+        }
+      } catch (err) {
+        console.error('Error decoding QR image:', err);
+        return whatsappService.sendTextMessage(from, `⚠️ Error processing image. Please type the Student's Registration Number directly.`);
+      }
+    }
+
+    // ── 3) STUDENT REGISTRATION NUMBER OR QR TOKEN TEXT ──
+    const regMatch = actionLower.match(/^(vcet-out-|\d{8,15})/i);
+    if (regMatch) {
+      return this.processGuardStudentScan(session, messageText.trim(), from, gateName);
+    }
+
+    // ── 4) STANDARD MENU ACTIONS ──
     if (actionLower === 'security_open_scanner' || actionLower === '1' || actionLower === 'scan' || actionLower === 'scanner') {
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
       return whatsappService.sendTextMessage(from,
-        `🛡️ *Velammal Gate QR Scanner*\n\n` +
+        `🛡️ *Velammal Gate QR Scanner (${gateName})*\n\n` +
         `Open the security guard QR scanner below on your mobile or tablet to scan student Outing Passes:\n` +
         `🔗 ${frontendUrl}/guard-scanner`
       );
@@ -1149,7 +1223,7 @@ class ChatService {
         `📋 *Today's Campus Gate Summary*\n\n` +
         `🚪 *Students Currently OUT:* ${outCount}\n` +
         `🔙 *Students Returned Today:* ${returnedCount}\n\n` +
-        `_Assigned Gate:_ *${gateName}*`
+        `_Your Active Post:_ *${gateName}*`
       );
     }
 
@@ -1161,6 +1235,82 @@ class ChatService {
     }
 
     return whatsappService.sendSecurityGuardWelcome(from, guardName, gateName);
+  }
+
+  async processGuardStudentScan(session, scanText, from, gateName) {
+    const Student = require('../models/Student');
+    const Outing = require('../models/Outing');
+    let regNum = scanText.trim();
+
+    if (regNum.toUpperCase().startsWith('VCET-OUT-')) {
+      const parts = regNum.split('-');
+      if (parts.length >= 3) regNum = parts[2];
+    }
+
+    const student = await Student.findOne({ regNum: regNum });
+    if (!student) {
+      return whatsappService.sendTextMessage(from, `❌ *Student Not Found*\nNo student registered with Registration Number: *${regNum}*`);
+    }
+
+    const outing = await Outing.findOne({
+      studentId: student._id,
+      status: { $in: ['Pending', 'Out'] }
+    }).sort({ requestTime: -1 });
+
+    if (!outing) {
+      return whatsappService.sendTextMessage(from,
+        `⚠️ *No Active Outing Request*\n` +
+        `Student *${student.name}* (${student.regNum}) does not have an approved or active Outing Pass.`
+      );
+    }
+
+    const now = new Date();
+    const timeFormatted = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' });
+    const dateFormatted = now.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+    // Exit Check
+    if (outing.status === 'Pending') {
+      outing.status = 'Out';
+      outing.actualOutTime = now;
+      if (gateName.includes('1')) outing.gate1ExitTime = now;
+      if (gateName.includes('2')) outing.gate2ExitTime = now;
+      await outing.save();
+
+      if (student.parentContact) {
+        whatsappService.sendTextMessage(student.parentContact,
+          `🔔 *Velammal Gate Alert:* Student *${student.name}* has exited campus via *${gateName}* on ${dateFormatted} at ${timeFormatted}.`
+        );
+      }
+      return whatsappService.sendTextMessage(from,
+        `✅ *OUTING EXIT APPROVED*\n\n` +
+        `🧑 *Student:* ${student.name} (${student.regNum})\n` +
+        `🏢 *Gate:* ${gateName}\n` +
+        `🕒 *Time:* ${timeFormatted}\n\n` +
+        `_Student is checked out of campus._`
+      );
+    }
+
+    // Return Check
+    if (outing.status === 'Out') {
+      outing.status = 'Returned';
+      outing.actualReturnTime = now;
+      if (gateName.includes('1')) outing.gate1ReturnTime = now;
+      if (gateName.includes('2')) outing.gate2ReturnTime = now;
+      await outing.save();
+
+      if (student.parentContact) {
+        whatsappService.sendTextMessage(student.parentContact,
+          `🔔 *Velammal Gate Alert:* Student *${student.name}* has returned to campus via *${gateName}* on ${dateFormatted} at ${timeFormatted}.`
+        );
+      }
+      return whatsappService.sendTextMessage(from,
+        `✅ *CAMPUS RETURN LOGGED*\n\n` +
+        `🧑 *Student:* ${student.name} (${student.regNum})\n` +
+        `🏢 *Gate:* ${gateName}\n` +
+        `🕒 *Time:* ${timeFormatted}\n\n` +
+        `_Student has returned safely to campus._`
+      );
+    }
   }
 
   async handleDriverAction(session, messageText, from) {
