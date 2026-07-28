@@ -445,10 +445,10 @@ class WhatsAppService {
         type: 'list',
         body: { text: welcomeText },
         action: {
-          button: 'Select Action / Gate',
+          button: 'Select Gate/Menu',
           sections: [
             {
-              title: '📍 Set My Active Gate Post',
+              title: '📍 Set Active Gate',
               rows: [
                 { id: 'select_gate_1', title: '🏢 Select Gate 1', description: 'Hostel Gate (Save for shift)' },
                 { id: 'select_gate_2', title: '🏛️ Select Gate 2', description: 'Main Gate (Save for shift)' }
