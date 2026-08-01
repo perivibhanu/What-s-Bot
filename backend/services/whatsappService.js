@@ -502,6 +502,49 @@ class WhatsAppService {
     });
   }
 
+  async sendMasterCategoryMenu(to) {
+    const welcomeText =
+      `Welcome to *Velammal Institute of Technology* WhatsApp Portal! 🏛️\n\n` +
+      `Your convenience is our priority.\n` +
+      `Experience seamless access to our official campus services right here on WhatsApp.\n\n` +
+      `👉 Please select your category below:`;
+
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: { text: welcomeText },
+        action: {
+          button: 'Choose Portal',
+          sections: [
+            {
+              title: '🎓 Academic & Info',
+              rows: [
+                { id: 'portal_admission', title: '1. Admission Student', description: 'Apply online & admission helpdesk' },
+                { id: 'portal_student', title: '2. College Student', description: 'Outings, Fees, Attendance & Info' }
+              ]
+            },
+            {
+              title: '👔 Staff & Operations',
+              rows: [
+                { id: 'portal_staff', title: '3. Faculty & Staff', description: 'Teaching & Lab Assistant Portal' },
+                { id: 'portal_warden', title: '4. Hostel Warden', description: 'Outing approvals & complaints' }
+              ]
+            },
+            {
+              title: '👪 Parents & Security',
+              rows: [
+                { id: 'portal_parent', title: '5. Parent Portal', description: 'Track student outing & attendance' },
+                { id: 'portal_security', title: '6. Security Guard', description: 'Gate 1 & Gate 2 Outing Scanner' }
+              ]
+            }
+          ]
+        }
+      }
+    });
+  }
+
   async sendMainMenuButton(to) {
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',

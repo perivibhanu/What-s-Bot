@@ -156,7 +156,104 @@ class ChatService {
     }
 
     const msgLower = messageText.toLowerCase();
-    const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai', 'back', 'menu', 'main menu', 'main_menu'].includes(msgLower);
+    const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai', 'back', 'menu', 'main menu', 'main_menu', 'portal', 'choose portal', 'switch portal', 'change portal', 'categories', '0'].includes(msgLower);
+
+    // ── Explicit Portal / Category Switch Request ─────────────────────────────
+    if (['portal', 'choose portal', 'switch portal', 'change portal', 'categories', '0', 'main menu', 'main_menu'].includes(msgLower)) {
+      session.currentState = 'visitor_welcome';
+      await session.save();
+      return whatsappService.sendMasterCategoryMenu(from);
+    }
+
+    // ── Handle 6 Master Portal Categories (AP Gov Bot Style) ──────────────────
+    if (msgLower === 'portal_admission') {
+      session.userType = 'visitor';
+      session.currentState = 'admission_welcome';
+      session.admissionStep = '';
+      session.admissionData = {};
+      await session.save();
+      return whatsappService.sendAdmissionWelcome(from);
+    }
+
+    if (msgLower === 'portal_student') {
+      session.userType = 'student';
+      session.currentState = 'awaiting_reg_number';
+      await session.save();
+      return whatsappService.sendTextMessage(from,
+        '🎓 *Velammal Student Portal*\n\n' +
+        'Please enter your 10-12 digit *Register Number* (e.g. 113323106071) to verify your student account:'
+      );
+    }
+
+    if (msgLower === 'portal_staff') {
+      const Staff = require('../models/Staff');
+      const staffList = await Staff.find({});
+      const staffMember = staffList.find(s => normalizePhone(s.contactDetails) === normalizePhone(from));
+      if (staffMember) {
+        session.userType = 'staff';
+        session.staffId = staffMember._id;
+        session.currentState = 'staff_welcome';
+        await session.save();
+        return whatsappService.sendStaffWelcome(from, staffMember.name);
+      } else {
+        return whatsappService.sendTextMessage(from,
+          '👔 *Faculty & Staff Portal*\n\n' +
+          'Your mobile number is not currently registered as Faculty or Lab Assistant in the database.\n' +
+          'Please register your WhatsApp mobile number in the Velammal Admin Panel under *Staff Management* to access this portal.\n\n' +
+          'Type *0* or *Menu* to return to Category Selector.'
+        );
+      }
+    }
+
+    if (msgLower === 'portal_warden') {
+      const Warden = require('../models/Warden');
+      const wardenList = await Warden.find({});
+      const wardenMember = wardenList.find(w => normalizePhone(w.mobileNumber) === normalizePhone(from));
+      if (wardenMember) {
+        session.userType = 'warden';
+        session.wardenId = wardenMember._id;
+        session.currentState = 'warden_welcome';
+        await session.save();
+        return whatsappService.sendWardenWelcome(from, wardenMember.name, wardenMember.block);
+      } else {
+        return whatsappService.sendTextMessage(from,
+          '👨‍✈️ *Hostel Warden Portal*\n\n' +
+          'Your mobile number is not registered as an authorized Hostel Warden.\n' +
+          'Please contact the Velammal Admin Panel under *Hostel Warden* to authorize this number.\n\n' +
+          'Type *0* or *Menu* to return to Category Selector.'
+        );
+      }
+    }
+
+    if (msgLower === 'portal_parent') {
+      session.userType = 'parent';
+      session.currentState = 'awaiting_parent_reg';
+      await session.save();
+      return whatsappService.sendTextMessage(from,
+        '👪 *Velammal Parents Portal*\n\n' +
+        "Please enter your Child's 10-12 digit *Register Number* (e.g. 113323106071) to verify parent access:"
+      );
+    }
+
+    if (msgLower === 'portal_security') {
+      const SecurityGuard = require('../models/SecurityGuard');
+      const guardList = await SecurityGuard.find({});
+      const guardMember = guardList.find(g => normalizePhone(g.mobileNumber) === normalizePhone(from));
+      if (guardMember) {
+        session.userType = 'security';
+        session.securityId = guardMember._id;
+        session.currentState = 'security_welcome';
+        await session.save();
+        return whatsappService.sendSecurityGuardWelcome(from, guardMember.name, session.activeGate || guardMember.gateAssigned);
+      } else {
+        return whatsappService.sendTextMessage(from,
+          '🛡️ *Security Guard Gate Scanner*\n\n' +
+          'Your WhatsApp number is not registered as an authorized Security Guard.\n' +
+          'Please contact the Velammal Admin Panel under *Security Guards* to authorize this number.\n\n' +
+          'Type *0* or *Menu* to return to Category Selector.'
+        );
+      }
+    }
 
     // ── Auto-detect staff, warden, security guard, or driver ────────────────────────────
     if (isGreeting) {
@@ -298,9 +395,9 @@ class ChatService {
     switch (session.currentState) {
 
       case 'initial':
-        // Any message (greeting or otherwise) → show 2-button welcome
+        // Any message (greeting or otherwise) → show master category menu
         session.currentState = 'visitor_welcome';
-        return whatsappService.sendInitialWelcome(from);
+        return whatsappService.sendMasterCategoryMenu(from);
 
       case 'visitor_welcome':
       case 'about_topic':
@@ -344,10 +441,10 @@ class ChatService {
         // Greeting or Back resets to welcome
         if (isGreeting || msgLower === 'back_to_main') {
           session.currentState = 'visitor_welcome';
-          return whatsappService.sendInitialWelcome(from);
+          return whatsappService.sendMasterCategoryMenu(from);
         }
         // Unknown → re-show welcome
-        return whatsappService.sendInitialWelcome(from);
+        return whatsappService.sendMasterCategoryMenu(from);
 
       case 'about_college':
         if (msgLower === 'student_login') {
@@ -362,7 +459,7 @@ class ChatService {
         }
         if (msgLower === 'back_to_main' || isGreeting) {
           session.currentState = 'visitor_welcome';
-          return whatsappService.sendInitialWelcome(from);
+          return whatsappService.sendMasterCategoryMenu(from);
         }
         return whatsappService.sendAboutCollegeDetails(from);
 
