@@ -506,8 +506,20 @@ class WhatsAppService {
     const welcomeText =
       `Welcome to *Velammal Institute of Technology* WhatsApp Portal! 🏛️\n\n` +
       `Your convenience is our priority.\n` +
-      `Experience seamless access to our official campus services right here on WhatsApp.\n\n` +
-      `👉 Please select your category below:`;
+      `Experience efficient support with seamless access to our official campus services right here on WhatsApp.\n\n` +
+      `Please choose your preferred category below.\n\n` +
+      `> తెలుగు / English పోర్టల్ ఎంపిక చేయండి`;
+
+    // Send official institutional logo banner image (AP Government Bot Style)
+    try {
+      await this.sendImageMessage(
+        to,
+        'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600',
+        '🏛️ *Velammal Institute of Technology* - Official WhatsApp Helper'
+      );
+    } catch (err) {
+      console.log('Optional logo send skipped:', err.message);
+    }
 
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
@@ -519,22 +531,12 @@ class WhatsAppService {
           button: 'Choose Portal',
           sections: [
             {
-              title: '🎓 Academic & Info',
+              title: 'Please Select Your Portal',
               rows: [
                 { id: 'portal_admission', title: '1. Admission Student', description: 'Apply online & admission helpdesk' },
-                { id: 'portal_student', title: '2. College Student', description: 'Outings, Fees, Attendance & Info' }
-              ]
-            },
-            {
-              title: '👔 Staff & Operations',
-              rows: [
+                { id: 'portal_student', title: '2. College Student', description: 'Outings, Fees, Attendance & Info' },
                 { id: 'portal_staff', title: '3. Faculty & Staff', description: 'Teaching & Lab Assistant Portal' },
-                { id: 'portal_warden', title: '4. Hostel Warden', description: 'Outing approvals & complaints' }
-              ]
-            },
-            {
-              title: '👪 Parents & Security',
-              rows: [
+                { id: 'portal_warden', title: '4. Hostel Warden', description: 'Outing approvals & complaints' },
                 { id: 'portal_parent', title: '5. Parent Portal', description: 'Track student outing & attendance' },
                 { id: 'portal_security', title: '6. Security Guard', description: 'Gate 1 & Gate 2 Outing Scanner' }
               ]
