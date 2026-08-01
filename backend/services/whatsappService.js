@@ -97,30 +97,30 @@ class WhatsAppService {
 
   async sendRegisteredWelcome(to, student) {
     const welcomeText = student?.name 
-      ? `Welcome to Velammal Institute of Technology! 👋\n\nHello *${student.name}*, choose any student service below:`
-      : 'Welcome to Velammal Institute of Technology! 👋\n\nChoose any student service below:';
+      ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${student.name}, please choose your preferred student service below:`
+      : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred student service below:`;
     
     const rows = [
-      { id: 'current_updates', title: '📢 Current Updates', description: 'Principal circulars' },
-      { id: 'marks', title: '📊 Marks & Results', description: 'View semester marks' },
-      { id: 'attendance', title: '📅 Attendance %', description: 'Check current attendance' },
-      { id: 'timetable', title: '🕐 Class Timetable', description: 'View lecture schedule' }
+      { id: 'current_updates', title: 'Current Updates', description: 'Principal & college circulars' },
+      { id: 'marks', title: 'Marks & Results', description: 'View semester marks & grades' },
+      { id: 'attendance', title: 'Attendance Report', description: 'Check current attendance %' },
+      { id: 'timetable', title: 'Class Timetable', description: 'View daily lecture schedule' }
     ];
 
     if (student?.scholarType === 'Hostel') {
       rows.push(
-        { id: 'make_outing', title: '🚪 Make Outing', description: 'Request new outing permit' },
-        { id: 'return_outing', title: '📍 Outing Return', description: 'Share location for check-in' },
-        { id: 'rate_food', title: '🍽️ Rate Hostel Food', description: 'Rate hostel meals' }
+        { id: 'make_outing', title: 'Make Outing Permit', description: 'Request new outing permit' },
+        { id: 'return_outing', title: 'Outing Return Check', description: 'Share location for check-in' },
+        { id: 'rate_food', title: 'Rate Hostel Food', description: 'Rate hostel meals & dining' }
       );
     } else {
-      rows.push({ id: 'transportation', title: '🚌 Transportation', description: 'Bus routes & numbers' });
+      rows.push({ id: 'transportation', title: 'Transport Services', description: 'College bus routes & numbers' });
     }
 
     rows.push(
-      { id: 'fee_balance', title: '💰 Fee Balance', description: 'Check & pay fees' },
-      { id: 'helpdesk', title: '🎫 Helpdesk / Issues', description: 'Report issues & complaints' },
-      { id: 'admission_start', title: '📋 Admission', description: 'Apply for siblings/cousins' }
+      { id: 'fee_balance', title: 'Fee Balance Status', description: 'Check due fees & payment' },
+      { id: 'helpdesk', title: 'Helpdesk Services', description: 'Report issues & complaints' },
+      { id: 'admission_start', title: 'Sibling Admission', description: 'Apply for siblings & cousins' }
     );
 
     return this.sendMessage(to, {
@@ -132,9 +132,9 @@ class WhatsAppService {
           text: welcomeText
         },
         action: {
-          button: 'Select Service',
+          button: 'Choose Service',
           sections: [{
-            title: 'Student Services',
+            title: 'Select One Service',
             rows: rows
           }]
         }
@@ -235,8 +235,8 @@ class WhatsAppService {
 
   async sendParentWelcome(to, studentName) {
     const welcomeText = studentName 
-      ? `Welcome to Velammal Institute of Technology! 👋\n\nYou are viewing the portal for ${studentName}.\nHow can we assist you today?`
-      : 'Welcome to Velammal Institute of Technology! 👋\n\nHow can we assist you today?';
+      ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nYou are viewing the portal for ${studentName}.\nPlease choose your preferred parent service below:`
+      : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred parent service below:`;
     
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
@@ -247,14 +247,14 @@ class WhatsAppService {
           text: welcomeText
         },
         action: {
-          button: 'View Menu',
+          button: 'Choose Service',
           sections: [{
-            title: 'Parent Services',
+            title: 'Select One Service',
             rows: [
-              { id: 'principal_circulars', title: '📢 Principal Circulars', description: 'Latest college circulars' },
-              { id: 'hod_circulars', title: '📝 HOD Circulars', description: 'Department specific circulars' },
-              { id: 'marks', title: '📊 Marks', description: 'View semester marks' },
-              { id: 'admission_start', title: '📋 Admission', description: 'Apply for admission online' }
+              { id: 'principal_circulars', title: 'Principal Circulars', description: 'Latest college circulars' },
+              { id: 'hod_circulars', title: 'HOD Circulars', description: 'Department specific circulars' },
+              { id: 'marks', title: 'Academic Marks', description: 'View semester marks' },
+              { id: 'admission_start', title: 'Sibling Admission', description: 'Apply for admission online' }
             ]
           }]
         }
@@ -294,8 +294,8 @@ class WhatsAppService {
 
   async sendStaffWelcome(to, staffName) {
     const welcomeText = staffName 
-      ? `Welcome back, ${staffName}! 👔\n\nPlease select an option:`
-      : 'Welcome back! 👔\n\nPlease select an option:';
+      ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${staffName}, please choose your preferred staff service below:`
+      : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred staff service below:`;
     
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
@@ -304,12 +304,12 @@ class WhatsAppService {
         type: 'list',
         body: { text: welcomeText },
         action: {
-          button: 'View Menu',
+          button: 'Choose Service',
           sections: [{
-            title: 'Staff Services',
+            title: 'Select One Service',
             rows: [
-              { id: 'staff_complaint', title: '⚠️ Complaint', description: 'Report an issue' },
-              { id: 'staff_admission', title: '📋 Admission', description: 'Admission link' }
+              { id: 'staff_complaint', title: 'Register Complaint', description: 'Report an issue & complaint' },
+              { id: 'staff_admission', title: 'Sibling Admission', description: 'Admission application link' }
             ]
           }]
         }
@@ -415,8 +415,8 @@ class WhatsAppService {
 
   async sendWardenWelcome(to, wardenName, blockName) {
     const welcomeText = wardenName 
-      ? `Welcome back, ${wardenName}! 🏢\n*Hostel Block:* ${blockName || 'N/A'}\n\nPlease select an option:`
-      : 'Welcome back! 🏢\n\nPlease select an option:';
+      ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${wardenName} (${blockName || 'Hostel'}), please choose your preferred warden service below:`
+      : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred warden service below:`;
     
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
@@ -425,13 +425,13 @@ class WhatsAppService {
         type: 'list',
         body: { text: welcomeText },
         action: {
-          button: 'View Menu',
+          button: 'Choose Service',
           sections: [{
-            title: 'Warden Services',
+            title: 'Select One Service',
             rows: [
-              { id: 'warden_outing', title: '🚪 Outing', description: 'Manage New & Return Outings' },
-              { id: 'warden_complaint', title: '⚠️ Complaint', description: 'Report an issue' },
-              { id: 'warden_admission', title: '📋 Admission', description: 'Admission link' }
+              { id: 'warden_outing', title: 'Outing Applications', description: 'Manage new & return outings' },
+              { id: 'warden_complaint', title: 'Hostel Complaints', description: 'Report a maintenance issue' },
+              { id: 'warden_admission', title: 'Sibling Admission', description: 'Admission application link' }
             ]
           }]
         }
@@ -441,8 +441,8 @@ class WhatsAppService {
 
   async sendSecurityGuardWelcome(to, guardName, gateAssigned) {
     const welcomeText = guardName 
-      ? `Welcome back, *${guardName}*! 🛡️\n*Current Saved Post:* ${gateAssigned || 'Gate 1 (Hostel Gate)'}\n\n👉 *Choose your active Gate below* for today's shift (saved until you send 'Hi' again).\n\n*How to scan Student Outing Passes in WhatsApp:*\n1️⃣ *Send a Photo 📷* of the student's QR code here\n2️⃣ Or *Type/Paste* their Registration Number (e.g. 113323106071)\n3️⃣ Or use *🔗 Open Web Scanner* below for live video scanning.`
-      : 'Welcome back, Security Guard! 🛡️\n\nPlease select your active gate for today:';
+      ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${guardName} (Post: ${gateAssigned || 'Gate 1'}), please choose your preferred security service below:\n\n*How to scan Student Outing Passes:*\n1️⃣ *Send Photo* of QR code here\n2️⃣ Or *Type/Paste* Reg Number\n3️⃣ Or use *Open Web Scanner* below for live video scan.`
+      : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred security service below:`;
     
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
@@ -451,21 +451,21 @@ class WhatsAppService {
         type: 'list',
         body: { text: welcomeText },
         action: {
-          button: 'Select Gate/Menu',
+          button: 'Choose Service',
           sections: [
             {
-              title: '📍 Set Active Gate',
+              title: 'Select Gate Shift',
               rows: [
-                { id: 'select_gate_1', title: '🏢 Select Gate 1', description: 'Hostel Gate (Save for shift)' },
-                { id: 'select_gate_2', title: '🏛️ Select Gate 2', description: 'Main Gate (Save for shift)' }
+                { id: 'select_gate_1', title: 'Select Gate 1', description: 'Hostel Gate (Save for shift)' },
+                { id: 'select_gate_2', title: 'Select Gate 2', description: 'Main Gate (Save for shift)' }
               ]
             },
             {
-              title: '🛡️ Gate Operations',
+              title: 'Gate Operations',
               rows: [
-                { id: 'security_open_scanner', title: '🔗 Open Web Scanner', description: 'Live mobile video scanner' },
-                { id: 'security_gate_logs', title: '📋 Today Gate Summary', description: 'View active outing counts' },
-                { id: 'security_report_issue', title: '🚨 Report Gate Issue', description: 'Send emergency alert' }
+                { id: 'security_open_scanner', title: 'Open Web Scanner', description: 'Live mobile video scanner' },
+                { id: 'security_gate_logs', title: 'Today Gate Summary', description: 'View active outing counts' },
+                { id: 'security_report_issue', title: 'Report Gate Issue', description: 'Send emergency alert' }
               ]
             }
           ]
@@ -476,8 +476,8 @@ class WhatsAppService {
 
   async sendDriverWelcome(to, driverName, busNumber, routeNumber) {
     const welcomeText = driverName 
-      ? `Welcome back, ${driverName}! 🚌\n*Bus No:* ${busNumber || 'N/A'} | *Route:* ${routeNumber || 'N/A'}\n\nPlease select an option:`
-      : 'Welcome back, Driver! 🚌\n\nPlease select an option:';
+      ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${driverName} (Bus No: ${busNumber || 'N/A'}, Route: ${routeNumber || 'N/A'}), please choose your preferred transport service below:`
+      : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred transport service below:`;
     
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
@@ -486,13 +486,13 @@ class WhatsAppService {
         type: 'list',
         body: { text: welcomeText },
         action: {
-          button: 'Driver Menu',
+          button: 'Choose Service',
           sections: [{
-            title: 'Bus Fleet Services',
+            title: 'Select One Service',
             rows: [
-              { id: 'driver_start_trip', title: '📍 Share Trip GPS', description: 'Share live GPS with parents' },
-              { id: 'driver_route_info', title: '🗺️ Route & Stops', description: 'View bus route schedule' },
-              { id: 'driver_report_issue', title: '⚠️ Report Bus Issue', description: 'Notify Transport Admin' }
+              { id: 'driver_start_trip', title: 'Share Trip GPS', description: 'Share live GPS with parents' },
+              { id: 'driver_route_info', title: 'Route Schedule', description: 'View bus route & stops' },
+              { id: 'driver_report_issue', title: 'Report Bus Issue', description: 'Notify transport admin' }
             ]
           }]
         }
@@ -510,18 +510,18 @@ class WhatsAppService {
 
   async sendMasterCategoryMenu(to) {
     const welcomeText =
-      `Welcome to *Velammal Institute of Technology* WhatsApp Portal! 🏛️\n\n` +
-      `Your convenience is our priority.\n` +
-      `Experience efficient support with seamless access to our official campus services right here on WhatsApp.\n\n` +
-      `Please choose your preferred category below.\n\n` +
-      `> తెలుగు / English పోర్టల్ ఎంపిక చేయండి`;
+      `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\n` +
+      `Your convenience is our priority.\n\n` +
+      `Experience efficient support with seamless access to a wide range of campus services.\n\n` +
+      `Please choose your preferred campus service.\n\n` +
+      `> తెలుగు / English భాష కోసం TE టైప్ చేయండి`;
 
     // Send official institutional logo banner image (AP Government Bot Style)
     try {
       await this.sendImageMessage(
         to,
         'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600',
-        '🏛️ *Velammal Institute of Technology* - Official WhatsApp Helper'
+        'Velammal Institute of Technology - Official WhatsApp Helper'
       );
     } catch (err) {
       console.log('Optional logo send skipped:', err.message);
@@ -534,17 +534,17 @@ class WhatsAppService {
         type: 'list',
         body: { text: welcomeText },
         action: {
-          button: 'Choose Portal',
+          button: 'Choose Service',
           sections: [
             {
-              title: 'Select Your Portal',
+              title: 'Select One Service',
               rows: [
-                { id: 'portal_admission', title: '1. Admission Student', description: 'Apply online & admission helpdesk' },
-                { id: 'portal_student', title: '2. College Student', description: 'Outings, Fees, Attendance & Info' },
-                { id: 'portal_staff', title: '3. Faculty & Staff', description: 'Teaching & Lab Assistant Portal' },
-                { id: 'portal_warden', title: '4. Hostel Warden', description: 'Outing approvals & complaints' },
-                { id: 'portal_parent', title: '5. Parent Portal', description: 'Track student outing & attendance' },
-                { id: 'portal_security', title: '6. Security Guard', description: 'Gate 1 & Gate 2 Outing Scanner' }
+                { id: 'portal_admission', title: 'Admission Services', description: 'New admission application & campus tour' },
+                { id: 'portal_student', title: 'Student Services', description: 'Attendance, marks, outing and fee balance' },
+                { id: 'portal_staff', title: 'Faculty & Staff', description: 'Staff attendance, circulars and leave' },
+                { id: 'portal_warden', title: 'Warden Services', description: 'Outing approvals and hostel management' },
+                { id: 'portal_parent', title: 'Parent Services', description: 'Student progress, fees and circulars' },
+                { id: 'portal_security', title: 'Security Services', description: 'Gate pass verification and vehicle check' }
               ]
             }
           ]
@@ -1140,21 +1140,23 @@ class WhatsAppService {
 
   async sendAdmissionWelcome(to) {
     const welcomeText = 
-      `Welcome to *Velammal Institute of Technology* Admissions! 🎓\n\n` +
-      `Explore our campus life, placement records, facilities, and engineering departments below:\n\n` +
-      `🌐 *Apply Online:* https://velammalitech.edu.in/admission`;
+      `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\n` +
+      `Your convenience is our priority.\n\n` +
+      `Experience efficient support with seamless access to a wide range of admission services.\n\n` +
+      `Please choose your preferred admission service.\n\n` +
+      `🌐 Apply Online: https://velammalitech.edu.in/admission`;
 
     const rows = [
-      { id: 'adm_placements', title: '💼 Placements', description: 'Career & placement records' },
-      { id: 'adm_projects', title: '🔬 Projects', description: 'Student innovations & labs' },
-      { id: 'adm_academics', title: '📚 Academics', description: 'Academic excellence' },
-      { id: 'adm_achievements', title: '🏆 Achievements', description: 'Awards & recognitions' },
-      { id: 'adm_hostel_food', title: '🏨 Hostel & Mess Food', description: 'Hostel life, rooms & dining' },
-      { id: 'adm_transport', title: '🚌 Bus & Transport', description: 'Transportation facility' },
-      { id: 'adm_sports_hosp', title: '⚽ Sports & Hospital', description: 'Sports, gym & medical facilities' },
-      { id: 'adm_location', title: '📍 Location & Map', description: 'Google Maps pin & directions' },
-      { id: 'adm_contact', title: '📞 Admission Officer', description: 'Counselor contact & callback' },
-      { id: 'adm_departments', title: '🏫 Departments', description: 'AI&DS, ECE, CSE, IT, EEE, Mech' }
+      { id: 'adm_placements', title: 'Placements', description: 'Career & placement records' },
+      { id: 'adm_projects', title: 'Projects', description: 'Student innovations & labs' },
+      { id: 'adm_academics', title: 'Academics', description: 'Academic excellence' },
+      { id: 'adm_achievements', title: 'Achievements', description: 'Awards & recognitions' },
+      { id: 'adm_hostel_food', title: 'Hostel & Mess Food', description: 'Hostel life, rooms & dining' },
+      { id: 'adm_transport', title: 'Bus & Transport', description: 'Transportation facility' },
+      { id: 'adm_sports_hosp', title: 'Sports & Hospital', description: 'Sports, gym & medical facilities' },
+      { id: 'adm_location', title: 'Location & Map', description: 'Google Maps pin & directions' },
+      { id: 'adm_contact', title: 'Admission Officer', description: 'Counselor contact & callback' },
+      { id: 'adm_departments', title: 'Course Departments', description: 'AI&DS, ECE, CSE, IT, EEE, Mech' }
     ];
 
     return this.sendMessage(to, {
@@ -1164,9 +1166,9 @@ class WhatsAppService {
         type: 'list',
         body: { text: welcomeText },
         action: {
-          button: 'Explore Campus',
+          button: 'Choose Service',
           sections: [{
-            title: 'Admission Portal',
+            title: 'Select One Service',
             rows: rows
           }]
         }
@@ -1176,19 +1178,19 @@ class WhatsAppService {
 
   async sendAdmissionDepartmentMenu(to) {
     const text = 
-      `🏫 *Select Engineering Department*\n\n` +
+      `Select Engineering Department\n\n` +
       `Velammal Institute of Technology offers cutting-edge undergraduate engineering programs.\n` +
-      `Please select a department below to explore placements, projects, and industrial visits:`;
+      `Please choose a department below to explore placements, projects, and industrial visits:`;
 
     const rows = [
-      { id: 'dept_aids', title: '🤖 AI & DS', description: 'Artificial Intelligence & Data Science' },
-      { id: 'dept_ece', title: '📡 ECE', description: 'Electronics & Communication Engg' },
-      { id: 'dept_cse', title: '💻 CSE', description: 'Computer Science & Engineering' },
-      { id: 'dept_eee', title: '⚡ EEE', description: 'Electrical & Electronics Engg' },
-      { id: 'dept_mech', title: '⚙️ Mechanical', description: 'Mechanical Engineering' },
-      { id: 'dept_mechatronics', title: '🤖 Mechatronics', description: 'Mechatronics Engineering' },
-      { id: 'dept_it', title: '🌐 IT', description: 'Information Technology' },
-      { id: 'adm_main', title: '🔙 Admission Menu', description: 'Return to main admission menu' }
+      { id: 'dept_aids', title: 'AI & DS', description: 'Artificial Intelligence & Data Science' },
+      { id: 'dept_ece', title: 'ECE Department', description: 'Electronics & Communication Engg' },
+      { id: 'dept_cse', title: 'CSE Department', description: 'Computer Science & Engineering' },
+      { id: 'dept_eee', title: 'EEE Department', description: 'Electrical & Electronics Engg' },
+      { id: 'dept_mech', title: 'Mechanical Engg', description: 'Mechanical Engineering' },
+      { id: 'dept_mechatronics', title: 'Mechatronics', description: 'Mechatronics Engineering' },
+      { id: 'dept_it', title: 'IT Department', description: 'Information Technology' },
+      { id: 'adm_main', title: 'Admission Menu', description: 'Return to main admission menu' }
     ];
 
     return this.sendMessage(to, {
@@ -1198,9 +1200,9 @@ class WhatsAppService {
         type: 'list',
         body: { text: text },
         action: {
-          button: 'Select Dept',
+          button: 'Choose Service',
           sections: [{
-            title: 'Departments',
+            title: 'Select One Service',
             rows: rows
           }]
         }
@@ -1210,19 +1212,19 @@ class WhatsAppService {
 
   async sendDepartmentExploreMenu(to, deptName = 'Department') {
     const text = 
-      `🏫 *Explore: ${deptName}*\n\n` +
-      `Discover career opportunities, research labs, achievements, and industry exposure in *${deptName}*:\n\n` +
+      `Explore: ${deptName}\n\n` +
+      `Discover career opportunities, research labs, achievements, and industry exposure in ${deptName}:\n\n` +
       `Choose an option below to learn more:`;
 
     const rows = [
-      { id: `dept_exp_placements_${deptName}`, title: '💼 Placements', description: `${deptName} placement records` },
-      { id: `dept_exp_projects_${deptName}`, title: '🔬 Projects', description: `${deptName} student innovations` },
-      { id: `dept_exp_academics_${deptName}`, title: '📚 Academics', description: `${deptName} academic excellence` },
-      { id: `dept_exp_achievements_${deptName}`, title: '🏆 Achievements', description: `${deptName} awards & trophies` },
-      { id: `dept_exp_ind_visit_${deptName}`, title: '🏭 Ind. Visit', description: `${deptName} industry exposure` },
-      { id: `dept_exp_sports_${deptName}`, title: '⚽ Sports', description: `${deptName} sports & recreation` },
-      { id: 'adm_departments', title: '🔙 Change Dept', description: 'Select another department' },
-      { id: 'adm_main', title: '🔙 Admission Menu', description: 'Return to admission menu' }
+      { id: `dept_exp_placements_${deptName}`, title: 'Placements', description: `${deptName} placement records` },
+      { id: `dept_exp_projects_${deptName}`, title: 'Projects', description: `${deptName} student innovations` },
+      { id: `dept_exp_academics_${deptName}`, title: 'Academics', description: `${deptName} academic excellence` },
+      { id: `dept_exp_achievements_${deptName}`, title: 'Achievements', description: `${deptName} awards & trophies` },
+      { id: `dept_exp_ind_visit_${deptName}`, title: 'Industrial Visit', description: `${deptName} industry exposure` },
+      { id: `dept_exp_sports_${deptName}`, title: 'Sports Facility', description: `${deptName} sports & recreation` },
+      { id: 'adm_departments', title: 'Change Department', description: 'Select another department' },
+      { id: 'adm_main', title: 'Admission Menu', description: 'Return to admission menu' }
     ];
 
     return this.sendMessage(to, {
@@ -1232,9 +1234,9 @@ class WhatsAppService {
         type: 'list',
         body: { text: text },
         action: {
-          button: 'Explore Dept',
+          button: 'Choose Service',
           sections: [{
-            title: 'Dept Highlights',
+            title: 'Select One Service',
             rows: rows
           }]
         }
