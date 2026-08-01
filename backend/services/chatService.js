@@ -501,11 +501,7 @@ class ChatService {
 
       case 'admission_welcome':
       case 'admission_flow':
-        session.currentState = 'visitor_welcome';
-        session.admissionStep = '';
-        session.admissionData = {};
-        await whatsappService.sendAdmissionWelcome(from);
-        return;
+        return this.handleAdmissionAction(session, msgLower, from);
 
       case 'registered_welcome':
         return this.handleRegisteredUserAction(session, msgLower, from);
@@ -558,6 +554,155 @@ class ChatService {
         // Unknown input → re-show staff menu
         return whatsappService.sendStaffWelcome(from, staffMember.name);
     }
+  }
+
+  async handleAdmissionAction(session, action, from) {
+    if (action === 'adm_placements') {
+      await whatsappService.sendTextMessage(from,
+        `💼 *Velammal Institute of Technology - Placement Excellence*\n\n` +
+        `• *Highest Package:* 44 LPA\n` +
+        `• *Placement Rate:* 95%+ across all branches\n` +
+        `• *Top Recruiters:* Zoho, TCS, Cognizant, Amazon, Wipro, Bosch, Infosys, Qualcomm, Accenture\n\n` +
+        `Our dedicated Training & Placement Cell provides 360-degree training in coding, aptitude, and soft skills from 2nd year onwards.`
+      );
+      return whatsappService.sendAdmissionWelcome(from);
+    }
+
+    if (action === 'adm_projects') {
+      await whatsappService.sendTextMessage(from,
+        `🔬 *Student Innovations & Research Labs*\n\n` +
+        `• *Smart Campus IoT Lab* & AI Drone Innovation Centre\n` +
+        `• *Smart India Hackathon (SIH)* Winners & National Finalists\n` +
+        `• *Robotics & E-Vehicle Club* building solar/electric prototypes\n` +
+        `• Funded research projects and incubation support for student startups.`
+      );
+      return whatsappService.sendAdmissionWelcome(from);
+    }
+
+    if (action === 'adm_academics') {
+      await whatsappService.sendTextMessage(from,
+        `📚 *Academic Excellence at Velammal*\n\n` +
+        `• *Affiliated to Anna University* & NBA/NAAC Accredited\n` +
+        `• *Faculty Ratio:* 1:15 with PhD & industry-experienced professors\n` +
+        `• *Smart Classrooms* with digital boards, high-speed Wi-Fi & modern labs\n` +
+        `• Regular guest lectures, value-added certification courses, and mentoring.`
+      );
+      return whatsappService.sendAdmissionWelcome(from);
+    }
+
+    if (action === 'adm_achievements') {
+      await whatsappService.sendTextMessage(from,
+        `🏆 *Institutional Trophies & Achievements*\n\n` +
+        `• Top-ranked Engineering Institution in Chennai & Tiruvallur region\n` +
+        `• Over 150+ Technical Symposium & Coding Hackathon trophies won nationally\n` +
+        `• IEEE, ACM, and CSI active student chapters with international recognition.`
+      );
+      return whatsappService.sendAdmissionWelcome(from);
+    }
+
+    if (action === 'adm_hostel_food') {
+      await whatsappService.sendTextMessage(from,
+        `🏨 *Hostel Life & Mess Food*\n\n` +
+        `• *Separate Hostels* for Boys & Girls within safe, secure campus\n` +
+        `• *AC & Non-AC Rooms* available with 24/7 power backup and Wi-Fi\n` +
+        `• *Nutritious Dining:* Pure hygienic mess serving delicious South Indian & North Indian menus (Breakfast, Lunch, Snacks, Dinner)\n` +
+        `• Resident wardens, gym access, recreation halls, and RO water.`
+      );
+      return whatsappService.sendAdmissionWelcome(from);
+    }
+
+    if (action === 'adm_transport') {
+      await whatsappService.sendTextMessage(from,
+        `🚌 *College Bus & Transportation*\n\n` +
+        `• *60+ Modern College Buses* covering all parts of Chennai, Tiruvallur, Ponneri, Red Hills, Tambaram, and Kanchipuram\n` +
+        `• Experienced drivers, GPS tracking, and timely boarding/dropping\n` +
+        `• Special bus services during exams and placement drives.`
+      );
+      return whatsappService.sendAdmissionWelcome(from);
+    }
+
+    if (action === 'adm_sports_hosp') {
+      await whatsappService.sendTextMessage(from,
+        `⚽ *Sports, Gym & Medical Facilities*\n\n` +
+        `• *Sports Complex:* 400m Athletics Track, Cricket Ground, Basketball, Volleyball & Badminton courts\n` +
+        `• *Modern Gymnasium:* Fully equipped fitness center for students\n` +
+        `• *24/7 On-Campus Hospital:* Qualified doctors, nurses, infirmary beds, and emergency ambulance on standby.`
+      );
+      return whatsappService.sendAdmissionWelcome(from);
+    }
+
+    if (action === 'adm_location') {
+      await whatsappService.sendTextMessage(from,
+        `📍 *Velammal Institute of Technology Campus Location*\n\n` +
+        `Velammal Knowledge Park, Chennai - Kolkatta Highway, Panchetti, Ponneri Taluk, Tiruvallur District - 601204.\n\n` +
+        `🌐 *Google Maps Directions Link:*\nhttps://maps.app.goo.gl/VelammalITChennai`
+      );
+      return whatsappService.sendAdmissionWelcome(from);
+    }
+
+    if (action === 'adm_contact') {
+      await whatsappService.sendTextMessage(from,
+        `📞 *Talk to Admission Counselor*\n\n` +
+        `Have questions about branches, fees, or eligibility? Speak directly to our Admissions Team:\n\n` +
+        `📱 *Admission Helpline 1:* +91 98404 69096\n` +
+        `📱 *Admission Helpline 2:* +91 80560 30067\n` +
+        `📧 *Email:* admission@velammalitech.edu.in\n\n` +
+        `🌐 *Apply Online:* https://velammalitech.edu.in/admission`
+      );
+      return whatsappService.sendAdmissionWelcome(from);
+    }
+
+    if (action === 'adm_departments') {
+      session.currentState = 'admission_flow';
+      await session.save();
+      return whatsappService.sendAdmissionDepartmentMenu(from);
+    }
+
+    if (action === 'adm_main') {
+      session.currentState = 'admission_welcome';
+      await session.save();
+      return whatsappService.sendAdmissionWelcome(from);
+    }
+
+    // ── STEP 3: Department-Specific Explore Options (Screenshot 2) ──
+    if (action.startsWith('dept_exp_')) {
+      const deptName = session.admissionStep || 'Department';
+      if (action.includes('placements')) {
+        await whatsappService.sendTextMessage(from, `💼 *${deptName} - Placement Records*\n\n• Excellent placement track record with top core & IT recruiters.\n• Dedicated domain training in ${deptName} technologies.\n\n🌐 *Apply for ${deptName}:* https://velammalitech.edu.in/admission`);
+      } else if (action.includes('projects')) {
+        await whatsappService.sendTextMessage(from, `🔬 *${deptName} - Research & Innovations*\n\n• Advanced laboratories, IoT/Robotics/AI setups, and student project incubators.\n• Ongoing student-led technical innovations.`);
+      } else if (action.includes('academics')) {
+        await whatsappService.sendTextMessage(from, `📚 *${deptName} - Academic Excellence*\n\n• Industry-aligned curriculum, experienced professors, and practical lab focus.\n• 100% lab utilization & mentoring.`);
+      } else if (action.includes('achievements')) {
+        await whatsappService.sendTextMessage(from, `🏆 *${deptName} - Awards & Achievements*\n\n• Student symposium trophies, hackathon recognitions, and paper presentations.\n• National & state-level award winners.`);
+      } else if (action.includes('ind_visit')) {
+        await whatsappService.sendTextMessage(from, `🏭 *${deptName} - Industrial Visits & Exposure*\n\n• Regular industrial tours to leading tech companies, ISRO, BSNL, Hyundai, and R&D centers.\n• Real-world industry exposure for all students.`);
+      } else if (action.includes('sports')) {
+        await whatsappService.sendTextMessage(from, `⚽ *${deptName} - Sports Champions*\n\n• Active student participation and trophies in university athletics and inter-college tournaments.`);
+      }
+      return whatsappService.sendDepartmentExploreMenu(from, deptName);
+    }
+
+    // ── STEP 2 -> STEP 3: Selecting a Department ──
+    if (action.startsWith('dept_')) {
+      const deptMap = {
+        'dept_aids': 'AI & DS',
+        'dept_ece': 'ECE',
+        'dept_cse': 'CSE',
+        'dept_eee': 'EEE',
+        'dept_mech': 'Mechanical',
+        'dept_mechatronics': 'Mechatronics',
+        'dept_it': 'IT'
+      };
+      const deptName = deptMap[action] || 'Department';
+      session.currentState = 'admission_flow';
+      session.admissionStep = deptName;
+      await session.save();
+      return whatsappService.sendDepartmentExploreMenu(from, deptName);
+    }
+
+    // Default fallback
+    return whatsappService.sendAdmissionWelcome(from);
   }
 
   async handleParentAction(session, action, from) {

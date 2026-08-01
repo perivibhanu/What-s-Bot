@@ -1139,26 +1139,104 @@ class WhatsAppService {
   // ─────────────────────────────────────────────────────────────────────────────
 
   async sendAdmissionWelcome(to) {
-    const webFormUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/apply`;
-    
+    const welcomeText = 
+      `Welcome to *Velammal Institute of Technology* Admissions! 🎓\n\n` +
+      `Explore our campus life, placement records, facilities, and engineering departments below:\n\n` +
+      `🌐 *Apply Online:* https://velammalitech.edu.in/admission`;
+
+    const rows = [
+      { id: 'adm_placements', title: '💼 Placements', description: 'Career & placement records' },
+      { id: 'adm_projects', title: '🔬 Projects', description: 'Student innovations & labs' },
+      { id: 'adm_academics', title: '📚 Academics', description: 'Academic excellence' },
+      { id: 'adm_achievements', title: '🏆 Achievements', description: 'Awards & recognitions' },
+      { id: 'adm_hostel_food', title: '🏨 Hostel & Mess Food', description: 'Hostel life, rooms & dining' },
+      { id: 'adm_transport', title: '🚌 Bus & Transport', description: 'Transportation facility' },
+      { id: 'adm_sports_hosp', title: '⚽ Sports & Hospital', description: 'Sports, gym & medical facilities' },
+      { id: 'adm_location', title: '📍 Location & Map', description: 'Google Maps pin & directions' },
+      { id: 'adm_contact', title: '📞 Admission Officer', description: 'Counselor contact & callback' },
+      { id: 'adm_departments', title: '🏫 Departments', description: 'AI&DS, ECE, CSE, IT, EEE, Mech' }
+    ];
+
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
       type: 'interactive',
       interactive: {
-        type: 'cta_url',
-        header: {
-          type: 'text',
-          text: '📋 Admission Application'
-        },
-        body: {
-          text: 'Welcome to the Velammal Institute of Technology online admission process!\n\nFor your convenience, we have created a seamless web form to securely collect your personal and academic details.\n\nClick the button below to fill out the form directly on your mobile browser.'
-        },
+        type: 'list',
+        body: { text: welcomeText },
         action: {
-          name: 'cta_url',
-          parameters: {
-            display_text: 'Apply Now',
-            url: webFormUrl
-          }
+          button: 'Explore Campus',
+          sections: [{
+            title: 'Admission Portal',
+            rows: rows
+          }]
+        }
+      }
+    });
+  }
+
+  async sendAdmissionDepartmentMenu(to) {
+    const text = 
+      `🏫 *Select Engineering Department*\n\n` +
+      `Velammal Institute of Technology offers cutting-edge undergraduate engineering programs.\n` +
+      `Please select a department below to explore placements, projects, and industrial visits:`;
+
+    const rows = [
+      { id: 'dept_aids', title: '🤖 AI & DS', description: 'Artificial Intelligence & Data Science' },
+      { id: 'dept_ece', title: '📡 ECE', description: 'Electronics & Communication Engg' },
+      { id: 'dept_cse', title: '💻 CSE', description: 'Computer Science & Engineering' },
+      { id: 'dept_eee', title: '⚡ EEE', description: 'Electrical & Electronics Engg' },
+      { id: 'dept_mech', title: '⚙️ Mechanical', description: 'Mechanical Engineering' },
+      { id: 'dept_mechatronics', title: '🤖 Mechatronics', description: 'Mechatronics Engineering' },
+      { id: 'dept_it', title: '🌐 IT', description: 'Information Technology' },
+      { id: 'adm_main', title: '🔙 Admission Menu', description: 'Return to main admission menu' }
+    ];
+
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: { text: text },
+        action: {
+          button: 'Select Dept',
+          sections: [{
+            title: 'Departments',
+            rows: rows
+          }]
+        }
+      }
+    });
+  }
+
+  async sendDepartmentExploreMenu(to, deptName = 'Department') {
+    const text = 
+      `🏫 *Explore: ${deptName}*\n\n` +
+      `Discover career opportunities, research labs, achievements, and industry exposure in *${deptName}*:\n\n` +
+      `Choose an option below to learn more:`;
+
+    const rows = [
+      { id: `dept_exp_placements_${deptName}`, title: '💼 Placements', description: `${deptName} placement records` },
+      { id: `dept_exp_projects_${deptName}`, title: '🔬 Projects', description: `${deptName} student innovations` },
+      { id: `dept_exp_academics_${deptName}`, title: '📚 Academics', description: `${deptName} academic excellence` },
+      { id: `dept_exp_achievements_${deptName}`, title: '🏆 Achievements', description: `${deptName} awards & trophies` },
+      { id: `dept_exp_ind_visit_${deptName}`, title: '🏭 Ind. Visit', description: `${deptName} industry exposure` },
+      { id: `dept_exp_sports_${deptName}`, title: '⚽ Sports', description: `${deptName} sports & recreation` },
+      { id: 'adm_departments', title: '🔙 Change Dept', description: 'Select another department' },
+      { id: 'adm_main', title: '🔙 Admission Menu', description: 'Return to admission menu' }
+    ];
+
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: { text: text },
+        action: {
+          button: 'Explore Dept',
+          sections: [{
+            title: 'Dept Highlights',
+            rows: rows
+          }]
         }
       }
     });
