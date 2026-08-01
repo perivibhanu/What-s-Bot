@@ -531,7 +531,7 @@ class WhatsAppService {
           button: 'Choose Portal',
           sections: [
             {
-              title: 'Please Select Your Portal',
+              title: 'Select Your Portal',
               rows: [
                 { id: 'portal_admission', title: '1. Admission Student', description: 'Apply online & admission helpdesk' },
                 { id: 'portal_student', title: '2. College Student', description: 'Outings, Fees, Attendance & Info' },
