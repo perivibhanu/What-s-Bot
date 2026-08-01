@@ -97,16 +97,22 @@ class WhatsAppService {
 
   async sendRegisteredWelcome(to, student) {
     const welcomeText = student?.name 
-      ? `Welcome to Velammal Institute of Technology! 👋\n\nHello ${student.name}, how can we assist you today?`
-      : 'Welcome to Velammal Institute of Technology! 👋\n\nHow can we assist you today?';
+      ? `Welcome to Velammal Institute of Technology! 👋\n\nHello *${student.name}*, choose any student service below:`
+      : 'Welcome to Velammal Institute of Technology! 👋\n\nChoose any student service below:';
     
     const rows = [
       { id: 'current_updates', title: '📢 Current Updates', description: 'Principal circulars' },
-      { id: 'academics', title: '📚 Academics', description: 'Marks, Attendance, Timetable' }
+      { id: 'marks', title: '📊 Marks & Results', description: 'View semester marks' },
+      { id: 'attendance', title: '📅 Attendance %', description: 'Check current attendance' },
+      { id: 'timetable', title: '🕐 Class Timetable', description: 'View lecture schedule' }
     ];
 
     if (student?.scholarType === 'Hostel') {
-      rows.push({ id: 'hostel_services', title: '🏨 Hostel Services', description: 'Outings & Food Rating' });
+      rows.push(
+        { id: 'make_outing', title: '🚪 Make Outing', description: 'Request new outing permit' },
+        { id: 'return_outing', title: '📍 Outing Return', description: 'Share location for check-in' },
+        { id: 'rate_food', title: '🍽️ Rate Hostel Food', description: 'Rate hostel meals' }
+      );
     } else {
       rows.push({ id: 'transportation', title: '🚌 Transportation', description: 'Bus routes & numbers' });
     }
@@ -126,7 +132,7 @@ class WhatsAppService {
           text: welcomeText
         },
         action: {
-          button: 'View Menu',
+          button: 'Select Service',
           sections: [{
             title: 'Student Services',
             rows: rows

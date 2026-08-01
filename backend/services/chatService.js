@@ -159,10 +159,22 @@ class ChatService {
     }
 
     const msgLower = messageText.toLowerCase();
-    const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai', 'back', 'menu', 'main menu', 'main_menu', 'portal', 'choose portal', 'switch portal', 'change portal', 'categories', '0', 'switch_portal'].includes(msgLower);
+    const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai', 'portal', 'choose portal', 'switch portal', 'change portal', 'categories', '0', 'switch_portal'].includes(msgLower);
 
-    // ── AP Government Bot Style: Any Greeting or Menu command opens the 6-Portal Master Category Selector ─
+    // ── AP Government Bot Style: Any Greeting or Switch Portal opens the 6-Portal Master Selector ─
     if (isGreeting) {
+      session.currentState = 'visitor_welcome';
+      await session.save();
+      return whatsappService.sendMasterCategoryMenu(from);
+    }
+
+    // ── Internal Main Menu button returns to logged-in portal flow ────────────
+    if (['menu', 'main menu', 'main_menu', 'back'].includes(msgLower)) {
+      if (session.userType === 'student' && session.studentId) {
+        const Student = require('../models/Student');
+        const student = await Student.findById(session.studentId);
+        if (student) return whatsappService.sendRegisteredWelcome(from, student);
+      }
       session.currentState = 'visitor_welcome';
       await session.save();
       return whatsappService.sendMasterCategoryMenu(from);
