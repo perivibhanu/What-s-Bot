@@ -68,6 +68,14 @@ class ChatService {
       const interactive = message.interactive;
       if (interactive.type === 'button_reply') messageText = interactive.button_reply.id;
       else if (interactive.type === 'list_reply') messageText = interactive.list_reply.id;
+      else if (interactive.type === 'nfm_reply') {
+        try {
+          const payload = JSON.parse(interactive.nfm_reply.response_json || '{}');
+          if (payload.service) messageText = payload.service;
+        } catch (e) {
+          console.error('Error parsing NFM reply:', e);
+        }
+      }
     }
 
     await this.processMessage(session, messageText, from, message);
