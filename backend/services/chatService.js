@@ -159,10 +159,10 @@ class ChatService {
     }
 
     const msgLower = messageText.toLowerCase();
-    const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai', 'back', 'menu', 'main menu', 'main_menu', 'portal', 'choose portal', 'switch portal', 'change portal', 'categories', '0'].includes(msgLower);
+    const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai', 'back', 'menu', 'main menu', 'main_menu', 'portal', 'choose portal', 'switch portal', 'change portal', 'categories', '0', 'switch_portal'].includes(msgLower);
 
-    // ── Explicit Portal / Category Switch Request ─────────────────────────────
-    if (['portal', 'choose portal', 'switch portal', 'change portal', 'categories', '0', 'main menu', 'main_menu'].includes(msgLower)) {
+    // ── AP Government Bot Style: Any Greeting or Menu command opens the 6-Portal Master Category Selector ─
+    if (isGreeting) {
       session.currentState = 'visitor_welcome';
       await session.save();
       return whatsappService.sendMasterCategoryMenu(from);

@@ -114,7 +114,7 @@ class WhatsAppService {
     rows.push(
       { id: 'fee_balance', title: '💰 Fee Balance', description: 'Check & pay fees' },
       { id: 'helpdesk', title: '🎫 Helpdesk / Issues', description: 'Report issues & complaints' },
-      { id: 'admission_start', title: '📋 Admission', description: 'Apply for admission online' }
+      { id: 'switch_portal', title: '🔄 Switch Portal', description: 'Change user role / category' }
     );
 
     return this.sendMessage(to, {
