@@ -180,24 +180,38 @@ class ChatService {
       return whatsappService.sendMasterCategoryMenu(from);
     }
 
-    // ── Handle 6 Master Portal Categories (AP Gov Bot Style) ──────────────────
-    if (msgLower === 'portal_admission') {
-      session.userType = 'visitor';
+    // ── Handle Welcome Message 3 Buttons & Citizen Services ──────────────────
+    if (['btn_choose_service', 'choose service', 'service', 'services'].includes(msgLower)) {
       session.currentState = 'admission_welcome';
-      session.admissionStep = '';
-      session.admissionData = {};
       await session.save();
-      return whatsappService.sendAdmissionWelcome(from);
+      return whatsappService.sendCitizenServicesList(from);
     }
 
-    if (msgLower === 'portal_student') {
+    if (['btn_admission', 'admission', 'apply online', 'portal_admission'].includes(msgLower)) {
+      session.userType = 'visitor';
+      session.currentState = 'admission_welcome';
+      await session.save();
+      return whatsappService.sendAdmissionLinkCard(from);
+    }
+
+    if (['btn_language', 'te', 'telugu', 'english', 'language'].includes(msgLower)) {
+      return whatsappService.sendLanguageInfoCard(from);
+    }
+
+    if (['student_login', 'registration', 'portal_student'].includes(msgLower)) {
       session.userType = 'student';
       session.currentState = 'awaiting_reg_number';
       await session.save();
       return whatsappService.sendTextMessage(from,
-        '🎓 *Velammal Student Portal*\n\n' +
-        'Please enter your 10-12 digit *Register Number* (e.g. 113323106071) to verify your student account:'
+        '🎓 *Velammal Registration & Login*\n\n' +
+        'Please enter your 10-12 digit *Register Number* (e.g. 113323106071) to login to your portal:'
       );
+    }
+
+    if (msgLower.startsWith('adm_') || msgLower.startsWith('dept_')) {
+      session.currentState = 'admission_welcome';
+      await session.save();
+      return this.handleAdmissionAction(session, msgLower, from);
     }
 
     if (msgLower === 'portal_staff') {

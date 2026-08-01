@@ -516,16 +516,54 @@ class WhatsAppService {
       `Please choose your preferred campus service.\n\n` +
       `> తెలుగు / English భాష కోసం TE టైప్ చేయండి`;
 
-    // Send official institutional logo banner image (AP Government Bot Style)
+    // Send official institutional banner photo (Screenshot 2 - Velammal IT Main Building)
     try {
       await this.sendImageMessage(
         to,
-        'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600',
+        'https://images.shiksha.com/mediadata/images/1572944747phpJ1CffI.jpeg',
         'Velammal Institute of Technology - Official WhatsApp Helper'
       );
     } catch (err) {
       console.log('Optional logo send skipped:', err.message);
     }
+
+    // Send 3 buttons: 1. Choose Service, 2. Admission, 3. Language
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        body: { text: welcomeText },
+        action: {
+          buttons: [
+            { type: 'reply', reply: { id: 'btn_choose_service', title: 'Choose Service' } },
+            { type: 'reply', reply: { id: 'btn_admission', title: 'Admission' } },
+            { type: 'reply', reply: { id: 'btn_language', title: 'Language (TE)' } }
+          ]
+        }
+      }
+    });
+  }
+
+  async sendCitizenServicesList(to) {
+    const welcomeText =
+      `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\n` +
+      `Your convenience is our priority.\n\n` +
+      `Experience efficient support with seamless access to a wide range of campus services.\n\n` +
+      `Please choose your preferred campus service.`;
+
+    const rows = [
+      { id: 'student_login', title: 'Registration', description: 'Student & staff login registration' },
+      { id: 'adm_placements', title: 'Placements', description: 'Career & placement records' },
+      { id: 'adm_projects', title: 'Projects', description: 'Student innovations & labs' },
+      { id: 'adm_academics', title: 'Academics', description: 'Academic excellence' },
+      { id: 'adm_achievements', title: 'Achievements', description: 'Awards & recognitions' },
+      { id: 'adm_hostel_food', title: 'Hostel & Mess Food', description: 'Hostel life, rooms & dining' },
+      { id: 'adm_transport', title: 'Bus & Transport', description: 'Transportation facility' },
+      { id: 'adm_sports_hosp', title: 'Sports & Hospital', description: 'Sports, gym & medical facilities' },
+      { id: 'adm_location', title: 'Location & Map', description: 'Google Maps pin & directions' },
+      { id: 'adm_departments', title: 'Departments', description: 'AI&DS, ECE, CSE, IT, EEE, Mech' }
+    ];
 
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
@@ -535,18 +573,59 @@ class WhatsAppService {
         body: { text: welcomeText },
         action: {
           button: 'Choose Service',
-          sections: [
-            {
-              title: 'Select One Service',
-              rows: [
-                { id: 'portal_admission', title: 'Admission Services', description: 'New admission application & campus tour' },
-                { id: 'portal_student', title: 'Student Services', description: 'Attendance, marks, outing and fee balance' },
-                { id: 'portal_staff', title: 'Faculty & Staff', description: 'Staff attendance, circulars and leave' },
-                { id: 'portal_warden', title: 'Warden Services', description: 'Outing approvals and hostel management' },
-                { id: 'portal_parent', title: 'Parent Services', description: 'Student progress, fees and circulars' },
-                { id: 'portal_security', title: 'Security Services', description: 'Gate pass verification and vehicle check' }
-              ]
-            }
+          sections: [{
+            title: 'Select One Service',
+            rows: rows
+          }]
+        }
+      }
+    });
+  }
+
+  async sendAdmissionLinkCard(to) {
+    const text =
+      `🎓 *Velammal Institute of Technology - Online Admission Portal*\n\n` +
+      `Apply online for B.E. / B.Tech Engineering Admissions through our official application portal:\n\n` +
+      `🌐 *Admission Portal Link:*\nhttps://what-s-bot.onrender.com\n\n` +
+      `🌐 *College Website:*\nhttps://velammalitech.edu.in/admission\n\n` +
+      `📞 *Talk to Admission Officer:*\n` +
+      `• Helpline 1: +91 98404 69096\n` +
+      `• Helpline 2: +91 80560 30067\n` +
+      `📧 *Email:* admission@velammalitech.edu.in\n\n` +
+      `Click the link above to submit your admission application or speak with our admission counselor!`;
+
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        body: { text: text },
+        action: {
+          buttons: [
+            { type: 'reply', reply: { id: 'btn_choose_service', title: 'Choose Service' } }
+          ]
+        }
+      }
+    });
+  }
+
+  async sendLanguageInfoCard(to) {
+    const text =
+      `🌐 *భాష ఎంపిక / Language Preference*\n\n` +
+      `మీరు తెలుగు లేదా ఇంగ్లీషులో సేవలను ఉపయోగించవచ్చు.\n` +
+      `You can explore all campus services in English or Telugu.\n\n` +
+      `కింద ఉన్న 'Choose Service' బటన్ క్లిక్ చేసి మీకు కావలసిన సేవను ఎంచుకోండి.\n` +
+      `Please click 'Choose Service' below to select your service.`;
+
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        body: { text: text },
+        action: {
+          buttons: [
+            { type: 'reply', reply: { id: 'btn_choose_service', title: 'Choose Service' } }
           ]
         }
       }
@@ -1139,41 +1218,7 @@ class WhatsAppService {
   // ─────────────────────────────────────────────────────────────────────────────
 
   async sendAdmissionWelcome(to) {
-    const welcomeText = 
-      `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\n` +
-      `Your convenience is our priority.\n\n` +
-      `Experience efficient support with seamless access to a wide range of admission services.\n\n` +
-      `Please choose your preferred admission service.\n\n` +
-      `🌐 Apply Online: https://velammalitech.edu.in/admission`;
-
-    const rows = [
-      { id: 'adm_placements', title: 'Placements', description: 'Career & placement records' },
-      { id: 'adm_projects', title: 'Projects', description: 'Student innovations & labs' },
-      { id: 'adm_academics', title: 'Academics', description: 'Academic excellence' },
-      { id: 'adm_achievements', title: 'Achievements', description: 'Awards & recognitions' },
-      { id: 'adm_hostel_food', title: 'Hostel & Mess Food', description: 'Hostel life, rooms & dining' },
-      { id: 'adm_transport', title: 'Bus & Transport', description: 'Transportation facility' },
-      { id: 'adm_sports_hosp', title: 'Sports & Hospital', description: 'Sports, gym & medical facilities' },
-      { id: 'adm_location', title: 'Location & Map', description: 'Google Maps pin & directions' },
-      { id: 'adm_contact', title: 'Admission Officer', description: 'Counselor contact & callback' },
-      { id: 'adm_departments', title: 'Course Departments', description: 'AI&DS, ECE, CSE, IT, EEE, Mech' }
-    ];
-
-    return this.sendMessage(to, {
-      messaging_product: 'whatsapp',
-      type: 'interactive',
-      interactive: {
-        type: 'list',
-        body: { text: welcomeText },
-        action: {
-          button: 'Choose Service',
-          sections: [{
-            title: 'Select One Service',
-            rows: rows
-          }]
-        }
-      }
-    });
+    return this.sendCitizenServicesList(to);
   }
 
   async sendAdmissionDepartmentMenu(to) {
