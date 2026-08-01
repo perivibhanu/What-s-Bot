@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -35,6 +36,21 @@ import Drivers from './pages/Drivers';
 import IssuesFeedback from './pages/IssuesFeedback';
 import StaffIssuesFeedback from './pages/StaffIssuesFeedback';
 import WardenIssuesFeedback from './pages/WardenIssuesFeedback';
+
+// Global Axios response interceptor for 401 Unauthorized (expired token)
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      if (window.location.pathname !== '/login' && !window.location.pathname.startsWith('/dept/login')) {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 function App() {
   const [token, setToken] = React.useState(localStorage.getItem('token'));

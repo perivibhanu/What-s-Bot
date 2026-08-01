@@ -36,21 +36,24 @@ class ChatService {
         return;
       }
 
-      // ⏳ Check session expiry (5 minutes)
-      const sessionTimeoutMs = 5 * 60 * 1000;
+      // ⏳ Check session expiry (30 minutes of inactivity)
+      const sessionTimeoutMs = 30 * 60 * 1000;
       if (now - last > sessionTimeoutMs) {
-        console.log(`⏳ Session expired for ${from}. Resetting state.`);
-        if (session.studentId) {
+        console.log(`⏳ Session inactive (>30m) for ${from}. Resetting to role welcome or visitor menu.`);
+        if (session.userType === 'student' && session.studentId) {
           session.currentState = 'registered_welcome';
-          session.userType = 'student';
         } else if (session.userType === 'staff' && session.staffId) {
           session.currentState = 'staff_welcome';
+        } else if (session.userType === 'warden' && session.wardenId) {
+          session.currentState = 'warden_welcome';
+        } else if (session.userType === 'security' && session.securityId) {
+          session.currentState = 'security_welcome';
+        } else if (session.userType === 'parent' && session.studentId) {
+          session.currentState = 'parent_welcome';
         } else {
           session.currentState = 'initial';
           session.tempRegNumber = undefined;
           session.userType = 'visitor';
-          session.studentId = undefined;
-          session.staffId = undefined;
         }
       }
     }
@@ -880,6 +883,18 @@ class ChatService {
         return whatsappService.sendHostelMenu(from);
 
       case 'make_outing': {
+        const Outing = require('../models/Outing');
+        const existingOuting = await Outing.findOne({
+          studentId: session.studentId,
+          status: { $in: ['Pending', 'Approved', 'Out'] }
+        });
+        if (existingOuting) {
+          return whatsappService.sendTextMessage(from,
+            `⚠️ *Active Outing Permit Exists*\n\n` +
+            `You already have an outing pass with status: *${existingOuting.status}*.\n` +
+            `You cannot request a new outing permit until your current outing is completed or returned.`
+          );
+        }
         const Warden = require('../models/Warden');
         const wardens = await Warden.find({});
         if (!wardens || wardens.length === 0) {
@@ -1114,7 +1129,7 @@ class ChatService {
             return whatsappService.sendTextMessage(from, `❌ Could not find a pending outing request matching Reg No "${queryParam}". Please tap the ✅ Approve button on the request card.`);
           }
 
-          outing.status = 'Out';
+          outing.status = 'Approved';
           outing.returnOTP = Math.floor(1000 + Math.random() * 9000).toString();
           const stu = outing.studentId || {};
           outing.qrToken = `VCET-OUT-${outing._id}-${stu.regNumber || 'N/A'}`;
@@ -1289,11 +1304,21 @@ class ChatService {
         if (code && code.data) {
           return this.processGuardStudentScan(session, code.data, from, gateName);
         } else {
-          return whatsappService.sendTextMessage(from, `⚠️ *Could not detect QR Code in the photo.*\nPlease ensure the photo is clear and well-lit, or simply text the Student's 10-12 digit Registration Number.`);
+          return whatsappService.sendTextMessage(from,
+            `⚠️ *QR Code Blurry or Glare Detected*\n\n` +
+            `We could not read the barcode from this photo. Please try:\n` +
+            `1️⃣ *🔗 Use Live Web Scanner* from your menu\n` +
+            `2️⃣ Or *Type the Student's Reg No* (e.g. 113323106071) directly in this chat.`
+          );
         }
       } catch (err) {
         console.error('Error decoding QR image:', err);
-        return whatsappService.sendTextMessage(from, `⚠️ Error processing image. Please type the Student's Registration Number directly.`);
+        return whatsappService.sendTextMessage(from,
+          `⚠️ *Could Not Process Image*\n\n` +
+          `Please try:\n` +
+          `1️⃣ *🔗 Use Live Web Scanner* from your menu\n` +
+          `2️⃣ Or *Type the Student's Reg No* directly in this chat.`
+        );
       }
     }
 
@@ -1344,20 +1369,20 @@ class ChatService {
       if (parts.length >= 3) regNum = parts[2];
     }
 
-    const student = await Student.findOne({ regNum: regNum });
+    const student = await Student.findOne({ $or: [{ regNumber: regNum }, { regNum: regNum }] });
     if (!student) {
       return whatsappService.sendTextMessage(from, `❌ *Student Not Found*\nNo student registered with Registration Number: *${regNum}*`);
     }
 
     const outing = await Outing.findOne({
       studentId: student._id,
-      status: { $in: ['Pending', 'Out'] }
-    }).sort({ requestTime: -1 });
+      status: { $in: ['Approved', 'Pending', 'Out'] }
+    }).sort({ requestTime: -1 }).populate('wardenId');
 
     if (!outing) {
       return whatsappService.sendTextMessage(from,
         `⚠️ *No Active Outing Request*\n` +
-        `Student *${student.name}* (${student.regNum}) does not have an approved or active Outing Pass.`
+        `Student *${student.name}* (${student.regNumber || regNum}) does not have an approved or active Outing Pass.`
       );
     }
 
@@ -1365,22 +1390,37 @@ class ChatService {
     const timeFormatted = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' });
     const dateFormatted = now.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
 
+    const parentPhone = student.parentPhoneNumber || student.parentPhone || student.parentContact;
+    const studentPhone = student.phoneNumber || student.mobileNumber;
+    const wardenPhone = outing.wardenId ? (outing.wardenId.mobileNumber || outing.wardenId.phone) : null;
+
     // Exit Check
-    if (outing.status === 'Pending') {
+    if (outing.status === 'Approved' || outing.status === 'Pending') {
       outing.status = 'Out';
       outing.actualOutTime = now;
       if (gateName.includes('1')) outing.gate1ExitTime = now;
       if (gateName.includes('2')) outing.gate2ExitTime = now;
       await outing.save();
 
-      if (student.parentContact) {
-        whatsappService.sendTextMessage(student.parentContact,
+      if (parentPhone) {
+        whatsappService.sendTextMessage(normalizePhone(parentPhone),
           `🔔 *Velammal Gate Alert:* Student *${student.name}* has exited campus via *${gateName}* on ${dateFormatted} at ${timeFormatted}.`
-        );
+        ).catch(e => console.error('Parent exit alert failed:', e.message));
       }
+      if (studentPhone) {
+        whatsappService.sendTextMessage(normalizePhone(studentPhone),
+          `🔔 *Campus Exit Logged:* You have checked out via *${gateName}* at ${timeFormatted}. Have a safe outing!`
+        ).catch(e => console.error('Student exit alert failed:', e.message));
+      }
+      if (wardenPhone) {
+        whatsappService.sendTextMessage(normalizePhone(wardenPhone),
+          `🔔 *Warden Alert:* Student *${student.name}* (${student.regNumber || regNum}) exited campus via *${gateName}* at ${timeFormatted}.`
+        ).catch(e => console.error('Warden exit alert failed:', e.message));
+      }
+
       return whatsappService.sendTextMessage(from,
         `✅ *OUTING EXIT APPROVED*\n\n` +
-        `🧑 *Student:* ${student.name} (${student.regNum})\n` +
+        `🧑 *Student:* ${student.name} (${student.regNumber || regNum})\n` +
         `🏢 *Gate:* ${gateName}\n` +
         `🕒 *Time:* ${timeFormatted}\n\n` +
         `_Student is checked out of campus._`
@@ -1395,14 +1435,25 @@ class ChatService {
       if (gateName.includes('2')) outing.gate2ReturnTime = now;
       await outing.save();
 
-      if (student.parentContact) {
-        whatsappService.sendTextMessage(student.parentContact,
+      if (parentPhone) {
+        whatsappService.sendTextMessage(normalizePhone(parentPhone),
           `🔔 *Velammal Gate Alert:* Student *${student.name}* has returned to campus via *${gateName}* on ${dateFormatted} at ${timeFormatted}.`
-        );
+        ).catch(e => console.error('Parent return alert failed:', e.message));
       }
+      if (studentPhone) {
+        whatsappService.sendTextMessage(normalizePhone(studentPhone),
+          `🔔 *Campus Return Logged:* Welcome back! Your return via *${gateName}* has been logged at ${timeFormatted}.`
+        ).catch(e => console.error('Student return alert failed:', e.message));
+      }
+      if (wardenPhone) {
+        whatsappService.sendTextMessage(normalizePhone(wardenPhone),
+          `🔔 *Warden Alert:* Student *${student.name}* (${student.regNumber || regNum}) returned to campus via *${gateName}* at ${timeFormatted}.`
+        ).catch(e => console.error('Warden return alert failed:', e.message));
+      }
+
       return whatsappService.sendTextMessage(from,
         `✅ *CAMPUS RETURN LOGGED*\n\n` +
-        `🧑 *Student:* ${student.name} (${student.regNum})\n` +
+        `🧑 *Student:* ${student.name} (${student.regNumber || regNum})\n` +
         `🏢 *Gate:* ${gateName}\n` +
         `🕒 *Time:* ${timeFormatted}\n\n` +
         `_Student has returned safely to campus._`
