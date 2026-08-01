@@ -553,16 +553,16 @@ class WhatsAppService {
       `Please choose your preferred campus service.`;
 
     const rows = [
-      { id: 'student_login', title: 'Registration', description: 'Student & staff login registration' },
-      { id: 'adm_placements', title: 'Placements', description: 'Career & placement records' },
-      { id: 'adm_projects', title: 'Projects', description: 'Student innovations & labs' },
-      { id: 'adm_academics', title: 'Academics', description: 'Academic excellence' },
-      { id: 'adm_achievements', title: 'Achievements', description: 'Awards & recognitions' },
-      { id: 'adm_hostel_food', title: 'Hostel & Mess Food', description: 'Hostel life, rooms & dining' },
-      { id: 'adm_transport', title: 'Bus & Transport', description: 'Transportation facility' },
-      { id: 'adm_sports_hosp', title: 'Sports & Hospital', description: 'Sports, gym & medical facilities' },
-      { id: 'adm_location', title: 'Location & Map', description: 'Google Maps pin & directions' },
-      { id: 'adm_departments', title: 'Departments', description: 'AI&DS, ECE, CSE, IT, EEE, Mech' }
+      { id: 'student_login',        title: 'Registration',    description: 'Student & staff login registration' },
+      { id: 'topic_dept',           title: 'Departments',     description: '7 engineering departments' },
+      { id: 'topic_placements',     title: 'Placements',      description: 'Career & placement records' },
+      { id: 'topic_projects',       title: 'Projects',        description: 'Student innovations & labs' },
+      { id: 'topic_academics',      title: 'Academics',       description: 'Academic excellence' },
+      { id: 'topic_achievements',   title: 'Achievements',    description: 'Awards & recognitions' },
+      { id: 'topic_hostel',         title: 'Hostel',          description: 'Hostel life & facilities' },
+      { id: 'topic_transportation', title: 'Transportation',  description: '60+ college buses & routes' },
+      { id: 'topic_sports',         title: 'Sports',          description: 'Sports complex & gym' },
+      { id: 'topic_hostelFood',     title: 'Hostel Food',     description: 'Dining, canteen & medical' }
     ];
 
     return this.sendMessage(to, {
@@ -1010,33 +1010,7 @@ class WhatsAppService {
 
   // ── More Options Menu — shows 9 topics (excluding Departments) ───────────────
   async sendMoreOptionsMenu(to) {
-    return this.sendMessage(to, {
-      messaging_product: 'whatsapp',
-      type: 'interactive',
-      interactive: {
-        type: 'list',
-        body: {
-          text: '🏫 *Explore Velammal Institute of Technology*\n\nSelect a topic to learn more about our college:'
-        },
-        action: {
-          button: 'Explore',
-          sections: [{
-            title: 'College Highlights',
-            rows: [
-              { id: 'topic_placements',     title: '💼 Placements',    description: 'Career & placement records' },
-              { id: 'topic_projects',       title: '🔬 Projects',      description: 'Student innovations' },
-              { id: 'topic_academics',      title: '📚 Academics',     description: 'Academic excellence' },
-              { id: 'topic_achievements',   title: '🏆 Achievements',  description: 'Awards & recognitions' },
-              { id: 'topic_hostel',         title: '🏠 Hostel',        description: 'Hostel life & facilities' },
-              { id: 'topic_transportation', title: '🚌 Transport',     description: 'Transportation facility' },
-              { id: 'topic_sports',         title: '⚽ Sports',        description: 'Sports & recreation' },
-              { id: 'topic_hospital',       title: '🏥 Hospital',      description: 'Medical facilities' },
-              { id: 'topic_hostelFood',     title: '🍽️ Hostel Food',   description: 'Dining & canteen' }
-            ]
-          }]
-        }
-      }
-    });
+    return this.sendCitizenServicesList(to);
   }
 
   // ── Department More Options Menu ─────────────────────────────────────────────

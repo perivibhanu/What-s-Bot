@@ -198,6 +198,12 @@ class ChatService {
       return whatsappService.sendLanguageInfoCard(from);
     }
 
+    if (['more_options', 'main_menu', 'explore'].includes(msgLower)) {
+      session.currentState = 'admission_welcome';
+      await session.save();
+      return whatsappService.sendCitizenServicesList(from);
+    }
+
     if (['student_login', 'registration', 'portal_student'].includes(msgLower)) {
       session.userType = 'student';
       session.currentState = 'awaiting_reg_number';
@@ -206,6 +212,55 @@ class ChatService {
         '🎓 *Velammal Registration & Login*\n\n' +
         'Please enter your 10-12 digit *Register Number* (e.g. 113323106071) to login to your portal:'
       );
+    }
+
+    if (msgLower.startsWith('topic_')) {
+      const topicKey = msgLower.replace('topic_', '');
+      if (topicKey === 'dept') {
+        session.currentState = 'about_dept';
+        await session.save();
+        return whatsappService.sendDeptSubMenu(from);
+      }
+      session.currentState = 'about_topic';
+      session.currentTopic = topicKey;
+      await session.save();
+      return whatsappService.sendCollegeTopicMedia(from, topicKey);
+    }
+
+    const topicMap = {
+      'placements': 'placements',
+      'placement': 'placements',
+      'projects': 'projects',
+      'project': 'projects',
+      'academics': 'academics',
+      'academic': 'academics',
+      'achievements': 'achievements',
+      'achievement': 'achievements',
+      'hostel': 'hostel',
+      'transportation': 'transportation',
+      'transport': 'transportation',
+      'bus': 'transportation',
+      'sports': 'sports',
+      'hospital': 'hospital',
+      'medical': 'hospital',
+      'hostel food': 'hostelFood',
+      'food': 'hostelFood',
+      'mess': 'hostelFood',
+      'departments': 'dept',
+      'department': 'dept',
+      'dept': 'dept'
+    };
+    if (topicMap[msgLower]) {
+      const topicKey = topicMap[msgLower];
+      if (topicKey === 'dept') {
+        session.currentState = 'about_dept';
+        await session.save();
+        return whatsappService.sendDeptSubMenu(from);
+      }
+      session.currentState = 'about_topic';
+      session.currentTopic = topicKey;
+      await session.save();
+      return whatsappService.sendCollegeTopicMedia(from, topicKey);
     }
 
     if (msgLower.startsWith('adm_') || msgLower.startsWith('dept_')) {
