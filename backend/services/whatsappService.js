@@ -554,7 +554,6 @@ class WhatsAppService {
 
     const rows = [
       { id: 'student_login',        title: 'Registration',    description: 'Student & staff login registration' },
-      { id: 'topic_dept',           title: 'Departments',     description: '7 engineering departments' },
       { id: 'topic_placements',     title: 'Placements',      description: 'Career & placement records' },
       { id: 'topic_projects',       title: 'Projects',        description: 'Student innovations & labs' },
       { id: 'topic_academics',      title: 'Academics',       description: 'Academic excellence' },
@@ -562,7 +561,8 @@ class WhatsAppService {
       { id: 'topic_hostel',         title: 'Hostel',          description: 'Hostel life & facilities' },
       { id: 'topic_transportation', title: 'Transportation',  description: '60+ college buses & routes' },
       { id: 'topic_sports',         title: 'Sports',          description: 'Sports complex & gym' },
-      { id: 'topic_hostelFood',     title: 'Hostel Food',     description: 'Dining, canteen & medical' }
+      { id: 'topic_hostelFood',     title: 'Hostel Food',     description: 'Dining, canteen & medical' },
+      { id: 'topic_dept',           title: 'Departments',     description: '7 engineering departments' }
     ];
 
     return this.sendMessage(to, {
@@ -1110,20 +1110,7 @@ class WhatsAppService {
         }
         
         if (isMainDeptInfo) {
-          return this.sendMessage(to, {
-            messaging_product: 'whatsapp',
-            type: 'interactive',
-            interactive: {
-              type: 'button',
-              body: { text: 'Would you like to explore more about this department?' },
-              action: {
-                buttons: [
-                  { type: 'reply', reply: { id: 'more_options', title: 'More Options' } },
-                  { type: 'reply', reply: { id: 'back_to_dept', title: 'Back' } }
-                ]
-              }
-            }
-          });
+          return this.sendDeptMoreOptionsMenu(to, parts[1].toUpperCase(), parts[1]);
         }
         if (isDeptSubtopic) return this.sendDeptMoreOptionsMenu(to, parts[1].toUpperCase(), `dept_${parts[1]}`);
         return this.sendMoreOptionsMenu(to);
@@ -1154,20 +1141,7 @@ class WhatsAppService {
     }
 
     if (isMainDeptInfo) {
-      return this.sendMessage(to, {
-        messaging_product: 'whatsapp',
-        type: 'interactive',
-        interactive: {
-          type: 'button',
-          body: { text: 'Would you like to explore more about this department?' },
-          action: {
-            buttons: [
-              { type: 'reply', reply: { id: 'more_options', title: 'More Options' } },
-              { type: 'reply', reply: { id: 'back_to_dept', title: 'Back' } }
-            ]
-          }
-        }
-      });
+      return this.sendDeptMoreOptionsMenu(to, parts[1].toUpperCase(), parts[1]);
     }
 
     // For subtopics and general topics, offer Back and Main Menu

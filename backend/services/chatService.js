@@ -198,10 +198,29 @@ class ChatService {
       return whatsappService.sendLanguageInfoCard(from);
     }
 
-    if (['more_options', 'main_menu', 'explore'].includes(msgLower)) {
+    if (msgLower === 'more_options') {
+      if (session.currentTopic && session.currentTopic.startsWith('dept_')) {
+        const parts = session.currentTopic.split('_');
+        const deptKey = parts[1];
+        if (deptKey) {
+          return whatsappService.sendDeptMoreOptionsMenu(from, deptKey.toUpperCase(), deptKey);
+        }
+      }
       session.currentState = 'admission_welcome';
       await session.save();
       return whatsappService.sendCitizenServicesList(from);
+    }
+
+    if (['main_menu', 'explore', 'back_to_main'].includes(msgLower)) {
+      session.currentState = 'admission_welcome';
+      await session.save();
+      return whatsappService.sendCitizenServicesList(from);
+    }
+
+    if (msgLower === 'back_to_dept') {
+      session.currentState = 'about_dept';
+      await session.save();
+      return whatsappService.sendDeptSubMenu(from);
     }
 
     if (['student_login', 'registration', 'portal_student'].includes(msgLower)) {
