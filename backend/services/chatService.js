@@ -167,22 +167,40 @@ class ChatService {
     }
 
     const msgLower = messageText.toLowerCase();
-    const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai', 'portal', 'choose portal', 'switch portal', 'change portal', 'categories', '0', 'switch_portal'].includes(msgLower);
+    const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai'].includes(msgLower);
+    const isSwitchPortal = ['portal', 'choose portal', 'switch portal', 'change portal', 'categories', '0', 'switch_portal'].includes(msgLower);
 
-    // ── AP Government Bot Style: Any Greeting or Switch Portal opens the 6-Portal Master Selector ─
-    if (isGreeting) {
+    // ── Check if user is an already registered student when greeting or returning to main menu ─
+    if (isGreeting || ['menu', 'main menu', 'main_menu', 'back'].includes(msgLower)) {
+      let student = null;
+      if (session.userType === 'student' && session.studentId) {
+        student = await Student.findById(session.studentId);
+      }
+      if (!student) {
+        const senderPhone = normalizePhone(from);
+        student = await Student.findOne({
+          $or: [
+            { contactDetails: { $regex: senderPhone + '$' } },
+            { parentContact: { $regex: senderPhone + '$' } }
+          ],
+          isRegistered: true
+        });
+      }
+
+      if (student) {
+        session.userType = 'student';
+        session.studentId = student._id;
+        session.currentState = 'registered_welcome';
+        await session.save();
+        return whatsappService.sendRegisteredWelcome(from, student);
+      }
+
       session.currentState = 'visitor_welcome';
       await session.save();
       return whatsappService.sendMasterCategoryMenu(from);
     }
 
-    // ── Internal Main Menu button returns to logged-in portal flow ────────────
-    if (['menu', 'main menu', 'main_menu', 'back'].includes(msgLower)) {
-      if (session.userType === 'student' && session.studentId) {
-        const Student = require('../models/Student');
-        const student = await Student.findById(session.studentId);
-        if (student) return whatsappService.sendRegisteredWelcome(from, student);
-      }
+    if (isSwitchPortal) {
       session.currentState = 'visitor_welcome';
       await session.save();
       return whatsappService.sendMasterCategoryMenu(from);
