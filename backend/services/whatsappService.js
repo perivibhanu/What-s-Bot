@@ -101,26 +101,26 @@ class WhatsAppService {
       : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred student service below:`;
     
     const rows = [
-      { id: 'current_updates', title: 'Current Updates', description: 'Principal & college circulars' },
-      { id: 'marks', title: 'Marks & Results', description: 'View semester marks & grades' },
-      { id: 'attendance', title: 'Attendance Report', description: 'Check current attendance %' },
-      { id: 'timetable', title: 'Class Timetable', description: 'View daily lecture schedule' }
+      { id: 'current_updates', title: '📢 Current Updates', description: 'Principal & college circulars' },
+      { id: 'marks', title: '📊 Marks & Results', description: 'View semester marks & grades' },
+      { id: 'attendance', title: '📋 Attendance Report', description: 'Check current attendance %' },
+      { id: 'timetable', title: '📅 Class Timetable', description: 'View daily lecture schedule' }
     ];
 
     if (student?.scholarType === 'Hostel') {
       rows.push(
-        { id: 'make_outing', title: 'Make Outing Permit', description: 'Request new outing permit' },
-        { id: 'return_outing', title: 'Outing Return Check', description: 'Share location for check-in' },
-        { id: 'rate_food', title: 'Rate Hostel Food', description: 'Rate hostel meals & dining' }
+        { id: 'make_outing', title: '🎟️ Outing Permit', description: 'Request new outing permit' },
+        { id: 'return_outing', title: '📍 Outing Check-in', description: 'Share location for check-in' },
+        { id: 'rate_food', title: '⭐ Rate Hostel Food', description: 'Rate hostel meals & dining' }
       );
     } else {
-      rows.push({ id: 'transportation', title: 'Transport Services', description: 'College bus routes & numbers' });
+      rows.push({ id: 'transportation', title: '🚌 Transport Routes', description: 'College bus routes & numbers' });
     }
 
     rows.push(
-      { id: 'fee_balance', title: 'Fee Balance Status', description: 'Check due fees & payment' },
-      { id: 'helpdesk', title: 'Helpdesk Services', description: 'Report issues & complaints' },
-      { id: 'admission_start', title: 'Sibling Admission', description: 'Apply for siblings & cousins' }
+      { id: 'fee_balance', title: '💳 Fee Balance', description: 'Check due fees & payment' },
+      { id: 'helpdesk', title: '🛠️ Helpdesk Support', description: 'Report issues & complaints' },
+      { id: 'admission_start', title: '🎓 Sibling Admission', description: 'Apply for siblings & cousins' }
     );
 
     return this.sendMessage(to, {
@@ -553,16 +553,16 @@ class WhatsAppService {
       `Please choose your preferred campus service.`;
 
     const rows = [
-      { id: 'student_login',        title: 'Registration',    description: 'Student & staff login registration' },
-      { id: 'topic_placements',     title: 'Placements',      description: 'Career & placement records' },
-      { id: 'topic_projects',       title: 'Projects',        description: 'Student innovations & labs' },
-      { id: 'topic_academics',      title: 'Academics',       description: 'Academic excellence' },
-      { id: 'topic_achievements',   title: 'Achievements',    description: 'Awards & recognitions' },
-      { id: 'topic_hostel',         title: 'Hostel',          description: 'Hostel life & facilities' },
-      { id: 'topic_transportation', title: 'Transportation',  description: '60+ college buses & routes' },
-      { id: 'topic_sports',         title: 'Sports',          description: 'Sports complex & gym' },
-      { id: 'topic_hostelFood',     title: 'Hostel Food',     description: 'Dining, canteen & medical' },
-      { id: 'topic_dept',           title: 'Departments',     description: '7 engineering departments' }
+      { id: 'student_login',        title: '📝 Registration',    description: 'Student & staff login registration' },
+      { id: 'topic_placements',     title: '💼 Placements',      description: 'Career & placement records' },
+      { id: 'topic_projects',       title: '🔬 Projects',        description: 'Student innovations & labs' },
+      { id: 'topic_academics',      title: '📚 Academics',       description: 'Academic excellence' },
+      { id: 'topic_achievements',   title: '🏆 Achievements',    description: 'Awards & recognitions' },
+      { id: 'topic_hostel',         title: '🏠 Hostel',          description: 'Hostel life & facilities' },
+      { id: 'topic_transportation', title: '🚌 Transportation',  description: '60+ college buses & routes' },
+      { id: 'topic_sports',         title: '⚽ Sports',          description: 'Sports complex & gym' },
+      { id: 'topic_hostelFood',     title: '🍽️ Hostel Food',     description: 'Dining, canteen & medical' },
+      { id: 'topic_dept',           title: '🏛️ Departments',     description: '7 engineering departments' }
     ];
 
     return this.sendMessage(to, {
