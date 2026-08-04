@@ -108,7 +108,7 @@ class WhatsAppService {
         header: {
           type: 'image',
           image: {
-            link: 'https://raw.githubusercontent.com/perivibhanu/What-s-Bot/main/frontend/public/spark-watermark.jpeg'
+            link: 'https://raw.githubusercontent.com/perivibhanu/What-s-Bot/main/frontend/public/velammal-college.jpeg'
           }
         },
         body: { text: welcomeText },
@@ -551,7 +551,7 @@ class WhatsAppService {
         header: {
           type: 'image',
           image: {
-            link: 'https://raw.githubusercontent.com/perivibhanu/What-s-Bot/main/frontend/public/spark-watermark.jpeg'
+            link: 'https://raw.githubusercontent.com/perivibhanu/What-s-Bot/main/frontend/public/velammal-college.jpeg'
           }
         },
         body: { text: welcomeText },
