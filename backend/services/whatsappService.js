@@ -1104,7 +1104,7 @@ class WhatsAppService {
       if (!topic) {
         await this.sendTextMessage(to, '⚠️ Information for this topic is coming soon. Please check back later!');
         if (isMainDeptInfo) return this.sendDeptSubMenu(to);
-        if (isDeptSubtopic) return this.sendDeptMoreOptionsMenu(to, parts[1].toUpperCase(), `dept_${parts[1]}`);
+        if (isDeptSubtopic) return this.sendDeptMoreOptionsMenu(to, parts[1].toUpperCase(), parts[1]);
         return this.sendMoreOptionsMenu(to);
       }
 
@@ -1133,7 +1133,7 @@ class WhatsAppService {
         if (isMainDeptInfo) {
           return this.sendDeptMoreOptionsMenu(to, parts[1].toUpperCase(), parts[1]);
         }
-        if (isDeptSubtopic) return this.sendDeptMoreOptionsMenu(to, parts[1].toUpperCase(), `dept_${parts[1]}`);
+        if (isDeptSubtopic) return this.sendDeptMoreOptionsMenu(to, parts[1].toUpperCase(), parts[1]);
         return this.sendMoreOptionsMenu(to);
       }
 
