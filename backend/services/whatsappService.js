@@ -114,8 +114,7 @@ class WhatsAppService {
         body: { text: welcomeText },
         action: {
           buttons: [
-            { type: 'reply', reply: { id: 'btn_student_choose_service', title: 'Choose Service' } },
-            { type: 'reply', reply: { id: 'btn_switch_portal', title: 'Switch Portal' } }
+            { type: 'reply', reply: { id: 'btn_student_choose_service', title: 'Choose Service' } }
           ]
         }
       }
