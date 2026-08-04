@@ -516,23 +516,18 @@ class WhatsAppService {
       `Please choose your preferred campus service.\n\n` +
       `> తెలుగు / English భాష కోసం TE టైప్ చేయండి`;
 
-    // Send official institutional banner photo (Screenshot 2 - Velammal IT Main Building)
-    try {
-      await this.sendImageMessage(
-        to,
-        'https://images.shiksha.com/mediadata/images/1572944747phpJ1CffI.jpeg',
-        'Velammal Institute of Technology - Official WhatsApp Helper'
-      );
-    } catch (err) {
-      console.log('Optional logo send skipped:', err.message);
-    }
-
-    // Send 3 buttons: 1. Choose Service, 2. Admission, 3. Language
+    // Send unified welcome card with Velammal College Photo header, welcome address, and 3 buttons
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
       type: 'interactive',
       interactive: {
         type: 'button',
+        header: {
+          type: 'image',
+          image: {
+            link: 'https://images.shiksha.com/mediadata/images/1572944747phpJ1CffI.jpeg'
+          }
+        },
         body: { text: welcomeText },
         action: {
           buttons: [
