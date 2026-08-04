@@ -108,7 +108,7 @@ class WhatsAppService {
         header: {
           type: 'image',
           image: {
-            link: 'https://images.shiksha.com/mediadata/images/1572944747phpJ1CffI.jpeg'
+            link: 'https://raw.githubusercontent.com/perivibhanu/What-s-Bot/main/frontend/public/spark-watermark.jpeg'
           }
         },
         body: { text: welcomeText },
@@ -551,7 +551,7 @@ class WhatsAppService {
         header: {
           type: 'image',
           image: {
-            link: 'https://images.shiksha.com/mediadata/images/1572944747phpJ1CffI.jpeg'
+            link: 'https://raw.githubusercontent.com/perivibhanu/What-s-Bot/main/frontend/public/spark-watermark.jpeg'
           }
         },
         body: { text: welcomeText },
