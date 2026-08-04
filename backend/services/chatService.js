@@ -168,7 +168,7 @@ class ChatService {
 
     const msgLower = messageText.toLowerCase();
     const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai'].includes(msgLower);
-    const isSwitchPortal = ['portal', 'choose portal', 'switch portal', 'change portal', 'categories', '0', 'switch_portal'].includes(msgLower);
+    const isSwitchPortal = ['portal', 'choose portal', 'switch portal', 'change portal', 'categories', '0', 'switch_portal', 'btn_switch_portal'].includes(msgLower);
 
     // ── Check if user is an already registered student when greeting or returning to main menu ─
     if (isGreeting || ['menu', 'main menu', 'main_menu', 'back'].includes(msgLower)) {
@@ -207,7 +207,15 @@ class ChatService {
     }
 
     // ── Handle Welcome Message 3 Buttons & Citizen Services ──────────────────
-    if (['btn_choose_service', 'choose service', 'service', 'services'].includes(msgLower)) {
+    if (['btn_choose_service', 'btn_student_choose_service', 'choose service', 'service', 'services'].includes(msgLower)) {
+      if (session.userType === 'student' && session.studentId) {
+        const student = await Student.findById(session.studentId);
+        if (student) {
+          session.currentState = 'registered_welcome';
+          await session.save();
+          return whatsappService.sendStudentServicesList(from, student);
+        }
+      }
       session.currentState = 'admission_welcome';
       await session.save();
       return whatsappService.sendCitizenServicesList(from);

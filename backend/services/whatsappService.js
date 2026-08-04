@@ -97,8 +97,35 @@ class WhatsAppService {
 
   async sendRegisteredWelcome(to, student) {
     const welcomeText = student?.name 
-      ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${student.name}, please choose your preferred student service below:`
-      : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred student service below:`;
+      ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${student.name}, your convenience is our priority.\n\nExperience efficient support with seamless access to your student portal services.\n\nPlease choose your preferred service.`
+      : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nYour convenience is our priority.\n\nExperience efficient support with seamless access to your student portal services.\n\nPlease choose your preferred service.`;
+    
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        header: {
+          type: 'image',
+          image: {
+            link: 'https://images.shiksha.com/mediadata/images/1572944747phpJ1CffI.jpeg'
+          }
+        },
+        body: { text: welcomeText },
+        action: {
+          buttons: [
+            { type: 'reply', reply: { id: 'btn_student_choose_service', title: 'Choose Service' } },
+            { type: 'reply', reply: { id: 'btn_switch_portal', title: 'Switch Portal' } }
+          ]
+        }
+      }
+    });
+  }
+
+  async sendStudentServicesList(to, student) {
+    const welcomeText = student?.name 
+      ? `Hello ${student.name}, please choose your preferred student service below:`
+      : `Please choose your preferred student service below:`;
     
     const rows = [
       { id: 'current_updates', title: '📢 Current Updates', description: 'Principal & college circulars' },
