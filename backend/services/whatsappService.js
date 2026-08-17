@@ -535,29 +535,82 @@ class WhatsAppService {
   }
 
   async sendMasterCategoryMenu(to) {
-    const welcomeText =
-      `Welcome to Velammal Institute of Technology! ✨\n\n` +
-      `Empowering your educational journey with instant access to campus services. From academics to hostel facilities, everything you need is just a tap away.\n\n` +
-      `Please select a service from the menu below:\n\n` +
-      `> తెలుగు / English భాష కోసం TE టైప్ చేయండి`;
+    const flowId = '1734231277814539';
 
-    // Send unified welcome card with Velammal College Photo header, welcome address, and 3 buttons
-    return this.sendMessage(to, {
+    // 1. The Welcome Image with Choose Service Flow button
+    await this.sendMessage(to, {
       messaging_product: 'whatsapp',
+      recipient_type: 'individual',
       type: 'interactive',
       interactive: {
-        type: 'button',
+        type: 'flow',
         header: {
           type: 'image',
           image: {
             link: 'https://raw.githubusercontent.com/perivibhanu/What-s-Bot/main/frontend/public/velammal-college.jpeg'
           }
         },
-        body: { text: welcomeText },
+        body: {
+          text: `Welcome to Velammal Institute of Technology! ✨\n\n` +
+                `Empowering your educational journey with instant access to campus services. From academics to hostel facilities, everything you need is just a tap away.`
+        },
+        footer: {
+          text: 'Velammal Citizen Helper'
+        },
+        action: {
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'menu_flow_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Choose Service',
+            flow_action: 'navigate',
+            flow_action_payload: {
+              screen: 'MAIN_MENU_SCREEN'
+            }
+          }
+        }
+      }
+    });
+
+    // 2. Admission Flow button message
+    await this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      type: 'interactive',
+      interactive: {
+        type: 'flow',
+        body: {
+          text: 'To apply for new admissions or check your status, open the form below:'
+        },
+        action: {
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'admission_flow_' + Date.now(),
+            flow_id: flowId, // Temp ID until user creates the Admission Flow
+            flow_cta: 'Admission Form',
+            flow_action: 'navigate',
+            flow_action_payload: {
+              screen: 'MAIN_MENU_SCREEN'
+            }
+          }
+        }
+      }
+    });
+
+    // 3. Language setting button
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        body: {
+          text: '> తెలుగు / English భాష కోసం TE టైప్ చేయండి'
+        },
         action: {
           buttons: [
-            { type: 'reply', reply: { id: 'btn_choose_service', title: 'Choose Service' } },
-            { type: 'reply', reply: { id: 'btn_admission', title: 'Admission' } },
             { type: 'reply', reply: { id: 'btn_language', title: 'Language (TE)' } }
           ]
         }
