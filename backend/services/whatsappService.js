@@ -603,37 +603,35 @@ class WhatsAppService {
   }
 
   async sendCitizenServicesList(to) {
-    const welcomeText =
-      `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\n` +
-      `Your convenience is our priority.\n\n` +
-      `Experience efficient support with seamless access to a wide range of campus services.\n\n` +
-      `Please choose your preferred campus service.`;
-
-    const rows = [
-      { id: 'student_login',        title: '📝 Registration',    description: 'Student & staff login registration' },
-      { id: 'topic_placements',     title: '💼 Placements',      description: 'Career & placement records' },
-      { id: 'topic_projects',       title: '🔬 Projects',        description: 'Student innovations & labs' },
-      { id: 'topic_academics',      title: '📚 Academics',       description: 'Academic excellence' },
-      { id: 'topic_achievements',   title: '🏆 Achievements',    description: 'Awards & recognitions' },
-      { id: 'topic_hostel',         title: '🏠 Hostel',          description: 'Hostel life & facilities' },
-      { id: 'topic_transportation', title: '🚌 Transportation',  description: '60+ college buses & routes' },
-      { id: 'topic_sports',         title: '⚽ Sports',          description: 'Sports complex & gym' },
-      { id: 'topic_hostelFood',     title: '🍽️ Hostel Food',     description: 'Dining, canteen & medical' },
-      { id: 'topic_dept',           title: '🏛️ Departments',     description: '7 engineering departments' }
-    ];
-
+    const flowId = '1734231277814539';
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
+      recipient_type: 'individual',
       type: 'interactive',
       interactive: {
-        type: 'list',
-        body: { text: welcomeText },
+        type: 'flow',
+        header: {
+          type: 'text',
+          text: 'Velammal Citizen Helper'
+        },
+        body: {
+          text: 'Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nYour convenience is our priority.\n\nExperience efficient support with seamless access to a wide range of campus services.\n\nPlease choose your preferred campus service.'
+        },
+        footer: {
+          text: 'Velammal Institute of Technology'
+        },
         action: {
-          button: 'Choose Service',
-          sections: [{
-            title: 'Select One Service',
-            rows: rows
-          }]
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'menu_flow_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Choose Service',
+            flow_action: 'navigate',
+            flow_action_payload: {
+              screen: 'MAIN_MENU_SCREEN'
+            }
+          }
         }
       }
     });
