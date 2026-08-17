@@ -536,10 +536,9 @@ class WhatsAppService {
 
   async sendMasterCategoryMenu(to) {
     const welcomeText =
-      `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\n` +
-      `Your convenience is our priority.\n\n` +
-      `Experience efficient support with seamless access to a wide range of campus services.\n\n` +
-      `Please choose your preferred campus service.\n\n` +
+      `Welcome to Velammal Institute of Technology! ✨\n\n` +
+      `Empowering your educational journey with instant access to campus services. From academics to hostel facilities, everything you need is just a tap away.\n\n` +
+      `Please select a service from the menu below:\n\n` +
       `> తెలుగు / English భాష కోసం TE టైప్ చేయండి`;
 
     // Send unified welcome card with Velammal College Photo header, welcome address, and 3 buttons
@@ -615,7 +614,7 @@ class WhatsAppService {
           text: 'Velammal Citizen Helper'
         },
         body: {
-          text: 'Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nYour convenience is our priority.\n\nExperience efficient support with seamless access to a wide range of campus services.\n\nPlease choose your preferred campus service.'
+          text: 'Welcome to Velammal Institute of Technology! ✨\n\nEmpowering your educational journey with instant access to campus services. From academics to hostel facilities, everything you need is just a tap away.\n\nPlease select a service from the menu below:'
         },
         footer: {
           text: 'Velammal Institute of Technology'
