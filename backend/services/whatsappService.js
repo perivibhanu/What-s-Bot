@@ -566,6 +566,42 @@ class WhatsAppService {
     });
   }
 
+  // ── Send WhatsApp Flow for Student Login ─────────────────────────────────────
+  async sendStudentLoginFlow(to) {
+    const flowId = '1734231277814539';
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      type: 'interactive',
+      interactive: {
+        type: 'flow',
+        header: {
+          type: 'text',
+          text: 'Velammal Login'
+        },
+        body: {
+          text: 'Please enter your Registration Number to securely access your student portal.'
+        },
+        footer: {
+          text: 'Velammal Institute of Technology'
+        },
+        action: {
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'login_flow_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Login to Portal',
+            flow_action: 'navigate',
+            flow_action_payload: {
+              screen: 'LOGIN_SCREEN'
+            }
+          }
+        }
+      }
+    });
+  }
+
   async sendCitizenServicesList(to) {
     const welcomeText =
       `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\n` +

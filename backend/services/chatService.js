@@ -72,6 +72,7 @@ class ChatService {
         try {
           const payload = JSON.parse(interactive.nfm_reply.response_json || '{}');
           if (payload.service) messageText = payload.service;
+          if (payload.reg_number) messageText = payload.reg_number;
         } catch (e) {
           console.error('Error parsing NFM reply:', e);
         }
@@ -541,9 +542,7 @@ class ChatService {
       case 'more_options':
         if (msgLower === 'student_login') {
           session.currentState = 'awaiting_reg_number';
-          return whatsappService.sendTextMessage(from,
-            '🎓 *Student Login*\n\nPlease enter your *Registration Number* to continue:'
-          );
+          return whatsappService.sendStudentLoginFlow(from);
         }
         if (msgLower === 'about_college') {
           session.currentState = 'about_college';
