@@ -579,22 +579,20 @@ class WhatsAppService {
       recipient_type: 'individual',
       type: 'interactive',
       interactive: {
-        type: 'flow',
+        type: 'button',
         body: {
-          text: 'To apply for new admissions or check your status, open the form below:'
+          text: 'To apply for new admissions or check your status, tap the button below:'
         },
         action: {
-          name: 'flow',
-          parameters: {
-            flow_message_version: '3',
-            flow_token: 'admission_flow_' + Date.now(),
-            flow_id: flowId,
-            flow_cta: 'Admission Form',
-            flow_action: 'navigate',
-            flow_action_payload: {
-              screen: 'ADMISSION_SCREEN'
+          buttons: [
+            {
+              type: 'reply',
+              reply: {
+                id: 'adm_main',
+                title: '📝 Admission Form'
+              }
             }
-          }
+          ]
         }
       }
     });
@@ -693,7 +691,7 @@ class WhatsAppService {
     const text =
       `🎓 *Velammal Institute of Technology - Online Admission Portal*\n\n` +
       `Apply online for B.E. / B.Tech Engineering Admissions through our official application portal:\n\n` +
-      `🌐 *Admission Portal Link:*\nhttps://what-s-bot.onrender.com\n\n` +
+      `🌐 *Admission Portal Link:*\nhttps://what-s-bot.vercel.app/apply\n\n` +
       `🌐 *College Website:*\nhttps://velammalitech.edu.in/admission\n\n` +
       `📞 *Talk to Admission Officer:*\n` +
       `• Helpline 1: +91 98404 69096\n` +

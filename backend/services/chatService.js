@@ -811,7 +811,7 @@ class ChatService {
     if (action === 'adm_main') {
       session.currentState = 'admission_welcome';
       await session.save();
-      return whatsappService.sendAdmissionWelcome(from);
+      return whatsappService.sendAdmissionLinkCard(from);
     }
 
     // ── STEP 3: Department-Specific Explore Options (Screenshot 2) ──
