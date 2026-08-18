@@ -92,6 +92,13 @@ class ChatService {
             } else {
               messageText = svc;
             }
+          } else if (payload.action === 'submit_admission') {
+            const name = payload.name || 'Student';
+            const phone = payload.phone || '';
+            const cutoff = payload.cutoff || '';
+            const dept = payload.department || '';
+            await whatsappService.sendTextMessage(from, `✅ *Admission Application Received!*\\n\\nThank you, *${name}*. We have received your application for *${dept}* with a cutoff of *${cutoff}*.\\n\\nOur admission team will contact you shortly at ${phone}.`);
+            return;
           } else if (payload.reg_number) {
             messageText = payload.reg_number;
           }
