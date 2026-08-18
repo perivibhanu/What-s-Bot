@@ -77,7 +77,21 @@ class ChatService {
             session.admissionStep = payload.department;
             messageText = `dept_exp_${payload.subtopic}`;
           } else if (payload.service) {
-            messageText = payload.service;
+            const svc = payload.service;
+            // Handle Mega List format: dept_exp_DEPTKEY_SUBTOPIC
+            if (svc.startsWith('dept_exp_') && svc.split('_').length === 4) {
+              const parts = svc.split('_');
+              const deptKey = parts[2];
+              const subtopic = parts[3];
+              const deptMap = {
+                'aids': 'AI & DS', 'ece': 'ECE', 'cse': 'CSE', 'eee': 'EEE', 
+                'mech': 'Mechanical', 'mechatronics': 'Mechatronics', 'it': 'IT'
+              };
+              session.admissionStep = deptMap[deptKey] || 'Department';
+              messageText = `dept_exp_${subtopic}`;
+            } else {
+              messageText = svc;
+            }
           } else if (payload.reg_number) {
             messageText = payload.reg_number;
           }
