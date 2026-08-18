@@ -126,8 +126,8 @@ class WhatsAppService {
       ? `Hello ${student.name}, please choose your preferred student service below:`
       : `Please choose your preferred student service below:`;
     
-    const flowId = '1734231277814539';
-    const screenName = student?.scholarType === 'Hostel' ? 'STUDENT_MENU_HOSTEL' : 'STUDENT_MENU_DAY_SCHOLAR';
+    const flowId = process.env.STUDENT_FLOW_ID || '1734231277814539';
+    const screenName = 'STUDENT_MENU_SCREEN';
 
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
