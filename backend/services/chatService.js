@@ -76,6 +76,8 @@ class ChatService {
           if (payload.service === 'topic_dept' && payload.department && payload.subtopic) {
             session.admissionStep = payload.department;
             messageText = `dept_exp_${payload.subtopic}`;
+          } else if (payload.student_service) {
+            messageText = payload.student_service;
           } else if (payload.service) {
             const svc = payload.service;
             // Handle Mega List format: dept_exp_DEPTKEY_SUBTOPIC

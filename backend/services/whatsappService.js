@@ -126,43 +126,29 @@ class WhatsAppService {
       ? `Hello ${student.name}, please choose your preferred student service below:`
       : `Please choose your preferred student service below:`;
     
-    const rows = [
-      { id: 'current_updates', title: '📢 Current Updates', description: 'Principal & college circulars' },
-      { id: 'marks', title: '📊 Marks & Results', description: 'View semester marks & grades' },
-      { id: 'attendance', title: '📋 Attendance Report', description: 'Check current attendance %' },
-      { id: 'timetable', title: '📅 Class Timetable', description: 'View daily lecture schedule' }
-    ];
-
-    if (student?.scholarType === 'Hostel') {
-      rows.push(
-        { id: 'make_outing', title: '🎟️ Outing Permit', description: 'Request new outing permit' },
-        { id: 'return_outing', title: '📍 Outing Check-in', description: 'Share location for check-in' },
-        { id: 'rate_food', title: '⭐ Rate Hostel Food', description: 'Rate hostel meals & dining' }
-      );
-    } else {
-      rows.push({ id: 'transportation', title: '🚌 Transport Routes', description: 'College bus routes & numbers' });
-    }
-
-    rows.push(
-      { id: 'fee_balance', title: '💳 Fee Balance', description: 'Check due fees & payment' },
-      { id: 'helpdesk', title: '🛠️ Helpdesk Support', description: 'Report issues & complaints' },
-      { id: 'admission_start', title: '🎓 Sibling Admission', description: 'Apply for siblings & cousins' }
-    );
+    const flowId = '1734231277814539';
+    const screenName = student?.scholarType === 'Hostel' ? 'STUDENT_MENU_HOSTEL' : 'STUDENT_MENU_DAY_SCHOLAR';
 
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
       type: 'interactive',
       interactive: {
-        type: 'list',
+        type: 'flow',
         body: {
           text: welcomeText
         },
         action: {
-          button: 'Choose Service',
-          sections: [{
-            title: 'Select One Service',
-            rows: rows
-          }]
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'student_menu_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Choose Service',
+            flow_action: 'navigate',
+            flow_action_payload: {
+              screen: screenName
+            }
+          }
         }
       }
     });
