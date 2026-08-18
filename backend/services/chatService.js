@@ -822,6 +822,8 @@ class ChatService {
         await whatsappService.sendTextMessage(from, `🏭 *${deptName} - Industrial Visits & Exposure*\n\n• Regular industrial tours to leading tech companies, ISRO, BSNL, Hyundai, and R&D centers.\n• Real-world industry exposure for all students.`);
       } else if (action.includes('sports')) {
         await whatsappService.sendTextMessage(from, `⚽ *${deptName} - Sports Champions*\n\n• Active student participation and trophies in university athletics and inter-college tournaments.`);
+      } else if (action.includes('about')) {
+        await whatsappService.sendTextMessage(from, `ℹ️ *About ${deptName} Department*\n\n• Renowned for state-of-the-art facilities and experienced faculty.\n• Dedicated to empowering students with practical and theoretical excellence.\n\n🌐 *Learn More:* https://velammalitech.edu.in/departments`);
       }
       return whatsappService.sendDepartmentExploreMenu(from, deptName);
     }
