@@ -579,22 +579,20 @@ class WhatsAppService {
       recipient_type: 'individual',
       type: 'interactive',
       interactive: {
-        type: 'flow',
+        type: 'button',
         body: {
-          text: 'To apply for new admissions or check your status, open the form below:'
+          text: 'To apply for new admissions or check your status, tap the button below:'
         },
         action: {
-          name: 'flow',
-          parameters: {
-            flow_message_version: '3',
-            flow_token: 'admission_flow_' + Date.now(),
-            flow_id: flowId, // Temp ID until user creates the Admission Flow
-            flow_cta: 'Admission Form',
-            flow_action: 'navigate',
-            flow_action_payload: {
-              screen: 'MAIN_MENU_SCREEN'
+          buttons: [
+            {
+              type: 'reply',
+              reply: {
+                id: 'adm_main',
+                title: '📝 Admission Form'
+              }
             }
-          }
+          ]
         }
       }
     });
