@@ -71,8 +71,16 @@ class ChatService {
       else if (interactive.type === 'nfm_reply') {
         try {
           const payload = JSON.parse(interactive.nfm_reply.response_json || '{}');
-          if (payload.service) messageText = payload.service;
-          if (payload.reg_number) messageText = payload.reg_number;
+          
+          // Handle dynamic department drill-down Flow
+          if (payload.service === 'topic_dept' && payload.department && payload.subtopic) {
+            session.admissionStep = payload.department;
+            messageText = `dept_exp_${payload.subtopic}`;
+          } else if (payload.service) {
+            messageText = payload.service;
+          } else if (payload.reg_number) {
+            messageText = payload.reg_number;
+          }
         } catch (e) {
           console.error('Error parsing NFM reply:', e);
         }
