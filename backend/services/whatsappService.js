@@ -250,25 +250,23 @@ class WhatsAppService {
       ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nYou are viewing the portal for ${studentName}.\nPlease choose your preferred parent service below:`
       : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred parent service below:`;
     
+    const flowId = process.env.PARENT_FLOW_ID || '1734231277814539';
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
       type: 'interactive',
       interactive: {
-        type: 'list',
-        body: {
-          text: welcomeText
-        },
+        type: 'flow',
+        body: { text: welcomeText },
         action: {
-          button: 'Choose Service',
-          sections: [{
-            title: 'Select One Service',
-            rows: [
-              { id: 'principal_circulars', title: 'Principal Circulars', description: 'Latest college circulars' },
-              { id: 'hod_circulars', title: 'HOD Circulars', description: 'Department specific circulars' },
-              { id: 'marks', title: 'Academic Marks', description: 'View semester marks' },
-              { id: 'admission_start', title: 'Sibling Admission', description: 'Apply for admission online' }
-            ]
-          }]
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'parent_menu_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Parent Portal',
+            flow_action: 'navigate',
+            flow_action_payload: { screen: 'PARENT_MENU_SCREEN' }
+          }
         }
       }
     });
@@ -309,21 +307,23 @@ class WhatsAppService {
       ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${staffName}, please choose your preferred staff service below:`
       : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred staff service below:`;
     
+    const flowId = process.env.STAFF_FLOW_ID || '1734231277814539';
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
       type: 'interactive',
       interactive: {
-        type: 'list',
+        type: 'flow',
         body: { text: welcomeText },
         action: {
-          button: 'Choose Service',
-          sections: [{
-            title: 'Select One Service',
-            rows: [
-              { id: 'staff_complaint', title: 'Register Complaint', description: 'Report an issue & complaint' },
-              { id: 'staff_admission', title: 'Sibling Admission', description: 'Admission application link' }
-            ]
-          }]
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'staff_menu_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Staff Portal',
+            flow_action: 'navigate',
+            flow_action_payload: { screen: 'STAFF_MENU_SCREEN' }
+          }
         }
       }
     });
@@ -430,22 +430,23 @@ class WhatsAppService {
       ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${wardenName} (${blockName || 'Hostel'}), please choose your preferred warden service below:`
       : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred warden service below:`;
     
+    const flowId = process.env.WARDEN_FLOW_ID || '1734231277814539';
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
       type: 'interactive',
       interactive: {
-        type: 'list',
+        type: 'flow',
         body: { text: welcomeText },
         action: {
-          button: 'Choose Service',
-          sections: [{
-            title: 'Select One Service',
-            rows: [
-              { id: 'warden_outing', title: 'Outing Applications', description: 'Manage new & return outings' },
-              { id: 'warden_complaint', title: 'Hostel Complaints', description: 'Report a maintenance issue' },
-              { id: 'warden_admission', title: 'Sibling Admission', description: 'Admission application link' }
-            ]
-          }]
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'warden_menu_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Warden Portal',
+            flow_action: 'navigate',
+            flow_action_payload: { screen: 'WARDEN_MENU_SCREEN' }
+          }
         }
       }
     });
@@ -456,31 +457,23 @@ class WhatsAppService {
       ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${guardName} (Post: ${gateAssigned || 'Gate 1'}), please choose your preferred security service below:\n\n*How to scan Student Outing Passes:*\n1️⃣ *Send Photo* of QR code here\n2️⃣ Or *Type/Paste* Reg Number\n3️⃣ Or use *Open Web Scanner* below for live video scan.`
       : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred security service below:`;
     
+    const flowId = process.env.SECURITY_FLOW_ID || '1734231277814539';
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
       type: 'interactive',
       interactive: {
-        type: 'list',
+        type: 'flow',
         body: { text: welcomeText },
         action: {
-          button: 'Choose Service',
-          sections: [
-            {
-              title: 'Select Gate Shift',
-              rows: [
-                { id: 'select_gate_1', title: 'Select Gate 1', description: 'Hostel Gate (Save for shift)' },
-                { id: 'select_gate_2', title: 'Select Gate 2', description: 'Main Gate (Save for shift)' }
-              ]
-            },
-            {
-              title: 'Gate Operations',
-              rows: [
-                { id: 'security_open_scanner', title: 'Open Web Scanner', description: 'Live mobile video scanner' },
-                { id: 'security_gate_logs', title: 'Today Gate Summary', description: 'View active outing counts' },
-                { id: 'security_report_issue', title: 'Report Gate Issue', description: 'Send emergency alert' }
-              ]
-            }
-          ]
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'security_menu_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Security Portal',
+            flow_action: 'navigate',
+            flow_action_payload: { screen: 'SECURITY_MENU_SCREEN' }
+          }
         }
       }
     });
@@ -491,22 +484,23 @@ class WhatsAppService {
       ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${driverName} (Bus No: ${busNumber || 'N/A'}, Route: ${routeNumber || 'N/A'}), please choose your preferred transport service below:`
       : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred transport service below:`;
     
+    const flowId = process.env.DRIVER_FLOW_ID || '1734231277814539';
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
       type: 'interactive',
       interactive: {
-        type: 'list',
+        type: 'flow',
         body: { text: welcomeText },
         action: {
-          button: 'Choose Service',
-          sections: [{
-            title: 'Select One Service',
-            rows: [
-              { id: 'driver_start_trip', title: 'Share Trip GPS', description: 'Share live GPS with parents' },
-              { id: 'driver_route_info', title: 'Route Schedule', description: 'View bus route & stops' },
-              { id: 'driver_report_issue', title: 'Report Bus Issue', description: 'Notify transport admin' }
-            ]
-          }]
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'driver_menu_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Driver Portal',
+            flow_action: 'navigate',
+            flow_action_payload: { screen: 'DRIVER_MENU_SCREEN' }
+          }
         }
       }
     });

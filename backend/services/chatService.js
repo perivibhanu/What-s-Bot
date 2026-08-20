@@ -78,6 +78,8 @@ class ChatService {
             messageText = `dept_exp_${payload.subtopic}`;
           } else if (payload.student_service) {
             messageText = payload.student_service;
+          } else if (payload.role_action) {
+            messageText = payload.role_action;
           } else if (payload.service) {
             const svc = payload.service;
             // Handle Mega List format: dept_exp_DEPTKEY_SUBTOPIC
