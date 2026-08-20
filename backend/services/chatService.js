@@ -575,7 +575,10 @@ class ChatService {
       case 'more_options':
         if (msgLower === 'student_login') {
           session.currentState = 'awaiting_reg_number';
-          return whatsappService.sendStudentLoginFlow(from);
+          return whatsappService.sendTextMessage(from,
+            '🎓 *Velammal Registration & Login*\n\n' +
+            'Please enter your 10-12 digit *Register Number* (e.g. 113323106071) to login to your portal:'
+          );
         }
         if (msgLower === 'about_college') {
           session.currentState = 'about_college';
