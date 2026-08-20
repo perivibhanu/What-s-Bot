@@ -543,7 +543,7 @@ class WhatsAppService {
             flow_message_version: '3',
             flow_token: 'menu_flow_' + Date.now(),
             flow_id: flowId,
-            flow_cta: 'Choose Service',
+            flow_cta: 'Main View',
             flow_action: 'navigate',
             flow_action_payload: {
               screen: 'MAIN_MENU_SCREEN'
@@ -656,7 +656,7 @@ class WhatsAppService {
             flow_message_version: '3',
             flow_token: 'menu_flow_' + Date.now(),
             flow_id: flowId,
-            flow_cta: 'Choose Service',
+            flow_cta: 'Main View',
             flow_action: 'navigate',
             flow_action_payload: {
               screen: 'MAIN_MENU_SCREEN'
