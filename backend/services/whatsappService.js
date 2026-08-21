@@ -100,11 +100,15 @@ class WhatsAppService {
       ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${student.name}, your convenience is our priority.\n\nExperience efficient support with seamless access to your student portal services.\n\nPlease choose your preferred service.`
       : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nYour convenience is our priority.\n\nExperience efficient support with seamless access to your student portal services.\n\nPlease choose your preferred service.`;
     
-    return this.sendMessage(to, {
+    const flowId = process.env.STUDENT_FLOW_ID || '1734231277814539';
+
+    // 1. The Welcome Image with Choose Service Flow button
+    await this.sendMessage(to, {
       messaging_product: 'whatsapp',
+      recipient_type: 'individual',
       type: 'interactive',
       interactive: {
-        type: 'button',
+        type: 'flow',
         header: {
           type: 'image',
           image: {
@@ -112,9 +116,32 @@ class WhatsAppService {
           }
         },
         body: { text: welcomeText },
+        footer: { text: 'Velammal Citizen Helper' },
+        action: {
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'student_menu_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Choose Service',
+            flow_action: 'navigate',
+            flow_action_payload: { screen: 'STUDENT_MENU_SCREEN' }
+          }
+        }
+      }
+    });
+
+    // 2. Admission button message below it
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        body: { text: 'To apply for new sibling admissions, tap the button below:' },
         action: {
           buttons: [
-            { type: 'reply', reply: { id: 'btn_student_choose_service', title: 'Choose Service' } }
+            { type: 'reply', reply: { id: 'adm_main', title: '📝 Admission Form' } }
           ]
         }
       }
