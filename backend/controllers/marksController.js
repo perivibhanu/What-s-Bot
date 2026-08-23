@@ -204,16 +204,33 @@ exports.uploadMarks = async (req, res) => {
       await student.save();
 
       // Send WhatsApp Notification (only if registered)
-      if (student.isRegistered && student.phoneNumber) {
+      if (student.isRegistered) {
+        let sentAny = false;
         try {
-          await sendMarksNotification(student.phoneNumber, student, examType, subjectMarks, message);
-          results.success++;
-          // Small delay to prevent rate limiting
-          await new Promise(r => setTimeout(r, 200));
+          if (student.phoneNumber) {
+            await sendMarksNotification(student.phoneNumber, student, examType, subjectMarks, message);
+            sentAny = true;
+          }
+          if (student.parentPhoneNumber) {
+            await sendMarksNotification(student.parentPhoneNumber, student, examType, subjectMarks, message);
+            sentAny = true;
+          }
+          
+          if (sentAny) {
+            results.success++;
+            // Small delay to prevent rate limiting
+            await new Promise(r => setTimeout(r, 200));
+          } else {
+            results.errors.push({ 
+              row: rowNum, 
+              reason: `Saved marks, but ${regNumber} has no phone numbers saved`
+            });
+            results.failed++;
+          }
         } catch (waErr) {
           results.errors.push({ 
             row: rowNum, 
-            reason: `Saved marks, but failed to send WhatsApp to ${student.phoneNumber}`
+            reason: `Saved marks, but failed to send WhatsApp to ${regNumber}`
           });
           results.failed++;
         }
@@ -248,16 +265,48 @@ async function sendMarksNotification(to, student, examType, subjectMarks, option
     'model': 'Model Exam'
   };
 
+  const getMark = (map, subj) => {
+    if (!map) return '-';
+    // Mongoose maps vs plain objects
+    const val = typeof map.get === 'function' ? map.get(subj) : map[subj];
+    return val !== undefined && val !== null ? val : '-';
+  };
+
+  const hasMid1 = student.marks?.mid1 && Object.keys(typeof student.marks.mid1.toJSON === 'function' ? student.marks.mid1.toJSON() : student.marks.mid1).length > 0;
+  const hasMid2 = student.marks?.mid2 && Object.keys(typeof student.marks.mid2.toJSON === 'function' ? student.marks.mid2.toJSON() : student.marks.mid2).length > 0;
+
   let total = 0;
   let marksText = '';
   let rank = null;
+
+  let isSideBySide = false;
+  let headerFormat = '📝 *Marks Details:*';
+
+  if (examType === 'mid2' && hasMid1) {
+    isSideBySide = true;
+    headerFormat = '📝 *Marks Details (Mid-1 | Mid-2):*';
+  } else if (examType === 'model' && hasMid1 && hasMid2) {
+    isSideBySide = true;
+    headerFormat = '📝 *Marks Details (Mid-1 | Mid-2 | Model):*';
+  }
 
   Object.entries(subjectMarks).forEach(([subject, mark]) => {
     if (subject.toLowerCase().trim() === 'rank') {
       rank = mark;
     } else {
-      marksText += `• ${subject}: ${mark}\n`;
       total += Number(mark);
+      if (isSideBySide) {
+        if (examType === 'mid2') {
+          const m1 = getMark(student.marks.mid1, subject);
+          marksText += `• ${subject}: ${m1} | ${mark}\n`;
+        } else if (examType === 'model') {
+          const m1 = getMark(student.marks.mid1, subject);
+          const m2 = getMark(student.marks.mid2, subject);
+          marksText += `• ${subject}: ${m1} | ${m2} | ${mark}\n`;
+        }
+      } else {
+        marksText += `• ${subject}: ${mark}\n`;
+      }
     }
   });
 
@@ -266,7 +315,7 @@ async function sendMarksNotification(to, student, examType, subjectMarks, option
     `🏫 Department: ${student.branch} | Section: ${student.section}\n` +
     `🎓 Reg No: ${student.regNumber}\n` +
     `👤 Name: ${student.name}\n\n` +
-    `📝 *Marks Details:*\n${marksText}\n` +
+    `${headerFormat}\n${marksText}\n` +
     `📈 *Total Score:* ${total}\n` +
     (rank !== null ? `🏆 *Rank:* ${rank}\n\n` : `\n`) +
     (optionalMessage ? `📢 *Admin Note:*\n${optionalMessage}\n\n` : '') +
@@ -279,10 +328,14 @@ async function sendMarksNotification(to, student, examType, subjectMarks, option
 // ─── POST Clear Old Marks ─────────────────────────────────────────────────────
 exports.clearMarks = async (req, res) => {
   try {
-    const { batch, branch, section } = req.body;
+    const { batch, branch, section, examsToClear } = req.body;
     
     if (!batch || !branch || !section) {
       return res.status(400).json({ error: 'Batch, Branch, and Section are required to clear marks.' });
+    }
+
+    if (!examsToClear || !Array.isArray(examsToClear) || examsToClear.length === 0) {
+      return res.status(400).json({ error: 'Please select at least one exam to clear.' });
     }
 
     const branchCode = getBranchCode(branch);
@@ -291,7 +344,6 @@ exports.clearMarks = async (req, res) => {
     }
 
     const regex = getRegNoRegex(batch, branchCode);
-
     const sections = Array.isArray(section) ? section : [section].filter(Boolean);
 
     const students = await Student.find({
@@ -306,15 +358,16 @@ exports.clearMarks = async (req, res) => {
     let clearedCount = 0;
     for (const student of students) {
       if (student.marks) {
-        student.marks.mid1 = {};
-        student.marks.mid2 = {};
-        student.marks.model = {};
+        if (examsToClear.includes('mid1')) student.marks.mid1 = {};
+        if (examsToClear.includes('mid2')) student.marks.mid2 = {};
+        if (examsToClear.includes('model')) student.marks.model = {};
         await student.save();
         clearedCount++;
       }
     }
 
-    res.json({ message: `Successfully cleared all old marks for ${clearedCount} students in ${branch} Sec ${section}.` });
+    const clearedNames = examsToClear.map(e => e === 'mid1' ? 'Mid 1' : (e === 'mid2' ? 'Mid 2' : 'Model')).join(', ');
+    res.json({ message: `Successfully cleared ${clearedNames} marks for ${clearedCount} students in ${branch} Sec ${section}.` });
   } catch (error) {
     console.error('Error clearing marks:', error);
     res.status(500).json({ error: 'Failed to clear marks: ' + error.message });

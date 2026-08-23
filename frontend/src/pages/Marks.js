@@ -12,6 +12,8 @@ function Marks() {
     examType: 'mid1'
   });
 
+  const [examsToClear, setExamsToClear] = useState([]);
+
   const handleSectionToggle = (sec) => {
     setFilter(prev => {
       const current = prev.section || [];
@@ -91,9 +93,21 @@ function Marks() {
     }
   };
 
-  const handleClearMarks = async () => {
+  const handleExamToggle = (exam) => {
+    setExamsToClear(prev => {
+      if (prev.includes(exam)) return prev.filter(e => e !== exam);
+      return [...prev, exam];
+    });
+  };
+
+  const handleClearSelectedMarks = async () => {
     const secString = (filter.section || []).join(', ');
-    if (!window.confirm(`⚠️ WARNING ⚠️\n\nAre you sure you want to completely delete all Mid-1, Mid-2, and Model Exam marks for ${filter.branch} Batch ${filter.batch} Section(s) ${secString}?\n\nThis action cannot be undone!`)) {
+    if (examsToClear.length === 0) {
+      alert('Please select at least one exam to clear.');
+      return;
+    }
+    const examNames = examsToClear.map(e => e === 'mid1' ? 'Mid 1' : (e === 'mid2' ? 'Mid 2' : 'Model')).join(', ');
+    if (!window.confirm(`⚠️ WARNING ⚠️\n\nAre you sure you want to completely delete ${examNames} marks for ${filter.branch} Batch ${filter.batch} Section(s) ${secString}?\n\nThis action cannot be undone!`)) {
       return;
     }
     
@@ -101,11 +115,12 @@ function Marks() {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/marks/clear`, 
-        { batch: filter.batch, branch: filter.branch, section: filter.section }, 
+        { batch: filter.batch, branch: filter.branch, section: filter.section, examsToClear }, 
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setStatus('success');
       setResult({ message: res.data.message, summary: { success: 0, failed: 0 } });
+      setExamsToClear([]);
     } catch (err) {
       setStatus('error');
       setResult({
@@ -165,16 +180,39 @@ function Marks() {
                   </select>
                 </div>
               </div>
-              <div style={{ marginTop: '20px', textAlign: 'right' }}>
-                <button 
-                  onClick={handleClearMarks}
-                  style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}
-                >
-                  🗑️ Clear All Marks for this Group
-                </button>
-              </div>
             </div>
           </div>
+
+          {filter.batch && filter.branch && filter.section?.length > 0 && (
+            <>
+              <hr className="divider" />
+              <div className="marks-section" style={{ backgroundColor: '#fff3f3', borderLeft: '4px solid #dc3545' }}>
+                <div className="step-badge" style={{ backgroundColor: '#dc3545' }}>!</div>
+                <div className="section-content">
+                  <h3 style={{ color: '#dc3545' }}>Clear Old Data</h3>
+                  <p>Starting a new semester? Select old exams to delete before pushing new ones.</p>
+                  <div style={{ display: 'flex', gap: '20px', marginTop: '10px', marginBottom: '15px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={examsToClear.includes('mid1')} onChange={() => handleExamToggle('mid1')} /> Mid Exam 1
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={examsToClear.includes('mid2')} onChange={() => handleExamToggle('mid2')} /> Mid Exam 2
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={examsToClear.includes('model')} onChange={() => handleExamToggle('model')} /> Model Exam
+                    </label>
+                  </div>
+                  <button 
+                    onClick={handleClearSelectedMarks}
+                    disabled={examsToClear.length === 0}
+                    style={{ backgroundColor: examsToClear.length > 0 ? '#dc3545' : '#e0e0e0', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '5px', cursor: examsToClear.length > 0 ? 'pointer' : 'not-allowed', fontWeight: 'bold' }}
+                  >
+                    🗑️ Clear Selected Marks for this Group
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
 
           <hr className="divider" />
 
