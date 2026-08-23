@@ -148,58 +148,6 @@ class WhatsAppService {
     });
   }
 
-  async sendWardenWelcome(to, warden) {
-    const welcomeText = `Welcome back, Warden ${warden.name}! 🏢\n\n` +
-                        `You are currently managing the ${warden.block} block.\n` +
-                        `Please choose a service from the menu below:`;
-    
-    return this.sendMessage(to, {
-      messaging_product: 'whatsapp',
-      type: 'interactive',
-      interactive: {
-        type: 'list',
-        body: { text: welcomeText },
-        action: {
-          button: 'Warden Services',
-          sections: [{
-            title: 'Manage Hostel',
-            rows: [
-              { id: 'warden_outing', title: '🎟️ Outing Applications', description: 'Manage new & return outings' },
-              { id: 'warden_complaint', title: '🛠️ Hostel Complaints', description: 'Report a maintenance issue' },
-              { id: 'warden_admission', title: '🎓 Sibling Admission', description: 'Admission application link' }
-            ]
-          }]
-        }
-      }
-    });
-  }
-
-  async sendSecurityWelcome(to, guard) {
-    const welcomeText = `Welcome back, Security Officer ${guard.name}! 🛡️\n\n` +
-                        `Assigned: ${guard.gateAssigned} (${guard.shift})\n` +
-                        `Please choose a service from the menu below:`;
-    
-    return this.sendMessage(to, {
-      messaging_product: 'whatsapp',
-      type: 'interactive',
-      interactive: {
-        type: 'list',
-        body: { text: welcomeText },
-        action: {
-          button: 'Security Services',
-          sections: [{
-            title: 'Gate Controls',
-            rows: [
-              { id: 'security_open_scanner', title: '📸 Open Web Scanner', description: 'Live mobile video scanner' },
-              { id: 'security_gate_logs', title: '📊 Today Gate Summary', description: 'View active outing counts' },
-              { id: 'security_report_issue', title: '🚨 Report Gate Issue', description: 'Send emergency alert' }
-            ]
-          }]
-        }
-      }
-    });
-  }
-
   async sendStudentServicesList(to, student) {
     const welcomeText = student?.name 
       ? `Hello ${student.name}, please choose your preferred student service below:`
@@ -227,6 +175,63 @@ class WhatsAppService {
             flow_action_payload: {
               screen: screenName
             }
+          }
+        }
+      }
+    });
+  }
+  async sendWardenWelcome(to, warden) {
+    const welcomeText = warden?.name 
+      ? `Welcome back, Warden ${warden.name} (${warden.block})! ✨\n\nPlease choose a service below to manage hostel operations:`
+      : `Welcome back, Warden! ✨\n\nPlease choose a service below to manage hostel operations:`;
+    
+    const flowId = process.env.WARDEN_FLOW_ID;
+    const screenName = 'WARDEN_MENU_SCREEN';
+
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'flow',
+        body: { text: welcomeText },
+        action: {
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'warden_menu_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Warden Portal',
+            flow_action: 'navigate',
+            flow_action_payload: { screen: screenName }
+          }
+        }
+      }
+    });
+  }
+
+  async sendSecurityWelcome(to, guard) {
+    const welcomeText = guard?.name 
+      ? `Welcome, Officer ${guard.name}! 🛡️\nAssigned: ${guard.gateAssigned || 'Campus Gate'}\n\nPlease select an action below:`
+      : `Welcome, Security Officer! 🛡️\n\nPlease select an action below:`;
+    
+    const flowId = process.env.SECURITY_FLOW_ID;
+    const screenName = 'SECURITY_MENU_SCREEN';
+
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'flow',
+        body: { text: welcomeText },
+        action: {
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'security_menu_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Security Portal',
+            flow_action: 'navigate',
+            flow_action_payload: { screen: screenName }
           }
         }
       }

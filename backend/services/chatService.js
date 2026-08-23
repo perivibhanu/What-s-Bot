@@ -2,6 +2,8 @@ const ChatSession = require('../models/ChatSession');
 const Student = require('../models/Student');
 const Settings = require('../models/Settings');
 const AdmissionApplication = require('../models/AdmissionApplication');
+const Warden = require('../models/Warden');
+const SecurityGuard = require('../models/SecurityGuard');
 const whatsappService = require('./whatsappService');
 
 // ─── Normalize phone to digits only (for comparison) ─────────────────────────
@@ -204,11 +206,43 @@ class ChatService {
     const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai'].includes(msgLower);
     const isSwitchPortal = ['portal', 'choose portal', 'switch portal', 'change portal', 'categories', '0', 'switch_portal', 'btn_switch_portal'].includes(msgLower);
 
-    // ── Check if user is an already registered student when greeting or returning to main menu ─
+    // ── Check if user is an already registered role when greeting or returning to main menu ─
     if (isGreeting || ['menu', 'main menu', 'main_menu', 'back'].includes(msgLower)) {
       const senderPhone = normalizePhone(from);
-      
-      // 1. Check Student
+
+      // Check Warden
+      let warden = null;
+      if (session.userType === 'warden' && session.wardenId) {
+        warden = await Warden.findById(session.wardenId);
+      }
+      if (!warden) {
+        warden = await Warden.findOne({ mobileNumber: { $regex: senderPhone + '$' } });
+      }
+      if (warden) {
+        session.userType = 'warden';
+        session.wardenId = warden._id;
+        session.currentState = 'warden_welcome';
+        await session.save();
+        return whatsappService.sendWardenWelcome(from, warden);
+      }
+
+      // Check Security
+      let guard = null;
+      if (session.userType === 'security' && session.securityId) {
+        guard = await SecurityGuard.findById(session.securityId);
+      }
+      if (!guard) {
+        guard = await SecurityGuard.findOne({ mobileNumber: { $regex: senderPhone + '$' } });
+      }
+      if (guard) {
+        session.userType = 'security';
+        session.securityId = guard._id;
+        session.currentState = 'security_welcome';
+        await session.save();
+        return whatsappService.sendSecurityWelcome(from, guard);
+      }
+
+      // Check Student
       let student = null;
       if (session.userType === 'student' && session.studentId) {
         student = await Student.findById(session.studentId);
@@ -229,28 +263,6 @@ class ChatService {
         session.currentState = 'registered_welcome';
         await session.save();
         return whatsappService.sendRegisteredWelcome(from, student);
-      }
-
-      // 2. Check Warden
-      const Warden = require('../models/Warden');
-      const warden = await Warden.findOne({ mobileNumber: { $regex: senderPhone + '$' } });
-      if (warden) {
-        session.userType = 'warden';
-        session.wardenId = warden._id;
-        session.currentState = 'warden_welcome';
-        await session.save();
-        return whatsappService.sendWardenWelcome(from, warden);
-      }
-
-      // 3. Check Security Guard
-      const SecurityGuard = require('../models/SecurityGuard');
-      const guard = await SecurityGuard.findOne({ mobileNumber: { $regex: senderPhone + '$' } });
-      if (guard) {
-        session.userType = 'security';
-        session.securityId = guard._id;
-        session.currentState = 'security_welcome';
-        await session.save();
-        return whatsappService.sendSecurityWelcome(from, guard);
       }
 
       session.currentState = 'visitor_welcome';
