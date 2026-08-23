@@ -148,6 +148,58 @@ class WhatsAppService {
     });
   }
 
+  async sendWardenWelcome(to, warden) {
+    const welcomeText = `Welcome back, Warden ${warden.name}! 🏢\n\n` +
+                        `You are currently managing the ${warden.block} block.\n` +
+                        `Please choose a service from the menu below:`;
+    
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: { text: welcomeText },
+        action: {
+          button: 'Warden Services',
+          sections: [{
+            title: 'Manage Hostel',
+            rows: [
+              { id: 'warden_outing', title: '🎟️ Outing Applications', description: 'Manage new & return outings' },
+              { id: 'warden_complaint', title: '🛠️ Hostel Complaints', description: 'Report a maintenance issue' },
+              { id: 'warden_admission', title: '🎓 Sibling Admission', description: 'Admission application link' }
+            ]
+          }]
+        }
+      }
+    });
+  }
+
+  async sendSecurityWelcome(to, guard) {
+    const welcomeText = `Welcome back, Security Officer ${guard.name}! 🛡️\n\n` +
+                        `Assigned: ${guard.gateAssigned} (${guard.shift})\n` +
+                        `Please choose a service from the menu below:`;
+    
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: { text: welcomeText },
+        action: {
+          button: 'Security Services',
+          sections: [{
+            title: 'Gate Controls',
+            rows: [
+              { id: 'security_open_scanner', title: '📸 Open Web Scanner', description: 'Live mobile video scanner' },
+              { id: 'security_gate_logs', title: '📊 Today Gate Summary', description: 'View active outing counts' },
+              { id: 'security_report_issue', title: '🚨 Report Gate Issue', description: 'Send emergency alert' }
+            ]
+          }]
+        }
+      }
+    });
+  }
+
   async sendStudentServicesList(to, student) {
     const welcomeText = student?.name 
       ? `Hello ${student.name}, please choose your preferred student service below:`

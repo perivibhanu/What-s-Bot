@@ -206,12 +206,14 @@ class ChatService {
 
     // ── Check if user is an already registered student when greeting or returning to main menu ─
     if (isGreeting || ['menu', 'main menu', 'main_menu', 'back'].includes(msgLower)) {
+      const senderPhone = normalizePhone(from);
+      
+      // 1. Check Student
       let student = null;
       if (session.userType === 'student' && session.studentId) {
         student = await Student.findById(session.studentId);
       }
       if (!student) {
-        const senderPhone = normalizePhone(from);
         student = await Student.findOne({
           $or: [
             { contactDetails: { $regex: senderPhone + '$' } },
@@ -227,6 +229,28 @@ class ChatService {
         session.currentState = 'registered_welcome';
         await session.save();
         return whatsappService.sendRegisteredWelcome(from, student);
+      }
+
+      // 2. Check Warden
+      const Warden = require('../models/Warden');
+      const warden = await Warden.findOne({ mobileNumber: { $regex: senderPhone + '$' } });
+      if (warden) {
+        session.userType = 'warden';
+        session.wardenId = warden._id;
+        session.currentState = 'warden_welcome';
+        await session.save();
+        return whatsappService.sendWardenWelcome(from, warden);
+      }
+
+      // 3. Check Security Guard
+      const SecurityGuard = require('../models/SecurityGuard');
+      const guard = await SecurityGuard.findOne({ mobileNumber: { $regex: senderPhone + '$' } });
+      if (guard) {
+        session.userType = 'security';
+        session.securityId = guard._id;
+        session.currentState = 'security_welcome';
+        await session.save();
+        return whatsappService.sendSecurityWelcome(from, guard);
       }
 
       session.currentState = 'visitor_welcome';
