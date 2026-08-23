@@ -276,6 +276,8 @@ async function sendMarksNotification(to, student, examType, subjectMarks, option
   const hasMid2 = student.marks?.mid2 && Object.keys(typeof student.marks.mid2.toJSON === 'function' ? student.marks.mid2.toJSON() : student.marks.mid2).length > 0;
 
   let total = 0;
+  let totalMid1 = 0;
+  let totalMid2 = 0;
   let marksText = '';
   let rank = null;
 
@@ -298,10 +300,13 @@ async function sendMarksNotification(to, student, examType, subjectMarks, option
       if (isSideBySide) {
         if (examType === 'mid2') {
           const m1 = getMark(student.marks.mid1, subject);
+          if (m1 !== '-') totalMid1 += Number(m1);
           marksText += `• ${subject}: ${m1} | ${mark}\n`;
         } else if (examType === 'model') {
           const m1 = getMark(student.marks.mid1, subject);
           const m2 = getMark(student.marks.mid2, subject);
+          if (m1 !== '-') totalMid1 += Number(m1);
+          if (m2 !== '-') totalMid2 += Number(m2);
           marksText += `• ${subject}: ${m1} | ${m2} | ${mark}\n`;
         }
       } else {
@@ -310,17 +315,26 @@ async function sendMarksNotification(to, student, examType, subjectMarks, option
     }
   });
 
+  let totalText = `📈 *Total Score:* ${total}`;
+  if (isSideBySide) {
+    if (examType === 'mid2') {
+      totalText = `📈 *Total Score:* ${totalMid1} | ${total}`;
+    } else if (examType === 'model') {
+      totalText = `📈 *Total Score:* ${totalMid1} | ${totalMid2} | ${total}`;
+    }
+  }
+
   const messageText = 
     `📊 *Exam Results - ${examNames[examType]}*\n\n` +
     `🏫 Department: ${student.branch} | Section: ${student.section}\n` +
     `🎓 Reg No: ${student.regNumber}\n` +
     `👤 Name: ${student.name}\n\n` +
     `${headerFormat}\n${marksText}\n` +
-    `📈 *Total Score:* ${total}\n` +
+    `${totalText}\n` +
     (rank !== null ? `🏆 *Rank:* ${rank}\n\n` : `\n`) +
     (optionalMessage ? `📢 *Admin Note:*\n${optionalMessage}\n\n` : '') +
     `Keep it up! 🎉\n` +
-    `— VCET Admin`;
+    `— Velammalitech Admin`;
 
   return whatsappService.sendTextMessage(to, messageText);
 }
