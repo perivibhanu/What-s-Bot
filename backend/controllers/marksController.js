@@ -265,74 +265,52 @@ async function sendMarksNotification(to, student, examType, subjectMarks, option
     'model': 'Model Exam'
   };
 
-  const getMark = (map, subj) => {
-    if (!map) return '-';
-    // Mongoose maps vs plain objects
-    const val = typeof map.get === 'function' ? map.get(subj) : map[subj];
-    return val !== undefined && val !== null ? val : '-';
-  };
-
   const hasMid1 = student.marks?.mid1 && Object.keys(typeof student.marks.mid1.toJSON === 'function' ? student.marks.mid1.toJSON() : student.marks.mid1).length > 0;
   const hasMid2 = student.marks?.mid2 && Object.keys(typeof student.marks.mid2.toJSON === 'function' ? student.marks.mid2.toJSON() : student.marks.mid2).length > 0;
+  const hasModel = student.marks?.model && Object.keys(typeof student.marks.model.toJSON === 'function' ? student.marks.model.toJSON() : student.marks.model).length > 0;
 
-  let total = 0;
-  let totalMid1 = 0;
-  let totalMid2 = 0;
-  let marksText = '';
-  let rank = null;
-
-  let isSideBySide = false;
-  let headerFormat = '📝 *Marks Details:*';
-
-  if (examType === 'mid2' && hasMid1) {
-    isSideBySide = true;
-    headerFormat = '📝 *Marks Details (Mid-1 | Mid-2):*';
-  } else if (examType === 'model' && hasMid1 && hasMid2) {
-    isSideBySide = true;
-    headerFormat = '📝 *Marks Details (Mid-1 | Mid-2 | Model):*';
-  }
-
-  Object.entries(subjectMarks).forEach(([subject, mark]) => {
-    if (subject.toLowerCase().trim() === 'rank') {
-      rank = mark;
-    } else {
-      total += Number(mark);
-      if (isSideBySide) {
-        if (examType === 'mid2') {
-          const m1 = getMark(student.marks.mid1, subject);
-          if (m1 !== '-') totalMid1 += Number(m1);
-          marksText += `• ${subject}: ${m1} | ${mark}\n`;
-        } else if (examType === 'model') {
-          const m1 = getMark(student.marks.mid1, subject);
-          const m2 = getMark(student.marks.mid2, subject);
-          if (m1 !== '-') totalMid1 += Number(m1);
-          if (m2 !== '-') totalMid2 += Number(m2);
-          marksText += `• ${subject}: ${m1} | ${m2} | ${mark}\n`;
-        }
-      } else {
-        marksText += `• ${subject}: ${mark}\n`;
-      }
-    }
-  });
-
-  let totalText = `📈 *Total Score:* ${total}`;
-  if (isSideBySide) {
-    if (examType === 'mid2') {
-      totalText = `📈 *Total Score:* ${totalMid1} | ${total}`;
-    } else if (examType === 'model') {
-      totalText = `📈 *Total Score:* ${totalMid1} | ${totalMid2} | ${total}`;
-    }
-  }
-
-  const messageText = 
+  let messageText = 
     `📊 *Exam Results - ${examNames[examType]}*\n\n` +
     `🏫 Department: ${student.branch} | Section: ${student.section}\n` +
     `🎓 Reg No: ${student.regNumber}\n` +
-    `👤 Name: ${student.name}\n\n` +
-    `${headerFormat}\n${marksText}\n` +
-    `${totalText}\n` +
-    (rank !== null ? `🏆 *Rank:* ${rank}\n\n` : `\n`) +
-    (optionalMessage ? `📢 *Admin Note:*\n${optionalMessage}\n\n` : '') +
+    `👤 Name: ${student.name}\n\n`;
+
+  const buildMarksSection = (title, map) => {
+    let sectionText = `📝 *${title}:*\n`;
+    let secTotal = 0;
+    let secRank = null;
+    
+    let plainMap = typeof map.toJSON === 'function' ? map.toJSON() : map;
+    
+    Object.entries(plainMap).forEach(([subj, mk]) => {
+      const lowerSubj = subj.toLowerCase().trim();
+      if (lowerSubj === 'rank') {
+        secRank = mk;
+      } else {
+        sectionText += `• ${subj}: ${mk}\n`;
+        secTotal += Number(mk);
+      }
+    });
+    
+    sectionText += `📈 *Total Score:* ${secTotal}\n`;
+    if (secRank !== null && secRank !== undefined && secRank !== '') {
+      sectionText += `🏆 *Rank:* ${secRank}\n`;
+    }
+    return sectionText + '\n';
+  };
+
+  // Stack them vertically based on what exists
+  if (hasMid1) {
+    messageText += buildMarksSection('Mid Exam 1', student.marks.mid1);
+  }
+  if (hasMid2) {
+    messageText += buildMarksSection('Mid Exam 2', student.marks.mid2);
+  }
+  if (hasModel) {
+    messageText += buildMarksSection('Model Exam', student.marks.model);
+  }
+
+  messageText += (optionalMessage ? `📢 *Admin Note:*\n${optionalMessage}\n\n` : '') +
     `Keep it up! 🎉\n` +
     `— Velammalitech Admin`;
 
