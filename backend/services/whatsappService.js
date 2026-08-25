@@ -1156,10 +1156,7 @@ class WhatsAppService {
       }
 
       if (!mediaItems || mediaItems.length === 0) {
-        await this.sendTextMessage(to,
-          `${emoji} *${title}*\n\n${description || 'Content for this section is being prepared. Please check back soon!'}`
-        );
-        return;
+        return this.sendFlowTextButton(to, `${emoji} *${title}*\n\n${description || 'Content for this section is being prepared. Please check back soon!'}`);
       }
 
       for (const item of mediaItems) {
@@ -1179,14 +1176,42 @@ class WhatsAppService {
         await new Promise(resolve => setTimeout(resolve, 600));
       }
 
-      await this.sendTextMessage(to, `${emoji} *${title}*\n\n${description || ''}`);
-      return;
+      return this.sendFlowTextButton(to, `${emoji} *${title}*\n\n${description || ''}`);
 
     } catch (err) {
       console.error(`Error fetching topic media for ${topicKey}:`, err.message);
       await this.sendTextMessage(to, '⚠️ Unable to load content right now. Please try again.');
       return;
     }
+  }
+
+  // ── Helper to send text with Main View Flow button ───────────────────────────
+  async sendFlowTextButton(to, text) {
+    const flowId = '1734231277814539';
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      type: 'interactive',
+      interactive: {
+        type: 'flow',
+        body: {
+          text: text
+        },
+        action: {
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'menu_flow_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Main View',
+            flow_action: 'navigate',
+            flow_action_payload: {
+              screen: 'MAIN_MENU_SCREEN'
+            }
+          }
+        }
+      }
+    });
   }
 
   async sendMoreOptionsMenu(to, prefixText = '') {
