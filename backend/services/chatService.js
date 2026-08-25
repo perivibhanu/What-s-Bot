@@ -83,18 +83,24 @@ class ChatService {
           } else if (payload.service) {
             const svc = payload.service;
             // Handle Mega List format: dept_exp_DEPTKEY_SUBTOPIC
-            if (svc.startsWith('dept_exp_') && svc.split('_').length === 4) {
+            if (svc.startsWith('dept_exp_')) {
               const parts = svc.split('_');
-              const deptKey = parts[2];
-              const subtopic = parts[3];
-              const deptMap = {
-                'aids': 'AI & DS', 'ece': 'ECE', 'cse': 'CSE', 'eee': 'EEE', 
-                'mech': 'Mechanical', 'mechatronics': 'Mechatronics', 'it': 'IT'
-              };
-              session.admissionStep = deptMap[deptKey] || 'Department';
-              messageText = `dept_exp_${subtopic}`;
-            } else {
-              messageText = svc;
+              if (parts.length >= 4) {
+                const deptKey = parts[2];
+                const subtopic = parts.slice(3).join('_');
+                const deptMap = {
+                  'aids': 'AI & DS', 'ece': 'ECE', 'cse': 'CSE', 'eee': 'EEE', 
+                  'mech': 'Mechanical', 'mechatronics': 'Mechatronics', 'it': 'IT'
+                };
+                if (deptMap[deptKey]) {
+                  session.admissionStep = deptMap[deptKey];
+                  messageText = `dept_exp_${subtopic}`;
+                } else {
+                  messageText = svc;
+                }
+              } else {
+                messageText = svc;
+              }
             }
           } else if (payload.action === 'submit_admission') {
             const name = payload.name || 'Student';
