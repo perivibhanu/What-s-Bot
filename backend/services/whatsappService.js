@@ -102,8 +102,7 @@ class WhatsAppService {
     
     const flowId = process.env.STUDENT_FLOW_ID || '1734231277814539';
 
-    // 1. The Welcome Image with Choose Service Flow button
-    await this.sendMessage(to, {
+    return this.sendMessage(to, {
       messaging_product: 'whatsapp',
       recipient_type: 'individual',
       type: 'interactive',
@@ -127,22 +126,6 @@ class WhatsAppService {
             flow_action: 'navigate',
             flow_action_payload: { screen: 'STUDENT_MENU_SCREEN' }
           }
-        }
-      }
-    });
-
-    // 2. Admission button message below it
-    return this.sendMessage(to, {
-      messaging_product: 'whatsapp',
-      recipient_type: 'individual',
-      type: 'interactive',
-      interactive: {
-        type: 'button',
-        body: { text: 'To apply for new sibling admissions, tap the button below:' },
-        action: {
-          buttons: [
-            { type: 'reply', reply: { id: 'adm_main', title: '📝 Admission Form' } }
-          ]
         }
       }
     });
@@ -175,63 +158,6 @@ class WhatsAppService {
             flow_action_payload: {
               screen: screenName
             }
-          }
-        }
-      }
-    });
-  }
-  async sendWardenWelcome(to, warden) {
-    const welcomeText = warden?.name 
-      ? `Welcome back, Warden ${warden.name} (${warden.block})! ✨\n\nPlease choose a service below to manage hostel operations:`
-      : `Welcome back, Warden! ✨\n\nPlease choose a service below to manage hostel operations:`;
-    
-    const flowId = process.env.WARDEN_FLOW_ID;
-    const screenName = 'WARDEN_MENU_SCREEN';
-
-    return this.sendMessage(to, {
-      messaging_product: 'whatsapp',
-      type: 'interactive',
-      interactive: {
-        type: 'flow',
-        body: { text: welcomeText },
-        action: {
-          name: 'flow',
-          parameters: {
-            flow_message_version: '3',
-            flow_token: 'warden_menu_' + Date.now(),
-            flow_id: flowId,
-            flow_cta: 'Warden Portal',
-            flow_action: 'navigate',
-            flow_action_payload: { screen: screenName }
-          }
-        }
-      }
-    });
-  }
-
-  async sendSecurityWelcome(to, guard) {
-    const welcomeText = guard?.name 
-      ? `Welcome, Officer ${guard.name}! 🛡️\nAssigned: ${guard.gateAssigned || 'Campus Gate'}\n\nPlease select an action below:`
-      : `Welcome, Security Officer! 🛡️\n\nPlease select an action below:`;
-    
-    const flowId = process.env.SECURITY_FLOW_ID;
-    const screenName = 'SECURITY_MENU_SCREEN';
-
-    return this.sendMessage(to, {
-      messaging_product: 'whatsapp',
-      type: 'interactive',
-      interactive: {
-        type: 'flow',
-        body: { text: welcomeText },
-        action: {
-          name: 'flow',
-          parameters: {
-            flow_message_version: '3',
-            flow_token: 'security_menu_' + Date.now(),
-            flow_id: flowId,
-            flow_cta: 'Security Portal',
-            flow_action: 'navigate',
-            flow_action_payload: { screen: screenName }
           }
         }
       }
@@ -633,48 +559,6 @@ class WhatsAppService {
               screen: 'MAIN_MENU_SCREEN'
             }
           }
-        }
-      }
-    });
-
-    // 2. Admission Flow button message
-    await this.sendMessage(to, {
-      messaging_product: 'whatsapp',
-      recipient_type: 'individual',
-      type: 'interactive',
-      interactive: {
-        type: 'button',
-        body: {
-          text: 'To apply for new admissions or check your status, tap the button below:'
-        },
-        action: {
-          buttons: [
-            {
-              type: 'reply',
-              reply: {
-                id: 'adm_main',
-                title: '📝 Admission Form'
-              }
-            }
-          ]
-        }
-      }
-    });
-
-    // 3. Language setting button
-    return this.sendMessage(to, {
-      messaging_product: 'whatsapp',
-      recipient_type: 'individual',
-      type: 'interactive',
-      interactive: {
-        type: 'button',
-        body: {
-          text: '> తెలుగు / English భాష కోసం TE టైప్ చేయండి'
-        },
-        action: {
-          buttons: [
-            { type: 'reply', reply: { id: 'btn_language', title: 'Language (TE)' } }
-          ]
         }
       }
     });
@@ -1372,8 +1256,8 @@ class WhatsAppService {
     });
   }
 
-  async sendDepartmentExploreMenu(to, deptName = 'Department') {
-    const text = 
+  async sendDepartmentExploreMenu(to, deptName = 'Department', prefixText = '') {
+    const text = prefixText +
       `Explore: ${deptName}\n\n` +
       `Discover career opportunities, research labs, achievements, and industry exposure in ${deptName}:\n\n` +
       `Choose an option below to learn more:`;

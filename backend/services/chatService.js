@@ -2,8 +2,6 @@ const ChatSession = require('../models/ChatSession');
 const Student = require('../models/Student');
 const Settings = require('../models/Settings');
 const AdmissionApplication = require('../models/AdmissionApplication');
-const Warden = require('../models/Warden');
-const SecurityGuard = require('../models/SecurityGuard');
 const whatsappService = require('./whatsappService');
 
 // ─── Normalize phone to digits only (for comparison) ─────────────────────────
@@ -206,48 +204,14 @@ class ChatService {
     const isGreeting = ['hi', 'hello', 'hey', 'start', 'hii', 'hai'].includes(msgLower);
     const isSwitchPortal = ['portal', 'choose portal', 'switch portal', 'change portal', 'categories', '0', 'switch_portal', 'btn_switch_portal'].includes(msgLower);
 
-    // ── Check if user is an already registered role when greeting or returning to main menu ─
+    // ── Check if user is an already registered student when greeting or returning to main menu ─
     if (isGreeting || ['menu', 'main menu', 'main_menu', 'back'].includes(msgLower)) {
-      const senderPhone = normalizePhone(from);
-
-      // Check Warden
-      let warden = null;
-      if (session.userType === 'warden' && session.wardenId) {
-        warden = await Warden.findById(session.wardenId);
-      }
-      if (!warden) {
-        warden = await Warden.findOne({ mobileNumber: { $regex: senderPhone + '$' } });
-      }
-      if (warden) {
-        session.userType = 'warden';
-        session.wardenId = warden._id;
-        session.currentState = 'warden_welcome';
-        await session.save();
-        return whatsappService.sendWardenWelcome(from, warden);
-      }
-
-      // Check Security
-      let guard = null;
-      if (session.userType === 'security' && session.securityId) {
-        guard = await SecurityGuard.findById(session.securityId);
-      }
-      if (!guard) {
-        guard = await SecurityGuard.findOne({ mobileNumber: { $regex: senderPhone + '$' } });
-      }
-      if (guard) {
-        session.userType = 'security';
-        session.securityId = guard._id;
-        session.currentState = 'security_welcome';
-        await session.save();
-        return whatsappService.sendSecurityWelcome(from, guard);
-      }
-
-      // Check Student
       let student = null;
       if (session.userType === 'student' && session.studentId) {
         student = await Student.findById(session.studentId);
       }
       if (!student) {
+        const senderPhone = normalizePhone(from);
         student = await Student.findOne({
           $or: [
             { contactDetails: { $regex: senderPhone + '$' } },
@@ -873,7 +837,8 @@ class ChatService {
       } else if (action.includes('sports')) {
         await whatsappService.sendTextMessage(from, `⚽ *${deptName} - Sports Champions*\n\n• Active student participation and trophies in university athletics and inter-college tournaments.`);
       } else if (action.includes('about')) {
-        await whatsappService.sendTextMessage(from, `ℹ️ *About ${deptName} Department*\n\n• Renowned for state-of-the-art facilities and experienced faculty.\n• Dedicated to empowering students with practical and theoretical excellence.\n\n🌐 *Learn More:* https://velammalitech.edu.in/departments`);
+        const aboutText = `ℹ️ *About ${deptName} Department*\n\n• Renowned for state-of-the-art facilities and experienced faculty.\n• Dedicated to empowering students with practical and theoretical excellence.\n\n🌐 *Learn More:* https://velammalitech.edu.in/departments\n\n`;
+        return whatsappService.sendDepartmentExploreMenu(from, deptName, aboutText);
       }
       return whatsappService.sendDepartmentExploreMenu(from, deptName);
     }
