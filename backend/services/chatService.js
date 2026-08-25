@@ -824,23 +824,23 @@ class ChatService {
     // ── STEP 3: Department-Specific Explore Options (Screenshot 2) ──
     if (action.startsWith('dept_exp_')) {
       const deptName = session.admissionStep || 'Department';
+      let prefixText = '';
       if (action.includes('placements')) {
-        await whatsappService.sendTextMessage(from, `💼 *${deptName} - Placement Records*\n\n• Excellent placement track record with top core & IT recruiters.\n• Dedicated domain training in ${deptName} technologies.\n\n🌐 *Apply for ${deptName}:* https://velammalitech.edu.in/admission`);
+        prefixText = `💼 *${deptName} - Placement Records*\n\n• Excellent placement track record with top core & IT recruiters.\n• Dedicated domain training in ${deptName} technologies.\n\n🌐 *Apply for ${deptName}:* https://velammalitech.edu.in/admission\n\n`;
       } else if (action.includes('projects')) {
-        await whatsappService.sendTextMessage(from, `🔬 *${deptName} - Research & Innovations*\n\n• Advanced laboratories, IoT/Robotics/AI setups, and student project incubators.\n• Ongoing student-led technical innovations.`);
+        prefixText = `🔬 *${deptName} - Research & Innovations*\n\n• Advanced laboratories, IoT/Robotics/AI setups, and student project incubators.\n• Ongoing student-led technical innovations.\n\n`;
       } else if (action.includes('academics')) {
-        await whatsappService.sendTextMessage(from, `📚 *${deptName} - Academic Excellence*\n\n• Industry-aligned curriculum, experienced professors, and practical lab focus.\n• 100% lab utilization & mentoring.`);
+        prefixText = `📚 *${deptName} - Academic Excellence*\n\n• Industry-aligned curriculum, experienced professors, and practical lab focus.\n• 100% lab utilization & mentoring.\n\n`;
       } else if (action.includes('achievements')) {
-        await whatsappService.sendTextMessage(from, `🏆 *${deptName} - Awards & Achievements*\n\n• Student symposium trophies, hackathon recognitions, and paper presentations.\n• National & state-level award winners.`);
+        prefixText = `🏆 *${deptName} - Awards & Achievements*\n\n• Student symposium trophies, hackathon recognitions, and paper presentations.\n• National & state-level award winners.\n\n`;
       } else if (action.includes('ind_visit')) {
-        await whatsappService.sendTextMessage(from, `🏭 *${deptName} - Industrial Visits & Exposure*\n\n• Regular industrial tours to leading tech companies, ISRO, BSNL, Hyundai, and R&D centers.\n• Real-world industry exposure for all students.`);
+        prefixText = `🏭 *${deptName} - Industrial Visits & Exposure*\n\n• Regular industrial tours to leading tech companies, ISRO, BSNL, Hyundai, and R&D centers.\n• Real-world industry exposure for all students.\n\n`;
       } else if (action.includes('sports')) {
-        await whatsappService.sendTextMessage(from, `⚽ *${deptName} - Sports Champions*\n\n• Active student participation and trophies in university athletics and inter-college tournaments.`);
+        prefixText = `⚽ *${deptName} - Sports Champions*\n\n• Active student participation and trophies in university athletics and inter-college tournaments.\n\n`;
       } else if (action.includes('about')) {
-        const aboutText = `ℹ️ *About ${deptName} Department*\n\n• Renowned for state-of-the-art facilities and experienced faculty.\n• Dedicated to empowering students with practical and theoretical excellence.\n\n🌐 *Learn More:* https://velammalitech.edu.in/departments\n\n`;
-        return whatsappService.sendDepartmentExploreMenu(from, deptName, aboutText);
+        prefixText = `ℹ️ *About ${deptName} Department*\n\n• Renowned for state-of-the-art facilities and experienced faculty.\n• Dedicated to empowering students with practical and theoretical excellence.\n\n🌐 *Learn More:* https://velammalitech.edu.in/departments\n\n`;
       }
-      return whatsappService.sendDepartmentExploreMenu(from, deptName);
+      return whatsappService.sendDepartmentExploreMenu(from, deptName, prefixText);
     }
 
     // ── STEP 2 -> STEP 3: Selecting a Department ──
