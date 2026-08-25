@@ -73,7 +73,20 @@ class ChatService {
           const payload = JSON.parse(interactive.nfm_reply.response_json || '{}');
           
           // Handle dynamic department drill-down Flow
-          if (payload.service === 'topic_dept' && payload.department && payload.subtopic) {
+          if (payload.dynamic_menu) {
+            if (payload.category === 'college') {
+              messageText = payload.topic;
+            } else {
+              const deptMap = {
+                'aids': 'AI & DS', 'ece': 'ECE', 'cse': 'CSE', 'eee': 'EEE', 
+                'mech': 'Mechanical', 'mechatronics': 'Mechatronics', 'it': 'IT'
+              };
+              if (deptMap[payload.category]) {
+                session.admissionStep = deptMap[payload.category];
+                messageText = `dept_exp_${payload.category}_${payload.topic}`;
+              }
+            }
+          } else if (payload.service === 'topic_dept' && payload.department && payload.subtopic) {
             session.admissionStep = payload.department;
             messageText = `dept_exp_${payload.subtopic}`;
           } else if (payload.student_service) {
