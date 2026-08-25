@@ -1156,15 +1156,10 @@ class WhatsAppService {
       }
 
       if (!mediaItems || mediaItems.length === 0) {
-        const textContent = `${emoji} *${title}*\n\n${description || 'Content for this section is being prepared. Please check back soon!'}`;
-        
-        if (isMainDeptInfo) {
-          return this.sendDeptMoreOptionsMenu(to, parts[1].toUpperCase(), parts[1], textContent + '\n\n');
-        }
-        if (isDeptSubtopic) {
-          return this.sendDeptMoreOptionsMenu(to, parts[1].toUpperCase(), parts[1], textContent + '\n\n');
-        }
-        return this.sendMoreOptionsMenu(to, textContent);
+        await this.sendTextMessage(to,
+          `${emoji} *${title}*\n\n${description || 'Content for this section is being prepared. Please check back soon!'}`
+        );
+        return;
       }
 
       for (const item of mediaItems) {
@@ -1184,23 +1179,14 @@ class WhatsAppService {
         await new Promise(resolve => setTimeout(resolve, 600));
       }
 
-      const textContent = `${emoji} *${title}*\n\n${description || ''}`;
+      await this.sendTextMessage(to, `${emoji} *${title}*\n\n${description || ''}`);
+      return;
 
     } catch (err) {
       console.error(`Error fetching topic media for ${topicKey}:`, err.message);
       await this.sendTextMessage(to, '⚠️ Unable to load content right now. Please try again.');
       return;
     }
-
-    if (isMainDeptInfo) {
-      return this.sendDeptMoreOptionsMenu(to, parts[1].toUpperCase(), parts[1], textContent + '\n\n');
-    }
-    if (isDeptSubtopic) {
-      return this.sendDeptMoreOptionsMenu(to, parts[1].toUpperCase(), parts[1], textContent + '\n\n');
-    }
-
-    // For subtopics and general topics, offer Back and Main Menu
-    return this.sendMoreOptionsMenu(to, textContent);
   }
 
   async sendMoreOptionsMenu(to, prefixText = '') {

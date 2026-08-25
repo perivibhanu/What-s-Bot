@@ -829,24 +829,10 @@ class ChatService {
 
     // ── STEP 3: Department-Specific Explore Options (Screenshot 2) ──
     if (action.startsWith('dept_exp_')) {
-      const deptName = session.admissionStep || 'Department';
-      let prefixText = '';
-      if (action.includes('placements')) {
-        prefixText = `💼 *${deptName} - Placement Records*\n\n• Excellent placement track record with top core & IT recruiters.\n• Dedicated domain training in ${deptName} technologies.\n\n🌐 *Apply for ${deptName}:* https://velammalitech.edu.in/admission\n\n`;
-      } else if (action.includes('projects')) {
-        prefixText = `🔬 *${deptName} - Research & Innovations*\n\n• Advanced laboratories, IoT/Robotics/AI setups, and student project incubators.\n• Ongoing student-led technical innovations.\n\n`;
-      } else if (action.includes('academics')) {
-        prefixText = `📚 *${deptName} - Academic Excellence*\n\n• Industry-aligned curriculum, experienced professors, and practical lab focus.\n• 100% lab utilization & mentoring.\n\n`;
-      } else if (action.includes('achievements')) {
-        prefixText = `🏆 *${deptName} - Awards & Achievements*\n\n• Student symposium trophies, hackathon recognitions, and paper presentations.\n• National & state-level award winners.\n\n`;
-      } else if (action.includes('ind_visit')) {
-        prefixText = `🏭 *${deptName} - Industrial Visits & Exposure*\n\n• Regular industrial tours to leading tech companies, ISRO, BSNL, Hyundai, and R&D centers.\n• Real-world industry exposure for all students.\n\n`;
-      } else if (action.includes('sports')) {
-        prefixText = `⚽ *${deptName} - Sports Champions*\n\n• Active student participation and trophies in university athletics and inter-college tournaments.\n\n`;
-      } else if (action.includes('about')) {
-        prefixText = `ℹ️ *About ${deptName} Department*\n\n• Renowned for state-of-the-art facilities and experienced faculty.\n• Dedicated to empowering students with practical and theoretical excellence.\n\n🌐 *Learn More:* https://velammalitech.edu.in/departments\n\n`;
-      }
-      return whatsappService.sendDepartmentExploreMenu(from, deptName, prefixText);
+      session.currentState = 'about_topic';
+      session.currentTopic = action;
+      await session.save();
+      return whatsappService.sendCollegeTopicMedia(from, action);
     }
 
     // ── STEP 2 -> STEP 3: Selecting a Department ──
