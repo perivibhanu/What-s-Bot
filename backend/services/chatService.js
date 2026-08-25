@@ -107,13 +107,17 @@ class ChatService {
                 };
                 if (deptMap[deptKey]) {
                   session.admissionStep = deptMap[deptKey];
-                  messageText = `dept_exp_${subtopic}`;
+                  // Preserve the full service ID (e.g., dept_exp_ece_placements) 
+                  // so the DB can fetch the department-specific record.
+                  messageText = svc;
                 } else {
                   messageText = svc;
                 }
               } else {
                 messageText = svc;
               }
+            } else {
+              messageText = svc;
             }
           } else if (payload.action === 'submit_admission') {
             const name = payload.name || 'Student';
