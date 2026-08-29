@@ -456,9 +456,10 @@ function CollegeMedia() {
     setTopics(prev => prev.map(t => t.topic === updated.topic ? updated : t));
 
   const introTopic  = topics.find(t => t.topic === 'intro');
+  const adminTopic  = topics.find(t => t.topic === 'admin_details');
   const subDepts    = topics.filter(t => t.topic.startsWith('dept_'));
   const otherTopics = topics.filter(t =>
-    t.topic !== 'intro' && t.topic !== 'dept' && !t.topic.startsWith('dept_')
+    t.topic !== 'intro' && t.topic !== 'admin_details' && t.topic !== 'dept' && !t.topic.startsWith('dept_')
   );
 
   if (loading) return (
@@ -489,7 +490,12 @@ function CollegeMedia() {
         {/* College Overview */}
         {introTopic && <IntroCard topic={introTopic} onUpdate={handleUpdate} />}
 
-
+        {/* Admin Contacts */}
+        <p className="cm-section-title" style={{ marginTop: 36 }}>📞 Admin Contacts</p>
+        <p style={{ color: 'gray', fontSize: '0.85rem', marginBottom: '1rem', padding: '0 10px' }}>
+          Update the contact numbers shown in the bot here. Just type them in the description box and save!
+        </p>
+        {adminTopic && <TopicCard topic={adminTopic} onUpdate={handleUpdate} />}
 
         {/* Other Topics */}
         <p className="cm-section-title" style={{ marginTop: 36 }}>📋 Other College Topics</p>

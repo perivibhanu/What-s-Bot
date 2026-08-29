@@ -5,7 +5,7 @@ const fs = require('fs');
 // ─── Default topic definitions ─────────────────────────────────────────────────
 const DEFAULT_TOPICS = [
   { topic: 'intro',              title: 'About College',        emoji: '🏫', order: 0 },
-  { topic: 'dept',               title: 'Departments',          emoji: '🏛️', order: 1 },
+  { topic: 'admin_details',      title: 'Admin Contacts',       emoji: '📞', order: 1 },
   // ── Sub-departments ──────────────────────────────────────────────────────────
   { topic: 'dept_aids',          title: 'AIDS',                 emoji: '🤖', order: 2 },
   { topic: 'dept_cse',           title: 'CSE',                  emoji: '💻', order: 3 },
