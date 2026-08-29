@@ -489,9 +489,7 @@ function CollegeMedia() {
         {/* College Overview */}
         {introTopic && <IntroCard topic={introTopic} onUpdate={handleUpdate} />}
 
-        {/* Departments — drill-down */}
-        <p className="cm-section-title">🏛️ Departments</p>
-        <DeptSection subDepts={subDepts} onUpdate={handleUpdate} />
+
 
         {/* Other Topics */}
         <p className="cm-section-title" style={{ marginTop: 36 }}>📋 Other College Topics</p>

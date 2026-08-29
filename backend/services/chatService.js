@@ -607,6 +607,16 @@ class ChatService {
           session.currentState = 'visitor_welcome';
           return whatsappService.sendCollegeTopicMedia(from, 'intro');
         }
+        if (msgLower === 'admin_details') {
+          session.currentState = 'visitor_welcome';
+          return whatsappService.sendFlowTextButton(from, 
+            "📞 *Admin Contacts*\n\n" +
+            "👨‍💼 *Principal:* +91 9876543210\n" +
+            "💼 *Placement Officer:* +91 8765432109\n" +
+            "📋 *Admission Panel:* +91 7654321098\n\n" +
+            "Please feel free to contact us during working hours (9 AM - 5 PM)."
+          );
+        }
         if (msgLower === 'admission_start' || msgLower === 'admission') {
           session.currentState = 'admission_welcome';
           session.admissionStep = '';
