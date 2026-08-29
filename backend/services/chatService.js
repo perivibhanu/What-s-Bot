@@ -604,8 +604,8 @@ class ChatService {
           );
         }
         if (msgLower === 'about_college') {
-          session.currentState = 'about_college';
-          return whatsappService.sendAboutCollegeDetails(from);
+          session.currentState = 'visitor_welcome';
+          return whatsappService.sendCollegeTopicMedia(from, 'intro');
         }
         if (msgLower === 'admission_start' || msgLower === 'admission') {
           session.currentState = 'admission_welcome';
@@ -656,7 +656,7 @@ class ChatService {
           session.currentState = 'visitor_welcome';
           return whatsappService.sendMasterCategoryMenu(from);
         }
-        return whatsappService.sendAboutCollegeDetails(from);
+        return whatsappService.sendCollegeTopicMedia(from, 'intro');
 
       case 'about_dept':
         if (msgLower === 'student_login') {

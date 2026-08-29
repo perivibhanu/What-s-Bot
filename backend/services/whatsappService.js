@@ -1009,57 +1009,7 @@ class WhatsAppService {
     });
   }
 
-  // ── About College — send intro video/images then show 2-button menu ──────────
-  async sendAboutCollegeDetails(to) {
-    try {
-      const CollegeMedia = require('../models/CollegeMedia');
-      const intro = await CollegeMedia.findOne({ topic: 'intro' });
 
-      if (intro && intro.introVideoUrl) {
-        await this.sendMessage(to, {
-          messaging_product: 'whatsapp',
-          type: 'video',
-          video: {
-            link: intro.introVideoUrl,
-            caption: '🎓 *Velammal Institute of Technology*\n\nExplore our world-class facilities and vibrant campus life!'
-          }
-        });
-        await new Promise(resolve => setTimeout(resolve, 800));
-      }
-
-      if (intro && intro.mediaItems && intro.mediaItems.length > 0) {
-        for (const item of intro.mediaItems.slice(0, 3)) {
-          if (item.type === 'image') {
-            await this.sendMessage(to, {
-              messaging_product: 'whatsapp',
-              type: 'image',
-              image: { link: item.url, caption: item.caption || '🏫 Velammal Institute of Technology Campus' }
-            });
-            await new Promise(resolve => setTimeout(resolve, 400));
-          }
-        }
-      }
-    } catch (err) {
-      console.error('Error fetching intro media:', err.message);
-    }
-
-    return this.sendMessage(to, {
-      messaging_product: 'whatsapp',
-      type: 'interactive',
-      interactive: {
-        type: 'button',
-        body: {
-          text: 'Would you like to explore more about our college?'
-        },
-        action: {
-          buttons: [
-            { type: 'reply', reply: { id: 'more_options', title: 'More Options' } },
-            { type: 'reply', reply: { id: 'back_to_main', title: 'Back' } }
-          ]
-        }
-      }
-    });
-  }
 
   // ── More Options Menu — shows 9 topics (excluding Departments) ───────────────
   async sendMoreOptionsMenu(to) {
@@ -1142,14 +1092,14 @@ class WhatsAppService {
 
       const { title, emoji, description, mediaItems } = topic;
 
-      // Ensure intro video is sent if available for main dept info
-      if (isMainDeptInfo && topic.introVideoUrl) {
+      // Ensure intro video is sent if available
+      if (topic.introVideoUrl) {
         await this.sendMessage(to, {
           messaging_product: 'whatsapp',
           type: 'video',
           video: {
             link: topic.introVideoUrl,
-            caption: `🏛️ *${title}*\n\nExplore our department!`
+            caption: `🏛️ *${title}*\n\nExplore!`
           }
         });
         await new Promise(resolve => setTimeout(resolve, 800));
