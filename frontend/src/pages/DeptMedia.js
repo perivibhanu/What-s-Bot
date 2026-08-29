@@ -191,6 +191,17 @@ function DeptMedia() {
 
   const [topic, setTopic] = useState(null);
   const [subtopics, setSubtopics] = useState([]);
+
+  if (!dept) {
+    return (
+      <DeptLayout>
+        <div style={{ color: 'white', padding: '3rem', textAlign: 'center' }}>
+          <h2>⚠️ Access Denied</h2>
+          <p>You are logged in as the Main Admin. Please log out and log in as a <b>Department Admin</b> to edit department media.</p>
+        </div>
+      </DeptLayout>
+    );
+  }
   
   const [introVideoUrl, setIntroVideoUrl] = useState('');
   const [description, setDesc] = useState('');
