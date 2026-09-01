@@ -1081,7 +1081,7 @@ class WhatsAppService {
 
     try {
       const CollegeMedia = require('../models/CollegeMedia');
-      const topic = await CollegeMedia.findOne({ topic: { $regex: new RegExp(`^${topicKey}$`, 'i') } });
+      const topic = await CollegeMedia.findOne({ topic: new RegExp('^' + topicKey + '$', 'i') });
 
       if (!topic) {
         await this.sendTextMessage(to, '⚠️ Information for this topic is coming soon. Please check back later!');
