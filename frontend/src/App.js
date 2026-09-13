@@ -104,7 +104,7 @@ function App() {
         <Route path="/security-guards" element={<PrivateRoute><SecurityGuards /></PrivateRoute>} />
         <Route path="/drivers" element={<PrivateRoute><Drivers /></PrivateRoute>} />
         <Route path="/admissions/:id" element={<PrivateRoute><ApplicationForm /></PrivateRoute>} />
-        <Route path="/attendance" element={<PrivateRoute><AttendanceReports /></PrivateRoute>} />
+        <Route path="/attendance-reports" element={<PrivateRoute><AttendanceReports /></PrivateRoute>} />
         <Route path="/fee-defaulters" element={<PrivateRoute><FeeDefaulters /></PrivateRoute>} />
         <Route path="/staff-messages" element={<PrivateRoute><StaffMessages /></PrivateRoute>} />
 

@@ -44,7 +44,7 @@ function Layout({ children }) {
             <Link to="/students" className={`menu-item ${isActive('/students')}`}>
               👥 All Students
             </Link>
-            <Link to="/attendance" className={`menu-item ${isActive('/attendance')}`}>
+            <Link to="/attendance-reports" className={`menu-item ${isActive('/attendance-reports')}`}>
               📅 Attendance Reports
             </Link>
           </div>

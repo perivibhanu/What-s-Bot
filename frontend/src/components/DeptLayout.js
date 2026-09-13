@@ -52,7 +52,7 @@ function DeptLayout({ children }) {
             <Link to="/timetables" className={`menu-item ${isActive('/timetables')}`}>
               🕐 Upload Timetables
             </Link>
-            <Link to="/attendance" className={`menu-item ${isActive('/attendance')}`}>
+            <Link to="/attendance-reports" className={`menu-item ${isActive('/attendance-reports')}`}>
               📅 Attendance Reports
             </Link>
           </div>
