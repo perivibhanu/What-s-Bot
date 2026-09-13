@@ -122,15 +122,15 @@ exports.handleFlowEndpoint = async (req, res) => {
         
         // Fetch students from MongoDB (broad case-insensitive matching)
         const query = {
-          branch: new RegExp(department, 'i'), 
-          section: new RegExp(section.replace('Section ', '').trim(), 'i')
+          branch: { $regex: department, $options: 'i' }, 
+          section: { $regex: section.replace('Section ', '').trim(), $options: 'i' }
         };
 
         // If the frontend sends a batch year (e.g. "2023" or "23"), filter by the 5th and 6th digits of regNumber
         if (year) {
           const shortYear = String(year).slice(-2);
           if (/^\d{2}$/.test(shortYear)) {
-            query.regNumber = new RegExp(`^\\d{4}${shortYear}\\d+`, 'i');
+            query.regNumber = { $regex: `^\\d{4}${shortYear}\\d+`, $options: 'i' };
           }
         }
 
@@ -144,6 +144,17 @@ exports.handleFlowEndpoint = async (req, res) => {
             title: `${last3} - ${s.name}`
           };
         });
+
+        if (students.length === 0) {
+          studentChecklist.push({
+            id: 'debug',
+            title: `DEBUG: dept=${department}, sec=${section}, yr=${year}`
+          });
+          studentChecklist.push({
+            id: 'debug2',
+            title: `Q: ${JSON.stringify(query)}`
+          });
+        }
 
         // Add the "0 Absentees" fallback option at the top
         studentChecklist.unshift({
