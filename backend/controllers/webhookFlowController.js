@@ -33,7 +33,7 @@ const decryptRequest = (body, privateKeyStr) => {
   const authTag = flowDataBuffer.slice(flowDataBuffer.length - 16);
   const cipherText = flowDataBuffer.slice(0, flowDataBuffer.length - 16);
 
-  const decipher = crypto.createDecipheriv('aes-256-gcm', decryptedAesKey, ivBuffer);
+  const decipher = crypto.createDecipheriv('aes-128-gcm', decryptedAesKey, ivBuffer);
   decipher.setAuthTag(authTag);
   
   let decryptedData = decipher.update(cipherText, 'binary', 'utf8');
@@ -71,7 +71,7 @@ const encryptResponseCorrectly = (responseObj, aesKeyBuffer, initialVectorBuffer
     const flippedIvStr = initialVectorBuffer.toString('base64').split('').reverse().join('');
     const newIvBuffer = Buffer.from(flippedIvStr, 'base64');
 
-    const cipher = crypto.createCipheriv('aes-256-gcm', aesKeyBuffer, newIvBuffer);
+    const cipher = crypto.createCipheriv('aes-128-gcm', aesKeyBuffer, newIvBuffer);
     
     // 2. Encrypt JSON response
     const cipherText = Buffer.concat([
