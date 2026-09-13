@@ -124,10 +124,13 @@ class ChatService {
             const phone = payload.phone || '';
             const cutoff = payload.cutoff || '';
             const dept = payload.department || '';
-            await whatsappService.sendTextMessage(from, `✅ *Admission Application Received!*\\n\\nThank you, *${name}*. We have received your application for *${dept}* with a cutoff of *${cutoff}*.\\n\\nOur admission team will contact you shortly at ${phone}.`);
+            await whatsappService.sendTextMessage(from, `✅ *Admission Application Received!*\n\nThank you, *${name}*. We have received your application for *${dept}* with a cutoff of *${cutoff}*.\n\nOur admission team will contact you shortly at ${phone}.`);
             return;
           } else if (payload.reg_number) {
             messageText = payload.reg_number;
+          } else {
+            // DEBUG ECHO
+            await whatsappService.sendTextMessage(from, `🤖 DEBUG: Received Flow Payload but didn't know how to handle it. Payload: ${JSON.stringify(payload)}`);
           }
         } catch (e) {
           console.error('Error parsing NFM reply:', e);
