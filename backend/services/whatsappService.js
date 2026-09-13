@@ -317,7 +317,7 @@ class WhatsAppService {
       ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${staffName}, please choose your preferred staff service below:`
       : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred staff service below:`;
     
-    const flowId = process.env.STAFF_FLOW_ID || '1734231277814539';
+    const flowId = process.env.ATTENDANCE_FLOW_ID || '1401612644638227';
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
       type: 'interactive',
