@@ -120,11 +120,11 @@ exports.handleFlowEndpoint = async (req, res) => {
       if (screen === 'SELECTION_SCREEN' && data.type === 'fetch_students') {
         const { department, year, section } = data;
         
-        // Fetch students from MongoDB
+        // Fetch students from MongoDB (case-insensitive)
         const students = await Student.find({ 
-          branch: department, 
-          year: year, 
-          section: section 
+          branch: new RegExp('^' + department + '$', 'i'), 
+          year: new RegExp('^' + year + '$', 'i'), 
+          section: new RegExp('^' + section + '$', 'i') 
         }).sort('regNumber');
 
         // Build checklist array
