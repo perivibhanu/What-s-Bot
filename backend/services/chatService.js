@@ -251,10 +251,6 @@ class ChatService {
         await session.save();
         return whatsappService.sendRegisteredWelcome(from, student);
       }
-
-      session.currentState = 'visitor_welcome';
-      await session.save();
-      return whatsappService.sendMasterCategoryMenu(from);
     }
 
     if (isSwitchPortal) {
