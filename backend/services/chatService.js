@@ -740,8 +740,9 @@ class ChatService {
       }
 
       default:
-        // Unknown input → re-show staff menu
-        return whatsappService.sendStaffWelcome(from, staffMember.name);
+        // DEBUG ECHO
+        return whatsappService.sendTextMessage(from, `🤖 DEBUG: The action received was "${action}". Please tell the developer to add this exact spelling!`);
+        // return whatsappService.sendStaffWelcome(from, staffMember.name);
     }
   }
 
