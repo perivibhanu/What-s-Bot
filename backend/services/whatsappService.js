@@ -317,7 +317,7 @@ class WhatsAppService {
       ? `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nHello ${staffName}, please choose your preferred staff service below:`
       : `Welcome to Velammal Institute of Technology citizen helper on Whatsapp.\n\nPlease choose your preferred staff service below:`;
     
-    const flowId = process.env.ATTENDANCE_FLOW_ID || '1401612644638227';
+    const flowId = process.env.STAFF_FLOW_ID || '1071356722041304';
     return this.sendMessage(to, {
       messaging_product: 'whatsapp',
       type: 'interactive',
@@ -331,6 +331,29 @@ class WhatsAppService {
             flow_token: 'staff_menu_' + Date.now(),
             flow_id: flowId,
             flow_cta: 'Staff Portal',
+            flow_action: 'navigate',
+            flow_action_payload: { screen: 'STAFF_MENU_SCREEN' }
+          }
+        }
+      }
+    });
+  }
+
+  async sendStaffAttendanceFlow(to) {
+    const flowId = process.env.ATTENDANCE_FLOW_ID || '1401612644638227';
+    return this.sendMessage(to, {
+      messaging_product: 'whatsapp',
+      type: 'interactive',
+      interactive: {
+        type: 'flow',
+        body: { text: 'Please tap the button below to open the Attendance Monitoring portal.' },
+        action: {
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: 'attendance_menu_' + Date.now(),
+            flow_id: flowId,
+            flow_cta: 'Submit Attendance',
             flow_action: 'navigate',
             flow_action_payload: { screen: 'SELECTION_SCREEN' }
           }

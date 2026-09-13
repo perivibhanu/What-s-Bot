@@ -730,6 +730,10 @@ class ChatService {
         return whatsappService.sendLatestCirculars(from, circulars);
       }
 
+      case 'submit_attendance': {
+        return whatsappService.sendStaffAttendanceFlow(from);
+      }
+
       default:
         // Unknown input → re-show staff menu
         return whatsappService.sendStaffWelcome(from, staffMember.name);
