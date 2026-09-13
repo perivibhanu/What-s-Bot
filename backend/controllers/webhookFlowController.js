@@ -9,9 +9,9 @@ const PRIVATE_KEY = process.env.FLOW_PRIVATE_KEY;
 // Decrypt request from Meta
 const decryptRequest = (body, privateKeyStr) => {
   const { encrypted_aes_key, encrypted_flow_data, initial_vector } = body;
-
+  const cleanKey = privateKeyStr.replace(/\\n/g, '\n').replace(/^"|"$/g, '').trim();
   const privateKey = crypto.createPrivateKey({
-    key: privateKeyStr.replace(/\\n/g, '\n'),
+    key: cleanKey,
     format: 'pem',
   });
 
