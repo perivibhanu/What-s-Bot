@@ -733,7 +733,9 @@ class ChatService {
         return whatsappService.sendLatestCirculars(from, circulars);
       }
 
-      case 'submit_attendance': {
+      case 'submit_attendance':
+      case 'submit attendance':
+      case 'attendance': {
         return whatsappService.sendStaffAttendanceFlow(from);
       }
 
