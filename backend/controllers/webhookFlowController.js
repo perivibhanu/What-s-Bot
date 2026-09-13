@@ -67,9 +67,8 @@ const encryptResponse = (responseObj, aesKeyBuffer, initialVectorBuffer) => {
 
 // Fallback for when we want to handle the response completely without encryption just for testing? No, Meta requires it.
 const encryptResponseCorrectly = (responseObj, aesKeyBuffer, initialVectorBuffer) => {
-    // 1. Flip IV string
-    const flippedIvStr = initialVectorBuffer.toString('base64').split('').reverse().join('');
-    const newIvBuffer = Buffer.from(flippedIvStr, 'base64');
+    // 1. Flip IV bytes
+    const newIvBuffer = Buffer.from(initialVectorBuffer).reverse();
 
     const cipher = crypto.createCipheriv('aes-128-gcm', aesKeyBuffer, newIvBuffer);
     
