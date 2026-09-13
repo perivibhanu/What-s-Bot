@@ -121,10 +121,20 @@ exports.handleFlowEndpoint = async (req, res) => {
         const { department, year, section } = data;
         
         // Fetch students from MongoDB (broad case-insensitive matching)
-        const students = await Student.find({ 
+        const query = {
           branch: new RegExp(department, 'i'), 
           section: new RegExp(section.replace('Section ', '').trim(), 'i')
-        }).sort('regNumber');
+        };
+
+        // If the frontend sends a batch year (e.g. "2023" or "23"), filter by the 5th and 6th digits of regNumber
+        if (year) {
+          const shortYear = String(year).slice(-2);
+          if (/^\d{2}$/.test(shortYear)) {
+            query.regNumber = new RegExp(`^\\d{4}${shortYear}\\d+`, 'i');
+          }
+        }
+
+        const students = await Student.find(query).sort('regNumber');
 
         // Build checklist array
         const studentChecklist = students.map(s => {
