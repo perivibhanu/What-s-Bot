@@ -24,6 +24,7 @@ import StaffMessages from './pages/StaffMessages';
 import DeptMedia from './pages/DeptMedia';
 import Admissions from './pages/Admissions';
 import ApplicationForm from './pages/ApplicationForm';
+import AttendanceReports from './pages/AttendanceReports';
 import FeeDefaulters from './pages/FeeDefaulters';
 import HostelFeedback from './pages/HostelFeedback';
 import HostelWardens from './pages/HostelWardens';
@@ -102,6 +103,9 @@ function App() {
         <Route path="/hostel-wardens" element={<PrivateRoute><HostelWardens /></PrivateRoute>} />
         <Route path="/security-guards" element={<PrivateRoute><SecurityGuards /></PrivateRoute>} />
         <Route path="/drivers" element={<PrivateRoute><Drivers /></PrivateRoute>} />
+        <Route path="/admissions/:id" element={<PrivateRoute><ApplicationForm /></PrivateRoute>} />
+        <Route path="/attendance" element={<PrivateRoute><AttendanceReports /></PrivateRoute>} />
+        <Route path="/fee-defaulters" element={<PrivateRoute><FeeDefaulters /></PrivateRoute>} />
         <Route path="/staff-messages" element={<PrivateRoute><StaffMessages /></PrivateRoute>} />
 
         {/* Super Admin Routes */}

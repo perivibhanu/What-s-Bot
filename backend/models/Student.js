@@ -4,6 +4,7 @@ const studentSchema = new mongoose.Schema({
   regNumber: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   branch: { type: String, required: true },
+  year: { type: String, required: true, default: 'I' },
   section: { type: String, required: true },
   phoneNumber: { type: String },
   parentPhoneNumber: { type: String },

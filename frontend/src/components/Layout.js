@@ -47,6 +47,13 @@ function Layout({ children }) {
           </div>
 
           <div className="menu-group">
+            <h4 className="group-title">📚 ACADEMICS</h4>
+            <Link to="/attendance" className={`menu-item ${isActive('/attendance')}`}>
+              📅 Attendance Reports
+            </Link>
+          </div>
+
+          <div className="menu-group">
             <h4 className="group-title">📋 ADMISSIONS</h4>
             <Link to="/admissions" className={`menu-item ${isActive('/admissions')}`}>
               📝 Applications

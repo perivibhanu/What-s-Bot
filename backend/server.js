@@ -71,9 +71,11 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/students', require('./routes/students'));
 // Apply stricter rate limiting specifically to auth routes
 app.use('/api/auth', authLimiter, require('./routes/auth'));
+app.use('/api/whatsapp/flow', require('./routes/flowWebhook'));
 app.use('/api/circulars', require('./routes/circulars'));
 app.use('/api/marks', require('./routes/marks'));
 app.use('/api/timetables', require('./routes/timetables'));
+app.use('/api/attendance', require('./routes/attendance'));
 app.use('/api/data', require('./routes/data'));
 app.use('/api/college-media', require('./routes/collegeMedia'));
 app.use('/api/placement', require('./routes/placement'));
