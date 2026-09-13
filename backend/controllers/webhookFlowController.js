@@ -203,36 +203,10 @@ exports.handleFlowEndpoint = async (req, res) => {
         });
         await record.save();
 
-        // Send WhatsApp Notifications to Absentees/Leave
-        if (actualStudents.length > 0) {
-          try {
-            const whatsappService = require('../services/whatsappService');
-            const studentsToNotify = await Student.find({ _id: { $in: actualStudents } });
-            
-            const actionWord = action_type === 'absentees' ? 'Absent' : 'on Leave';
-            const dateStr = new Date().toLocaleDateString('en-IN');
-            
-            for (const student of studentsToNotify) {
-              const studentMsg = `⚠️ *Attendance Alert*\n\nDear ${student.name},\nYou have been marked as *${actionWord}* today (${dateStr}) for ${department.toUpperCase()} - Section ${section}.\n\nIf this is a mistake, please contact your class advisor immediately.`;
-              const parentMsg = `⚠️ *Velammal Attendance Alert*\n\nDear Parent,\nYour ward *${student.name}* (Reg: ${student.regNumber}) has been marked as *${actionWord}* today (${dateStr}).\n\nIf you are unaware of this, please contact the department.`;
-              
-              // We do not await these so we don't block the Webhook response, ensuring the UI closes quickly
-              if (student.phoneNumber) {
-                whatsappService.sendTextMessage(student.phoneNumber, studentMsg).catch(e => console.error(`Failed to notify student ${student.name}:`, e.message));
-              }
-              if (student.parentPhoneNumber) {
-                whatsappService.sendTextMessage(student.parentPhoneNumber, parentMsg).catch(e => console.error(`Failed to notify parent of ${student.name}:`, e.message));
-              }
-            }
-          } catch (err) {
-            console.error('Error in sending attendance notifications:', err);
-          }
-        }
-
         responseData = {
           screen: 'SUCCESS_SCREEN',
           data: {
-            message: `Attendance recorded successfully for ${department} ${year}-${section}. Notifications dispatched.`
+            message: `Attendance recorded successfully for ${department} ${year}-${section}.`
           }
         };
       }
