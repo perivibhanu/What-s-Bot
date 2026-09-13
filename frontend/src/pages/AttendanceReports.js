@@ -93,21 +93,30 @@ function AttendanceReports() {
     return 'Other';
   };
 
+  // Calculate batch-level totals
+  const batchTotals = {};
+
   records.forEach(r => {
-    const y = mapYear(r.year);
-    if (grouped[y]) {
-      grouped[y].push(r);
-    } else {
-      if (!grouped['Other']) grouped['Other'] = [];
-      grouped['Other'].push(r);
-    }
+    let y = mapYear(r.year);
+    if (y === 'IV') y = '22';
+    else if (y === 'III') y = '23';
+    else if (y === 'II') y = '24';
+    else if (y === 'I') y = '25';
+
+    if (!grouped[y]) grouped[y] = [];
+    grouped[y].push(r);
+
+    if (!batchTotals[y]) batchTotals[y] = { absentees: 0, leave: 0 };
+    batchTotals[y].absentees += (r.absentees?.length || 0);
+    batchTotals[y].leave += (r.leave?.length || 0);
+
     totalAbsentees += (r.absentees?.length || 0);
     totalLeave += (r.leave?.length || 0);
   });
 
-  // Sort sections alphabetically within each year
-  Object.keys(grouped).forEach(year => {
-    grouped[year].sort((a, b) => a.section.localeCompare(b.section));
+  // Sort sections alphabetically within each batch
+  Object.keys(grouped).forEach(batch => {
+    grouped[batch].sort((a, b) => a.section.localeCompare(b.section));
   });
 
   return (
@@ -166,47 +175,51 @@ function AttendanceReports() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            {/* Display grouped data */}
-            {['I', 'II', 'III', 'IV', 'Other'].map(year => {
-              const yearRecords = grouped[year];
-              if (!yearRecords || yearRecords.length === 0) return null;
+            {/* Display grouped data by Batch */}
+            {['22', '23', '24', '25', 'Other'].map(batch => {
+              const batchRecords = grouped[batch];
+              if (!batchRecords || batchRecords.length === 0) return null;
+
+              const totals = batchTotals[batch];
+              const batchLabel = batch === 'Other' ? 'Other Years' : `Batch ${batch}`;
 
               return (
-                <div key={year} className="table-container" style={{ padding: '1.5rem', marginBottom: 0 }}>
+                <div key={batch} className="table-container" style={{ padding: '1.5rem', marginBottom: 0 }}>
                   <h2 style={{ borderBottom: '2px solid #e5e7eb', paddingBottom: '0.5rem', marginBottom: '1rem', color: '#111827' }}>
-                    Year: {year}
+                    {batchLabel}
                   </h2>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                    {yearRecords.map(record => (
-                      <div key={record._id} style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '1rem', backgroundColor: '#f9fafb' }}>
+                  
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'stretch' }}>
+                    
+                    {/* Section Cards */}
+                    {batchRecords.map(record => (
+                      <div key={record._id} style={{ flex: '1 1 250px', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '1rem', backgroundColor: '#f9fafb' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                           <h3 style={{ margin: 0, color: '#374151' }}>Section {record.section}</h3>
                           <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>By: {record.recordedBy}</span>
                         </div>
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                          {/* Absentees */}
                           <div style={{ backgroundColor: '#fee2e2', padding: '8px', borderRadius: '6px' }}>
                             <strong style={{ color: '#991b1b', display: 'block', marginBottom: '4px' }}>
                               Absentees ({record.absentees?.length || 0})
                             </strong>
                             {record.absentees?.length > 0 ? (
                               <ul style={{ margin: 0, paddingLeft: '1rem', color: '#b91c1c', fontSize: '0.9rem' }}>
-                                {record.absentees.map(s => <li key={s._id}>{s.name} ({s.regNumber})</li>)}
+                                {record.absentees.map(s => <li key={s._id}>{s.name}</li>)}
                               </ul>
                             ) : (
                               <span style={{ fontSize: '0.85rem', color: '#ef4444' }}>None</span>
                             )}
                           </div>
 
-                          {/* Leave */}
                           <div style={{ backgroundColor: '#fef3c7', padding: '8px', borderRadius: '6px' }}>
                             <strong style={{ color: '#92400e', display: 'block', marginBottom: '4px' }}>
                               Leave ({record.leave?.length || 0})
                             </strong>
                             {record.leave?.length > 0 ? (
                               <ul style={{ margin: 0, paddingLeft: '1rem', color: '#b45309', fontSize: '0.9rem' }}>
-                                {record.leave.map(s => <li key={s._id}>{s.name} ({s.regNumber})</li>)}
+                                {record.leave.map(s => <li key={s._id}>{s.name}</li>)}
                               </ul>
                             ) : (
                               <span style={{ fontSize: '0.85rem', color: '#f59e0b' }}>None</span>
@@ -215,6 +228,22 @@ function AttendanceReports() {
                         </div>
                       </div>
                     ))}
+
+                    {/* Batch Analysis Card */}
+                    <div style={{ flex: '0 0 200px', border: '1px solid #d1d5db', borderRadius: '8px', padding: '1rem', backgroundColor: '#1e293b', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+                      <h3 style={{ margin: '0 0 1rem 0', color: '#94a3b8', fontSize: '1rem', textTransform: 'uppercase' }}>Analysis</h3>
+                      
+                      <div style={{ marginBottom: '1rem' }}>
+                        <span style={{ fontSize: '0.9rem', color: '#cbd5e1', display: 'block' }}>Total Absentees</span>
+                        <span style={{ fontSize: '2rem', fontWeight: 'bold', color: '#f87171' }}>{totals.absentees}</span>
+                      </div>
+                      
+                      <div>
+                        <span style={{ fontSize: '0.9rem', color: '#cbd5e1', display: 'block' }}>Total on Leave</span>
+                        <span style={{ fontSize: '2rem', fontWeight: 'bold', color: '#fbbf24' }}>{totals.leave}</span>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               );
