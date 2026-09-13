@@ -6,7 +6,7 @@ exports.getAttendanceRecords = async (req, res) => {
     let query = {};
     
     if (department) {
-      query.department = department;
+      query.department = { $regex: new RegExp(`^${department}$`, 'i') };
     }
     
     if (date) {
@@ -41,7 +41,7 @@ exports.sendAlerts = async (req, res) => {
     endOfDay.setHours(23, 59, 59, 999);
 
     const records = await AttendanceRecord.find({
-      department,
+      department: { $regex: new RegExp(`^${department}$`, 'i') },
       date: { $gte: startOfDay, $lte: endOfDay }
     }).populate('absentees').populate('leave');
 

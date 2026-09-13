@@ -30,7 +30,7 @@ function AttendanceReports() {
       const token = localStorage.getItem('token');
       let url = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/attendance?`;
       
-      if (filterDept) url += `department=${filterDept}&`;
+      if (filterDept) url += `department=${filterDept.toLowerCase()}&`;
       if (filterDate) url += `date=${filterDate}&`;
 
       const res = await axios.get(url, {
@@ -83,12 +83,21 @@ function AttendanceReports() {
   let totalAbsentees = 0;
   let totalLeave = 0;
 
+  const mapYear = (y) => {
+    if (!y) return 'Other';
+    const str = y.toString().toUpperCase().trim();
+    if (str.includes('1') || str === 'I' || str === 'FIRST') return 'I';
+    if (str.includes('2') || str === 'II' || str === 'SECOND') return 'II';
+    if (str.includes('3') || str === 'III' || str === 'THIRD') return 'III';
+    if (str.includes('4') || str === 'IV' || str === 'FOURTH') return 'IV';
+    return 'Other';
+  };
+
   records.forEach(r => {
-    const y = r.year?.toUpperCase();
+    const y = mapYear(r.year);
     if (grouped[y]) {
       grouped[y].push(r);
     } else {
-      // Fallback if somehow year is different
       if (!grouped['Other']) grouped['Other'] = [];
       grouped['Other'].push(r);
     }
