@@ -117,7 +117,7 @@ exports.handleFlowEndpoint = async (req, res) => {
     else if (action === 'data_exchange') {
       
       // Step 1: Initial load of students (INIT)
-      if (screen === 'STUDENT_SELECTION_SCREEN' && data.type === 'fetch_students') {
+      if (screen === 'SELECTION_SCREEN' && data.type === 'fetch_students') {
         const { department, year, section } = data;
         
         // Fetch students from MongoDB
