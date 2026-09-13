@@ -11,7 +11,7 @@ const decryptRequest = (body, privateKeyStr) => {
   const { encrypted_aes_key, encrypted_flow_data, initial_vector } = body;
 
   const privateKey = crypto.createPrivateKey({
-    key: privateKeyStr,
+    key: privateKeyStr.replace(/\\n/g, '\n'),
     format: 'pem',
   });
 
