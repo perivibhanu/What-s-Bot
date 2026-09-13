@@ -180,6 +180,7 @@ function TopicCard({ topic, onUpdate }) {
 // Step 1: Click "Departments" card → see 7 dept tiles
 // Step 2: Click a dept tile → see that dept's upload form
 // Back button → return to dept tiles
+// eslint-disable-next-line no-unused-vars
 function DeptSection({ subDepts, onUpdate }) {
   // null = closed, 'list' = showing 7 tiles, topic_key = showing detail
   const [view, setView] = useState(null);
@@ -457,6 +458,7 @@ function CollegeMedia() {
 
   const introTopic  = topics.find(t => t.topic === 'intro');
   const adminTopic  = topics.find(t => t.topic === 'admin_details');
+  // eslint-disable-next-line no-unused-vars
   const subDepts    = topics.filter(t => t.topic.startsWith('dept_'));
   const otherTopics = topics.filter(t =>
     t.topic !== 'intro' && t.topic !== 'admin_details' && t.topic !== 'dept' && !t.topic.startsWith('dept_')
