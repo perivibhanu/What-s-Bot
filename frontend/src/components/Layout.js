@@ -44,14 +44,12 @@ function Layout({ children }) {
             <Link to="/students" className={`menu-item ${isActive('/students')}`}>
               👥 All Students
             </Link>
-          </div>
-
-          <div className="menu-group">
-            <h4 className="group-title">📚 ACADEMICS</h4>
             <Link to="/attendance" className={`menu-item ${isActive('/attendance')}`}>
               📅 Attendance Reports
             </Link>
           </div>
+
+          {/* Academics section removed as it was empty after moving Attendance Reports */}
 
           <div className="menu-group">
             <h4 className="group-title">📋 ADMISSIONS</h4>
