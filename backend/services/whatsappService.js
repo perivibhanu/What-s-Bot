@@ -332,7 +332,7 @@ class WhatsAppService {
             flow_id: flowId,
             flow_cta: 'Staff Portal',
             flow_action: 'navigate',
-            flow_action_payload: { screen: 'STAFF_MENU_SCREEN' }
+            flow_action_payload: { screen: 'SELECTION_SCREEN' }
           }
         }
       }
