@@ -128,6 +128,9 @@ class ChatService {
             return;
           } else if (payload.reg_number) {
             messageText = payload.reg_number;
+          } else if (payload.flow_token && payload.flow_token.startsWith('attendance_menu')) {
+            // The flow completed successfully. The user already saw the Success screen.
+            return;
           } else {
             // DEBUG ECHO
             await whatsappService.sendTextMessage(from, `🤖 DEBUG: Received Flow Payload but didn't know how to handle it. Payload: ${JSON.stringify(payload)}`);
