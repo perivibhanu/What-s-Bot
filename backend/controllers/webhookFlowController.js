@@ -146,13 +146,19 @@ exports.handleFlowEndpoint = async (req, res) => {
         });
 
         if (students.length === 0) {
+          const totalInDept = await Student.countDocuments({ branch: { $regex: department, $options: 'i' } });
+          const totalInDeptSec = await Student.countDocuments({ 
+            branch: { $regex: department, $options: 'i' },
+            section: { $regex: section.replace('Section ', '').trim(), $options: 'i' }
+          });
+          
           studentChecklist.push({
             id: 'debug',
             title: `DEBUG: dept=${department}, sec=${section}, yr=${year}`
           });
           studentChecklist.push({
             id: 'debug2',
-            title: `Q: ${JSON.stringify(query)}`
+            title: `MATCHES: Dept=${totalInDept}, Dept+Sec=${totalInDeptSec}`
           });
         }
 
