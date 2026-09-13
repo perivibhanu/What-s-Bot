@@ -192,6 +192,6 @@ exports.handleFlowEndpoint = async (req, res) => {
 
   } catch (error) {
     console.error('Flow Webhook Error:', error);
-    return res.status(500).send('Internal Server Error');
+    return res.status(500).send(`Flow Error: ${error.message} \nStack: ${error.stack}`);
   }
 };
