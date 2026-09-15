@@ -83,13 +83,23 @@ function AttendanceReports() {
   let totalAbsentees = 0;
   let totalLeave = 0;
 
-  const mapYear = (y) => {
+  const getBatchFromYear = (y) => {
     if (!y) return 'Other';
     const str = y.toString().toUpperCase().trim();
-    if (str.includes('1') || str === 'I' || str === 'FIRST') return 'I';
-    if (str.includes('2') || str === 'II' || str === 'SECOND') return 'II';
-    if (str.includes('3') || str === 'III' || str === 'THIRD') return 'III';
-    if (str.includes('4') || str === 'IV' || str === 'FOURTH') return 'IV';
+    
+    // 1. Check if user already entered a batch number directly (e.g., "23", "2023")
+    // This matches numbers like 22, 23, 24, 25, 26 or 2022, 2023, etc.
+    const batchMatch = str.match(/(?:20)?(2[0-9])/);
+    if (batchMatch) {
+      return batchMatch[1]; // Returns just '23'
+    }
+
+    // 2. Otherwise, treat it as a Year of Study (1st Year, 2nd Year, etc.)
+    if (str === '1' || str === '1ST' || str === 'I' || str === 'FIRST') return '25';
+    if (str === '2' || str === '2ND' || str === 'II' || str === 'SECOND') return '24';
+    if (str === '3' || str === '3RD' || str === 'III' || str === 'THIRD') return '23';
+    if (str === '4' || str === '4TH' || str === 'IV' || str === 'FOURTH') return '22';
+    
     return 'Other';
   };
 
@@ -97,11 +107,7 @@ function AttendanceReports() {
   const batchTotals = {};
 
   records.forEach(r => {
-    let y = mapYear(r.year);
-    if (y === 'IV') y = '22';
-    else if (y === 'III') y = '23';
-    else if (y === 'II') y = '24';
-    else if (y === 'I') y = '25';
+    let y = getBatchFromYear(r.year);
 
     if (!grouped[y]) grouped[y] = [];
     grouped[y].push(r);
