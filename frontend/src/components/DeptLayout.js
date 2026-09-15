@@ -35,6 +35,9 @@ function DeptLayout({ children }) {
             <Link to="/students" className={`menu-item ${isActive('/students')}`}>
               👥 All Students
             </Link>
+            <Link to="/attendance-reports" className={`menu-item ${isActive('/attendance-reports')}`}>
+              📅 Attendance Reports
+            </Link>
           </div>
 
           <div className="menu-group">
@@ -51,9 +54,6 @@ function DeptLayout({ children }) {
             </Link>
             <Link to="/timetables" className={`menu-item ${isActive('/timetables')}`}>
               🕐 Upload Timetables
-            </Link>
-            <Link to="/attendance-reports" className={`menu-item ${isActive('/attendance-reports')}`}>
-              📅 Attendance Reports
             </Link>
           </div>
 
